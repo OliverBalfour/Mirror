@@ -81,15 +81,10 @@ Deploy to [GitHub Pages](https://oliverbalfour.github.io/Mirror/) via `npm run d
 **Android APK**
 
 1. Start JS server: `npm start`
-2. Run `./gradlew bundleRelease` in the `android` subdirectory. This generates the APK in `android/app/build/outputs/apk/release/app-release.apk`.
-
-**Android installation**
-
-Either copy over APK manually and open, or:
-
-1. Generate APK as above
-2. Connect physical device
-3. `npx react-native run-android --variant=release`
+2. Run `./gradlew bundleRelease` in the `android` subdirectory to generate the JS bundle.
+3. Connect physical device (ensure `adb devices` shows it)
+4. `npx react-native run-android --variant=release` to create the APK and install it to connected device.
+5. The APK is `android/app/build/outputs/apk/release/app-release.apk` (you can copy it to any device now)
 
 **Google Play AAB Bundle**
 
@@ -97,3 +92,9 @@ Either copy over APK manually and open, or:
   - https://reactnative.dev/docs/signed-apk-android#generating-an-upload-key
   - https://developer.android.com/studio/publish/app-signing
 - Then, create a Play Console account ($25 signup) [here](https://play.google.com/apps/publish/signup/) and upload.
+
+## Credits & License
+
+Designed and built by Oliver Balfour. MIT License.
+
+App icon is [Mirror](https://thenounproject.com/term/mirror/340140/) by Lastspark from [The Noun Project](http://thenounproject.com/).
