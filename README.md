@@ -24,9 +24,19 @@ The workflow involves using Expo to manage the development process, so you can u
 
 Evidence based scheduling is incorporated into the Kanban board. You can estimate times and get corrected estimates back. There is a timeline view where you can look at how long it will take you to finish everything on a probability distribution curve (web only).
 
+Web
+
+- Multiple boards use tabs
+
+Mobile
+
+- Multiple boards use [tab-view](https://github.com/satya164/react-native-tab-view) with `swipeEnabled=false`.
+- Each tab contains a [draganddrop-board](https://github.com/bear-junior/react-native-draganddrop-board).
+- The global hamburger menu (at the bottom?) allows changing to the notes section and signing in.
+
 **Possible future features**
 
-- Markdown notes (tree structure inspired by Cherrytree) using [this React Native renderer](https://github.com/mientjan/react-native-markdown-renderer).
+- Markdown notes (tree structure inspired by Cherrytree) using [this React Native renderer](https://github.com/mientjan/react-native-markdown-renderer) and [this Markdown editor](https://github.com/outline/rich-markdown-editor) or [this rich text editor](https://github.com/wxik/react-native-rich-editor).
 - Schedule/calender (difficult to design).
 - Column powerup system. Each column can have powerups enabled eg for WIP limiting, EBS time estimate (eg only for todo column), automatic archival, automatic import from eg GitHub issues.
 - Card plugin system. EBS, priority, links, markdown support fit in this category.

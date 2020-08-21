@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import { Button } from 'react-native-paper';
 
 const styles = StyleSheet.create({
-  button: {
+  button: Platform.OS === "web" ? {
     cursor: "pointer"
-  },
+  } : {},
 });
 
 export default props => (

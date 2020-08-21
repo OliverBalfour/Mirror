@@ -4,6 +4,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import Button from './comps/button';
+import TabView from './comps/tabview';
 
 const Application = () => (
   <PaperProvider>
@@ -12,6 +13,7 @@ const Application = () => (
       <StatusBar style="auto" />
       <Button>Press</Button>
     </View>
+    <TabView />
   </PaperProvider>
 );
 
