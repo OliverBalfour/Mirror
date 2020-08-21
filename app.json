@@ -1,0 +1,12 @@
+{
+  "name": "mirror",
+  "displayName": "mirror",
+  "expo": {
+    "name": "mirror",
+    "slug": "mirror",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
