@@ -37,11 +37,13 @@ Hot reloading via create-react-app. React and redux devtools (support for React 
 
 TODO: install [remote Redux devtools](https://github.com/zalmoxisus/remote-redux-devtools).
 
-You may need to set up the React Native environment via the [setup guide](https://reactnative.dev/docs/environment-setup)
+You may need to set up the React Native environment via the [setup guide](https://reactnative.dev/docs/environment-setup). Do not install Watchman or React Native CLI (because you use `npx`) if you can.
 
-Web: `npm run web`.
+Web: `npm run web`. You can also scan the QR code that comes up in the terminal on the Expo app for hot reloading on both platforms.
 
 Android device: enable USB debugging, make sure it's connected via `adb devices`, then `npm run android`. If you don't have ADB it should be in Android Studio (which is not needed otherwise). For React Devtools run `react-devtools`.
+
+Android device via Expo: download Expo app, make sure `adb` daemon is running via typing the `adb` command, then scan the QR code in the terminal when you run `npm run web`.
 
 (Aside: to initialise this project `npx create-react-native-app appname` was used.)
 
