@@ -1,0 +1,1 @@
+"serviceWorker"in navigator&&window.addEventListener("load",(function(){navigator.serviceWorker.register("/Mirror/expo-service-worker.js",{scope:"/Mirror/"}).then((function(r){})).catch((function(r){console.info("Failed to register service-worker",r)}))}));

@@ -1,0 +1,19 @@
+{
+  "files": {
+    "app.js": "/Mirror/static/js/app.35a7a242.chunk.js",
+    "app.js.map": "/Mirror/static/js/app.35a7a242.chunk.js.map",
+    "runtime~app.js": "/Mirror/static/js/runtime~app.734cff29.js",
+    "runtime~app.js.map": "/Mirror/static/js/runtime~app.734cff29.js.map",
+    "static/js/2.a8744514.chunk.js": "/Mirror/static/js/2.a8744514.chunk.js",
+    "static/js/2.a8744514.chunk.js.map": "/Mirror/static/js/2.a8744514.chunk.js.map",
+    "index.html": "/Mirror/index.html",
+    "manifest.json": "/Mirror/manifest.json",
+    "serve.json": "/Mirror/serve.json",
+    "static/js/2.a8744514.chunk.js.LICENSE.txt": "/Mirror/static/js/2.a8744514.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime~app.734cff29.js",
+    "static/js/2.a8744514.chunk.js",
+    "static/js/app.35a7a242.chunk.js"
+  ]
+}
