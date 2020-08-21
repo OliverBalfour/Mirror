@@ -24,10 +24,6 @@ The workflow involves using Expo to manage the build process, so you can use `np
 
 Evidence based scheduling is incorporated into the Kanban board. You can estimate times and get corrected estimates back. There is a timeline view where you can look at how long it will take you to finish everything on a probability distribution curve (web only).
 
-**Workflow**
-
-Hot reloading via create-react-app. React and redux devtools (support for React Native Web?). Use app for project management to iron out UX issues during development.
-
 **Installation**
 
 1. `git clone https://github.com/OliverBalfour/Mirror`
@@ -39,7 +35,7 @@ TODO: install [remote Redux devtools](https://github.com/zalmoxisus/remote-redux
 
 You may need to set up the React Native environment via the [setup guide](https://reactnative.dev/docs/environment-setup). Do not install Watchman or React Native CLI (because you use `npx`) if you can.
 
-Web: `npm run web`. You can also scan the QR code that comes up in the terminal on the Expo app for hot reloading on both platforms.
+Web: `npm run web`. You can also scan the QR code that comes up in the terminal on the Expo app for hot reloading on both platforms. Deploy to [GitHub Pages](https://oliverbalfour.github.io/Mirror/) via `npm run deploy` to Pages.
 
 Android device: enable USB debugging, make sure it's connected via `adb devices`, then `npm run android`. If you don't have ADB it should be in Android Studio (which is not needed otherwise). For React Devtools run `react-devtools`.
 
@@ -47,7 +43,7 @@ Android device via Expo: download Expo app, make sure `adb` daemon is running vi
 
 (Aside: to initialise this project `npx create-react-native-app appname` was used.)
 
-The plan is for distribution via an APK, possibly F-Droid and the Play Store, and the web app via [GitHub Pages](https://oliverbalfour.github.io/Mirror/). You can link to your Google account for Drive synchronisation.
+The plan is for distribution via an APK, possibly F-Droid and the Play Store, and the web app via  (run `npm run deploy`). You can link to your Google account for Drive synchronisation.
 
 **Possible future features**
 
@@ -56,23 +52,10 @@ The plan is for distribution via an APK, possibly F-Droid and the Play Store, an
 - Column powerup system. Each column can have powerups enabled eg for WIP limiting, EBS time estimate (eg only for todo column), automatic archival, automatic import from eg GitHub issues.
 - Card plugin system. EBS, priority, links, markdown support fit in this category.
 
-**Motivation**
-
-This project looks good on a portfolio and is useful personally. The dependence on less well known technologies means more opportunity for open source contribution, which is good experience and resume material.
-
-This is also good practice for designing and developing a product start to finish, and may have commercial value later.
-
-**Timeline**
+**Roadmap**
 
 Phase one is the app for web only (using React-Native-Web and render props in platform specific code for easy porting). It will not have synchronisation, and will only have basic Kanban boards and EBS.
 
 Phase two is synchonisation with Google Drive. This will make heavy use of Redux, and will mean multiple computers can have the same information.
 
 Phase three is an Android app. This will require substantial changes to the project configuration and to the styles, and the Kanban board frontend will need to be substituted.
-
-Folders
-
-Mirror: standard create react app that works for web
-mirror2: react native template including web that does work for android but doesn't work for web
-test2: CRA with react-native-web that works for web
-AwesomeProject: standard react native template without web by default and without the benefits of CRA. Seems to work on Android.
