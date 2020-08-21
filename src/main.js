@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
-import Button from './comps/button.js';
+import Button from './comps/button';
 
 const Application = () => (
   <PaperProvider>
