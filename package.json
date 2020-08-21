@@ -4,8 +4,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "web": "expo start --web",
-    "start": "react-native start",
-    "test": "jest"
+    "start": "react-native start"
   },
   "dependencies": {
     "expo": "~38.0.9",
@@ -22,13 +21,7 @@
     "react-native-web": "~0.11.7"
   },
   "devDependencies": {
-    "@babel/core": "~7.9.0",
-    "babel-jest": "~25.2.6",
-    "jest": "~25.2.6",
-    "react-test-renderer": "~16.11.0"
-  },
-  "jest": {
-    "preset": "react-native"
+    "@babel/core": "~7.9.0"
   },
   "private": true
 }
