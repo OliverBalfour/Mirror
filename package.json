@@ -10,6 +10,7 @@
     "deploy": "gh-pages -d web-build"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.0",
     "expo": "~38.0.9",
     "expo-splash-screen": "^0.5.0",
     "expo-status-bar": "^1.0.0",

@@ -1,14 +1,10 @@
 
-import React from 'react';
-import { StyleSheet, Platform } from 'react-native';
-import { Button } from 'react-native-paper';
+import * as React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 
-const styles = StyleSheet.create({
-  button: Platform.OS === "web" ? {
-    cursor: "pointer"
-  } : {},
-});
+const useStyles = makeStyles(theme => ({ button: {} }));
 
 export default props => (
-  <Button style={styles.button} mode='contained' {...props}></Button>
+  <Button className={useStyles().button} variant="contained" color="primary" {...props} />
 );
