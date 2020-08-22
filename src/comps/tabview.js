@@ -1,78 +1,41 @@
+
+/**
+ * TabView component
+ *
+ * <TabView
+ *   tabs={["one", "two", "three"]}
+ *   render={i => (<SomeComponent index={i} />)}
+ * />
+ *
+ */
+
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
+import { AppBar, Tabs, Tab, Typography, Box } from '@material-ui/core';
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
+const TabPanel = ({ show, children }) => (
+  <div hidden={!show}>
+    {show && children}
+  </div>
+);
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-  },
-}));
-
-export default function SimpleTabs() {
-  const classes = useStyles();
+export default ({ tabs, render }) => {
   const [value, setValue] = React.useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const handleChange = (event, newValue) => setValue(newValue);
 
   return (
-    <div className={classes.root}>
+    <div style={{ flex: 1 }}>
       <AppBar position="static">
-        <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-          <Tab label="Item One" {...a11yProps(0)} />
-          <Tab label="Item Two" {...a11yProps(1)} />
-          <Tab label="Item Three" {...a11yProps(2)} />
+        <Tabs value={value} onChange={handleChange}>
+          {tabs.map(tab => (
+            <Tab label={tab} key={tab} />
+          ))}
         </Tabs>
       </AppBar>
-      <TabPanel value={value} index={0}>
-        Item One
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        Item Two
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        Item Three
-      </TabPanel>
+      {tabs.map((tab, i) => (
+        <TabPanel show={value === i}>
+          {value === i && render(i)}
+        </TabPanel>
+      ))}
     </div>
   );
 }
