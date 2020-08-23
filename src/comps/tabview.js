@@ -24,15 +24,16 @@ export default ({ tabs, render }) => {
 
   return (
     <div style={{ flex: 1 }}>
-      <AppBar position="static">
-        <Tabs value={value} onChange={handleChange}>
+      <AppBar position="static" style={{ backgroundColor: "white" }}>
+        <Tabs value={value} onChange={handleChange}
+          indicatorColor="primary" textColor="primary">
           {tabs.map(tab => (
             <Tab label={tab} key={tab} />
           ))}
         </Tabs>
       </AppBar>
       {tabs.map((tab, i) => (
-        <TabPanel show={value === i}>
+        <TabPanel show={value === i} key={tab}>
           {value === i && render(i)}
         </TabPanel>
       ))}

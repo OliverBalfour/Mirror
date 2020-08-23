@@ -20,6 +20,11 @@ Most of the source code is shared, using the render props design pattern when th
 
 The workflow involves using Expo to manage the development process, so you can use `npm run web` and scan a QR code in the Expo app to run a hot-reloading Android version. The release Android version does not use Expo to build. The React Native and remote Redux devtools are used, and the app is used to plan its own development, ironing out usability issues.
 
+Performance ideas:
+
+- Use `React.memo()` HOC (`export default React.memo(MyComponent)`) for pure component memoisation.
+- Render one screen at a time, or multiple if transitions are more annoying.
+
 **Design**
 
 Evidence based scheduling is incorporated into the Kanban board. You can estimate times and get corrected estimates back. There is a timeline view where you can look at how long it will take you to finish everything on a probability distribution curve (web only).
@@ -36,10 +41,25 @@ Mobile
 
 **Possible future features**
 
-- Markdown notes (tree structure inspired by Cherrytree) using [this React Native renderer](https://github.com/mientjan/react-native-markdown-renderer) and [this Markdown editor](https://github.com/outline/rich-markdown-editor) or [this rich text editor](https://github.com/wxik/react-native-rich-editor).
+- Tree of Markdown notes (cf Cherrytree)
+  - [This renderer](https://github.com/mientjan/react-native-markdown-renderer) and [this editor](https://github.com/outline/rich-markdown-editor) or [this editor](https://github.com/wxik/react-native-rich-editor)
+
 - Schedule/calender (difficult to design).
+
 - Column powerup system. Each column can have powerups enabled eg for WIP limiting, EBS time estimate (eg only for todo column), automatic archival, automatic import from eg GitHub issues.
-- Card plugin system. EBS, priority, links, markdown support fit in this category.
+  - EBS time estimate for whole column (eg for todo preset)
+  - WIP limiting (display "a/b" where a is no cards, b is limit; make red if over)
+  - Automatic archival
+  - Automatic import from GitHub issues
+
+- Card powerup system. Each card can have certain extra features added to it.
+  - EBS estimate
+  - Priority
+  - Due date/time
+  - Links
+  - Markdown/plaintext
+  - Link to another board, with embedded progress bar (eg have board Main and board Mirror Project; you can have a card in Main that references Mirror Project to manage subprojects at a high level of abstraction)
+  - Stow for period of time (like a reminder); useful to keep a record of something in the future without causing clutter (eg holidays todo list).
 
 **Roadmap**
 
