@@ -36,10 +36,25 @@ Mobile
 
 **Possible future features**
 
-- Markdown notes (tree structure inspired by Cherrytree) using [this React Native renderer](https://github.com/mientjan/react-native-markdown-renderer) and [this Markdown editor](https://github.com/outline/rich-markdown-editor) or [this rich text editor](https://github.com/wxik/react-native-rich-editor).
+- Tree of Markdown notes (cf Cherrytree)
+  - [This renderer](https://github.com/mientjan/react-native-markdown-renderer) and [this editor](https://github.com/outline/rich-markdown-editor) or [this editor](https://github.com/wxik/react-native-rich-editor)
+
 - Schedule/calender (difficult to design).
+
 - Column powerup system. Each column can have powerups enabled eg for WIP limiting, EBS time estimate (eg only for todo column), automatic archival, automatic import from eg GitHub issues.
-- Card plugin system. EBS, priority, links, markdown support fit in this category.
+  - EBS time estimate for whole column (eg for todo preset)
+  - WIP limiting (display "a/b" where a is no cards, b is limit; make red if over)
+  - Automatic archival
+  - Automatic import from GitHub issues
+
+- Card powerup system. Each card can have certain extra features added to it.
+  - EBS estimate
+  - Priority
+  - Due date/time
+  - Links
+  - Markdown/plaintext
+  - Link to another board, with embedded progress bar (eg have board Main and board Mirror Project; you can have a card in Main that references Mirror Project to manage subprojects at a high level of abstraction)
+  - Stow for period of time (like a reminder); useful to keep a record of something in the future without causing clutter (eg holidays todo list).
 
 **Roadmap**
 

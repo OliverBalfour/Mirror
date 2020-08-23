@@ -11,9 +11,19 @@
 
 import * as React from 'react';
 import { Dimensions } from 'react-native';
-import { TabView } from 'react-native-tab-view';
+import { TabView, TabBar } from 'react-native-tab-view';
 
 const initialLayout = { width: Dimensions.get('window').width };
+
+const renderTabBar = props => (
+  <TabBar
+    {...props}
+    indicatorStyle={{ backgroundColor: '#3f51b5' }}
+    style={{ backgroundColor: 'white' }}
+    activeColor="#3f51b5"
+    inactiveColor="#777"
+  />
+);
 
 export default ({ tabs, render }) => {
   const [index, setIndex] = React.useState(0);
@@ -26,6 +36,7 @@ export default ({ tabs, render }) => {
       onIndexChange={setIndex}
       initialLayout={initialLayout}
       swipeEnabled={false}
+      renderTabBar={renderTabBar}
     />
   );
 }
