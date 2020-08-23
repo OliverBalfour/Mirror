@@ -5,10 +5,8 @@ import { Platform, Dimensions, StyleSheet, Text, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import Constants from 'expo-constants';
 
-import Button from './comps/button';
-import TabView from './comps/tabview';
-import BoardView from './comps/boardview';
-import MenuBar from './menubar';
+import { Button, MenuBar } from './components';
+import Kanban from './kanban';
 
 setStatusBarStyle("dark");
 
@@ -57,9 +55,7 @@ export default class Application extends React.Component {
           */}
 
           { this.state.active === 0 && (
-            <TabView
-              tabs={["one", "two"]}
-              render={i => (<BoardView index={i} />)} />
+            <Kanban />
           )}
 
           <MenuBar active={this.state.active} setActive={x => this.setState({ active: x })} />
