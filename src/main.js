@@ -3,10 +3,12 @@ import { setStatusBarStyle } from 'expo-status-bar';
 import React from 'react';
 import { Platform, Dimensions, StyleSheet, Text, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
+import { Provider } from 'react-redux';
 import Constants from 'expo-constants';
 
 import { Button, MenuBar } from './components';
 import Kanban from './kanban';
+import store from './store';
 
 setStatusBarStyle("dark");
 
@@ -40,27 +42,32 @@ export default class Application extends React.Component {
       width: "100%"
     }
 
+    // Note: PaperProvider is not needed for web
+    // TODO: create index.native.js that uses PaperProvider and handles status bar height
+    // and rename this to app.js
     return (
       <PaperProvider>
-        <View style={style}>
+        <Provider store={store}>
+          <View style={style}>
 
-          {/*
-            This approach renders only the active screen, and leads to lag when changing screens.
-            Another approach is to load the active screen, then using componentDidMount load all
-            the others inside the following snippet:
-            <View style={active ? {height: "100%", width: "100%"} : {
-              width: 0,
-              height: 0,
-            }}> ... </View>
-          */}
+            {/*
+              This approach renders only the active screen, and leads to lag when changing screens.
+              Another approach is to load the active screen, then using componentDidMount load all
+              the others inside the following snippet:
+              <View style={active ? {height: "100%", width: "100%"} : {
+                width: 0,
+                height: 0,
+              }}> ... </View>
+            */}
 
-          { this.state.active === 0 && (
-            <Kanban />
-          )}
+            { this.state.active === 0 && (
+              <Kanban />
+            )}
 
-          <MenuBar active={this.state.active} setActive={x => this.setState({ active: x })} />
+            <MenuBar active={this.state.active} setActive={x => this.setState({ active: x })} />
 
-        </View>
+          </View>
+        </Provider>
       </PaperProvider>
     );
   }
