@@ -6,6 +6,6 @@ import BoardView from './boardview';
 export default () => (
   <TabView
     tabs={["one", "two"]}
-    render={i => (<BoardView index={i} />)}
+    render={i => (<BoardView tab={i} />)}
   />
 );
