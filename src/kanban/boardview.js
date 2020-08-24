@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
   column: {
     background: '#DFEEEE',
     padding: grid,
-    paddingBottom: 0,
+    paddingBottom: 24,
     width: cardWidth,
     border: '1px solid #CCDCDC',
     borderRadius: 5,
@@ -40,9 +40,9 @@ const useStyles = makeStyles(theme => ({
     // there is a bug where moving cards to the tallest column leads to a scrollbar flashing up
     // and we don't want the scrollbar to take up horizontal space and force the cards to reflow
 
-    // maxHeight: 'calc(100vh - 140px)',
-    // overflowY: 'auto',
-    // overflowX: 'hidden'
+    maxHeight: 'calc(100vh - 160px)',
+    overflowY: 'auto',
+    overflowX: 'hidden'
   },
   draggingOverColumn: {
     background: '#DAEBEB',

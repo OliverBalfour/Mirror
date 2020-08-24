@@ -8,29 +8,17 @@
  */
 
 import React from 'react';
-import { makeStyles, AppBar, Toolbar, IconButton, Tabs, Tab } from '@material-ui/core';
+import { AppBar, Toolbar, IconButton, Tabs, Tab } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import NotesIcon from '@material-ui/icons/Notes';
 
-const useStyles = makeStyles((theme) => ({
-  appBar: {
-    top: 'auto',
-    bottom: 0,
-  },
-  grow: {
-    flexGrow: 1,
-  }
-}));
-
 export default ({ active, setActive }) => {
-  const classes = useStyles();
-
   return (
     <React.Fragment>
-      <AppBar position="fixed" color="primary" className={classes.appBar}>
+      <AppBar color="primary" style={{ top: 'auto', bottom: 0 }}>
         <Toolbar style={{ minHeight: 0 }}>
           <IconButton edge="start" color="inherit" onClick={() => console.log("open menu")}>
             <MenuIcon />
@@ -42,7 +30,7 @@ export default ({ active, setActive }) => {
             <Tab label={<div><DeveloperBoardIcon style={{verticalAlign: 'middle'}} /> Board</div>}  />
             <Tab label={<div><NotesIcon style={{verticalAlign: 'middle'}} /> Notes</div>}  />
           </Tabs>
-          <div className={classes.grow} />
+          <div style={{ flexGrow: 1 }} />
           <IconButton edge="end" color="inherit">
             <MoreIcon />
           </IconButton>

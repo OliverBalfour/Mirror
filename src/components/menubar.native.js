@@ -13,10 +13,6 @@ import { StyleSheet } from 'react-native';
 const Action = Appbar.Action;
 
 const styles = StyleSheet.create({
-  bottom: {
-    position: 'absolute',
-    left: 0, right: 0, bottom: 0
-  },
   label: {
     color: 'white',
     fontSize: 16
@@ -24,7 +20,7 @@ const styles = StyleSheet.create({
 });
 
 export default ({ active, setActive }) => (
-  <Appbar style={styles.bottom}>
+  <Appbar>
     <Action onPress={() => console.log("open menu")}   icon='menu' />
 
     <Action onPress={() => setActive(0)} icon='developer-board' />
