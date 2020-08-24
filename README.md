@@ -61,6 +61,8 @@ Mobile
   - Link to another board, with embedded progress bar (eg have board Main and board Mirror Project; you can have a card in Main that references Mirror Project to manage subprojects at a high level of abstraction)
   - Stow for period of time (like a reminder); useful to keep a record of something in the future without causing clutter (eg holidays todo list).
 
+- Swimlanes in Kanban board (show side-by-side in mobile?)
+
 **Roadmap**
 
 Phase one is mainly for the web, however the Android version will build but not have all the features. It will use render props in platform specific code for easy porting. It will not have synchronisation, and will only have basic Kanban boards and EBS for web only.

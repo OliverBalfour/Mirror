@@ -41,8 +41,7 @@ const useStyles = makeStyles(theme => ({
     // and we don't want the scrollbar to take up horizontal space and force the cards to reflow
 
     maxHeight: 'calc(100vh - 160px)',
-    overflowY: 'auto',
-    overflowX: 'hidden'
+    overflow: 'hidden'
   },
   draggingOverColumn: {
     background: '#DAEBEB',
@@ -111,7 +110,7 @@ const Column = ({ styles, col }) => {
   console.log(col)
   const { id, items, name } = col;
   return (
-    <Droppable droppableId={id}>
+    <Droppable droppableId={id} style={{ flexGrow: 1 }}>
       {(provided, snapshot) => (
         <div ref={provided.innerRef}
           className={classNames(
@@ -119,7 +118,11 @@ const Column = ({ styles, col }) => {
             {[styles.draggingOverColumn]: snapshot.isDraggingOver }
           )}>
           <ColumnHeader styles={styles} name={name} />
-          {items.map((card, index) => <Card card={card} styles={styles} index={index} key={card.id} />)}
+          <div style={{ width: cardWidth, overflowY: 'auto', overflowX: 'hidden', height: "100%" }}>
+            <div style={{ width: cardWidth }}> {/* could -20 to avoid clipping cards */}
+              {items.map((card, index) => <Card card={card} styles={styles} index={index} key={card.id} />)}
+            </div>
+          </div>
           {provided.placeholder}
         </div>
       )}
