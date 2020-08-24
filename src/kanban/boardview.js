@@ -3,9 +3,6 @@
  * BoardView component
  *
  * <BoardView
- *   index={1}
- *   boards={[ exampleBoardObject ]}
- *   render={i => (<SomeComponent index={i} />)}
  * />
  *
  */
@@ -14,36 +11,35 @@ import * as React from 'react';
 import { View, Text } from 'react-native';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
-// fake data generator
-const getItems = (count, offset = 0) =>
-  Array.from({ length: count }, (v, k) => k).map(k => ({
-    id: `item-${k + offset}`,
-    content: `item ${k + offset}`
-  }));
+// random ID: base64 encoded 8 char string of random number and current time
+const generateID = () => Math.random().toString().substring(15);
 
-// a little function to help us with reordering the result
-const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-  return result;
-};
-
-/**
- * Moves an item from one list to another list.
- */
-const move = (source, destination, droppableSource, droppableDestination) => {
-  const sourceClone = Array.from(source);
-  const destClone = Array.from(destination);
-  const [removed] = sourceClone.splice(droppableSource.index, 1);
-
-  destClone.splice(droppableDestination.index, 0, removed);
-
-  const result = {};
-  result[droppableSource.droppableId] = sourceClone;
-  result[droppableDestination.droppableId] = destClone;
-
-  return result;
+// generate { cards, columns } where each column has colnum[i] cards
+// both of these are objects where the keys are unique IDs
+// cards are { id, content } structs
+// todo: make them arrays containing their IDs and write selectors instead (once redux is up and running)
+// columns are { id, items: [ id ] } structs
+// Example: {
+//   cards: { "a": { id: "a", content: "Item 1" } },
+//   columns: { "b": { id: "b", items: ["a"] } }
+// }
+const dummyColumns = colnums => {
+  let numcards = colnums.reduce((a, b) => a + b, 0);
+  let cards = {};
+  let cardIds = [];
+  for (let i = 0; i < numcards; i++) {
+    let id = (i+1).toString() + "-" + generateID();
+    cards[id] = { id, content: `Item ${i+1}` };
+    cardIds.push(id);
+  }
+  let columns = {};
+  for (let i = 0, cnt = 0; i < colnums.length; i++) {
+    let items = cardIds.slice(cnt, cnt + colnums[i]);
+    let id = (i + 1).toString() + "-" + generateID();
+    columns[id] = { id, items };
+    cnt += colnums[i];
+  }
+  return { cards, columns };
 };
 
 const grid = 8;
@@ -70,122 +66,79 @@ const getListStyle = isDraggingOver => ({
 export default class App extends React.Component {
   constructor (props) {
     super(props);
+    const { cards, columns } = dummyColumns([10,5]);
     this.state = {
-      items: getItems(10),
-      selected: getItems(5, 10)
+      cards,
+      columns
     };
-    /**
-     * A semi-generic way to handle multiple lists. Matches
-     * the IDs of the droppable container to the names of the
-     * source arrays stored in the state.
-     */
-    this.id2List = {
-      droppable: 'items',
-      droppable2: 'selected'
-    };
-    this.getList = this.getList.bind(this);
-    this.onDragEnd = this.onDragEnd.bind(this);
   }
-
-  getList (id) { return this.state[this.id2List[id]]; }
 
   onDragEnd (result) {
     const { source, destination } = result;
+    const [src, dst] = [source, destination];
 
     // dropped outside the list
-    if (!destination) return;
+    if (!dst) return;
 
-    if (source.droppableId === destination.droppableId) {
-      const items = reorder(
-        this.getList(source.droppableId),
-        source.index,
-        destination.index
-      );
+    if (src.droppableId === dst.droppableId) {
+      // reorder an item in the same list
+      let newitems = Array.from(this.state.columns[src.droppableId].items);
+      const [removed] = newitems.splice(src.index, 1);
+      newitems.splice(dst.index, 0, removed);
 
-      let state = { items };
-
-      if (source.droppableId === 'droppable2') {
-        state = { selected: items };
-      }
-
-      this.setState(state);
+      this.setState({columns: {
+        ... this.state.columns,
+        [src.droppableId]: { id: src.droppableId, items: newitems }
+      }});
     } else {
-      const result = move(
-        this.getList(source.droppableId),
-        this.getList(destination.droppableId),
-        source,
-        destination
-      );
+      // move item between lists (preserves contents of both lists otherwise)
+      const srcCopy = Array.from(this.state.columns[src.droppableId].items);
+      const dstCopy = Array.from(this.state.columns[dst.droppableId].items);
+      const [removed] = srcCopy.splice(src.index, 1);
+      dstCopy.splice(dst.index, 0, removed);
 
-      this.setState({
-        items: result.droppable,
-        selected: result.droppable2
-      });
+      this.setState({columns: {
+        ... this.state.columns,
+        [src.droppableId]: { id: src.droppableId, items: srcCopy },
+        [dst.droppableId]: { id: dst.droppableId, items: dstCopy }
+      }});
     }
   };
 
-  // Normally you would want to split things out into separate components.
-  // But in this example everything is just done in one place for simplicity
   render() {
     return (
-      <View style={{ display: "flex", justifyContent: "space-between" }}>
-        <DragDropContext onDragEnd={(res) => this.onDragEnd(res)}>
-          <Droppable droppableId="droppable">
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                style={getListStyle(snapshot.isDraggingOver)}>
-                {this.state.items.map((item, index) => (
-                  <Draggable
-                    key={item.id}
-                    draggableId={item.id}
-                    index={index}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={getItemStyle(
-                          snapshot.isDragging,
-                          provided.draggableProps.style
-                        )}>
-                        {item.content}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-          <Droppable droppableId="droppable2">
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                style={getListStyle(snapshot.isDraggingOver)}>
-                {this.state.selected.map((item, index) => (
-                  <Draggable
-                    key={item.id}
-                    draggableId={item.id}
-                    index={index}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={getItemStyle(
-                          snapshot.isDragging,
-                          provided.draggableProps.style
-                        )}>
-                        {item.content}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
+      <View>
+        <DragDropContext onDragEnd={res => this.onDragEnd(res)}>
+          {Object.values(this.state.columns).map(({ id, items }) => (
+            <Droppable droppableId={id} key={id}>
+              {(provided, snapshot) => (
+                <div
+                  ref={provided.innerRef}
+                  style={getListStyle(snapshot.isDraggingOver)}>
+                  {items.map((id, index) => (
+                    <Draggable
+                      key={id}
+                      draggableId={id}
+                      index={index}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={getItemStyle(
+                            snapshot.isDragging,
+                            provided.draggableProps.style
+                          )}>
+                          {this.state.cards[id].content}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          ))}
         </DragDropContext>
       </View>
     );
