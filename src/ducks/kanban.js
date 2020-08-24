@@ -33,8 +33,7 @@ const indexFromID = (list, id) => list.map(item => item.id === id).indexOf(true)
 export const getColumnsInTab = tab => state =>
   state.tabs[tab].columns.map(_getColByID(state))
     .map(col => ({
-      id: col.id,
-      items: col.items.map(_getCardByID(state))
+      ...col, items: col.items.map(_getCardByID(state))
     }));
 
 // Reducers

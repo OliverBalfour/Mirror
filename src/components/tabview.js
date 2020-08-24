@@ -24,7 +24,10 @@ export default ({ tabs, render }) => {
 
   return (
     <div style={{ flex: 1 }}>
-      <AppBar position="static" style={{ backgroundColor: "white" }}>
+      <AppBar position="static" style={{
+          backgroundColor: "white",
+          zIndex: 2, position: 'relative'
+        }}>
         <Tabs value={value} onChange={handleChange}
           indicatorColor="primary" textColor="primary">
           {tabs.map(tab => (

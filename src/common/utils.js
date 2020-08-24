@@ -23,7 +23,7 @@ export const dummyCols = colnums => {
   for (let i = 0, cnt = 0; i < colnums.length; i++) {
     let items = cards.slice(cnt, cnt + colnums[i]).map(card => card.id);
     let id = (i + 1).toString() + "-" + generateID();
-    columns.push({ id, items });
+    columns.push({ id, items, name: `Column (${id})` });
     cnt += colnums[i];
   }
   return { cards, columns };
@@ -32,10 +32,10 @@ export const dummyCols = colnums => {
 export const dummyState = () => {
   let initial = {
     tabs: [{ name: "Main" }, { name: "Secondary" }],
-    ...dummyCols([8,5,6])
+    ...dummyCols([12,9,6,8,10])
   };
   const colIDs = initial.columns.map(col => col.id);
-  initial.tabs[0].columns = [colIDs[0]];
-  initial.tabs[1].columns = [colIDs[1], colIDs[2]];
+  initial.tabs[0].columns = [colIDs[0], colIDs[1], colIDs[2]];
+  initial.tabs[1].columns = [colIDs[3], colIDs[4]];
   return initial;
 }
