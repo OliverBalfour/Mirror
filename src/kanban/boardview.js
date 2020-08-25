@@ -18,7 +18,7 @@ import classNames from 'classnames';
 import { IconButton, Chip, TextField, Button } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
-import { PopoverMenu } from '../components';
+import { PopoverMenu, ConfirmDialog, PromptDialog } from '../components';
 
 const grid = 8;
 const cardWidth = 350;
@@ -187,9 +187,18 @@ const EditingCard = ({ value, setValue, add }) => {
 // header name, add button, chips for each addon (WIP limit, EBS time estimate, etc), menu button
 const ColumnHeader = ({ styles, col, add, menu }) => {
   const dispatch = useDispatch();
-  // TODO: confirm dialog for deleting column
-  const deleteColumn = () => dispatch(duck.deleteColumn(col.id));
-  const renameColumn = () => console.log("TODO: renameColumn");
+
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const confirmRespond = res => setConfirmOpen(false) ||
+    res === true && dispatch(duck.deleteColumn(col.id));
+  const deleteColumn = () => setConfirmOpen(true);
+
+  const [promptOpen, setPromptOpen] = React.useState(false);
+  const promptRespond = res => setPromptOpen(false) ||
+    typeof res === "string" && res.length &&
+      dispatch(duck.renameColumn({ colID: col.id, name: res }));
+  const renameColumn = () => setPromptOpen(true);
+
   return (
     <div>
       <div className={styles.columnHeaderContainer}>
@@ -212,6 +221,12 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
           </PopoverMenu>
         </div>
       </div>
+      <hr className={styles.columnHeaderRule} />
+      <ConfirmDialog open={confirmOpen} respond={confirmRespond}
+        title="Delete this column?" subtitle="Don't worry, this action can be undone." />
+      <PromptDialog open={promptOpen} respond={promptRespond}
+        title={`Rename column "${col.name}"`} subtitle="Don't worry, this action can be undone."
+        label="Name" />
       <hr className={styles.columnHeaderRule} />
     </div>
   );

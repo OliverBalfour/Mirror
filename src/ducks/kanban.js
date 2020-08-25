@@ -14,15 +14,15 @@ import { dummyState, generateID } from '../common/utils';
 
 export const transferCard = createAction('kanban/TRANSFER_CARD');
 export const reorderCard = createAction('kanban/REORDER_CARD');
-export const addCard = createAction('kanban/ADD_CARD');
+export const addCard = createAction('kanban/ADD_CARD'); // takes { content, colID }
 
 export const moveCard = (srcColID, dstColID, srcIndex, dstIndex) =>
   srcColID === dstColID
     ? reorderCard({ colID: srcColID, srcIndex, dstIndex })
     : transferCard({ srcColID, dstColID, srcIndex, dstIndex });
 
-// takes string column ID
-export const deleteColumn = createAction('kanban/DELETE_COLUMN');
+export const deleteColumn = createAction('kanban/DELETE_COLUMN'); // takes string column ID
+export const renameColumn = createAction('kanban/RENAME_COLUMN'); // takes { colID, name }
 
 // Selectors
 
@@ -78,7 +78,10 @@ const reducer = createReducer(initialState, {
     s.columns[colIdx].items.forEach(deleteByID(s.cards));
     s.tabs.forEach(tab => deleteInList(tab.columns, a.payload));
     deleteByID(s.columns)(a.payload);
-  }
+  },
+  [renameColumn]: (s, a) => {
+    s.columns[indexFromID(s.columns, a.payload.colID)].name = a.payload.name;
+  },
 });
 
 export default reducer;
