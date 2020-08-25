@@ -97,7 +97,7 @@ export default ({ tab }) => {
 
   // TODO: is there a way to memoise these higher order selectors?
   // TODO: how do we deal with .boards namespace being only needed part of the time
-  const columns = useSelector(state => duck.getColumnsInTab(tab)(state.boards));
+  const columns = useSelector(state => duck.getColumnsInTab(tab)(state.boards.present));
 
   // dispatch move card action
   const onDragEnd = res => res.destination ? dispatch(duck.moveCard(

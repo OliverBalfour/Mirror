@@ -8,6 +8,7 @@
  */
 
 import { createReducer, createAction, createSelector } from '@reduxjs/toolkit';
+import undoable from 'redux-undo';
 import { dummyState, generateID } from '../common/utils';
 
 // Action creators
@@ -88,4 +89,4 @@ const reducer = createReducer(initialState, {
   }
 });
 
-export default reducer;
+export default undoable(reducer);

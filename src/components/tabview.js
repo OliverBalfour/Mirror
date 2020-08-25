@@ -18,7 +18,7 @@ const TabPanel = ({ show, children }) => (
   </div>
 );
 
-export default ({ tabs, render }) => {
+export default ({ tabs, render, children }) => {
   const [value, setValue] = React.useState(0);
   const handleChange = (event, newValue) => setValue(newValue);
 
@@ -33,6 +33,8 @@ export default ({ tabs, render }) => {
           {tabs.map(tab => (
             <Tab label={tab} key={tab} />
           ))}
+          <div style={{flexGrow: 1}} />
+          {children}
         </Tabs>
       </AppBar>
       {tabs.map((tab, i) => (
