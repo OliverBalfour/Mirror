@@ -3,5 +3,13 @@
   "lang": "en",
   "name": "mirror",
   "short_name": "mirror",
-  "start_url": "/?utm_source=web_app_manifest"
+  "start_url": "/?utm_source=web_app_manifest",
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "http://play.google.com/store/apps/details?id=com.oliverbalfour.mirror",
+      "id": "com.oliverbalfour.mirror"
+    }
+  ],
+  "prefer_related_applications": true
 }
