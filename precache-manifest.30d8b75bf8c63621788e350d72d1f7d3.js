@@ -1,18 +1,18 @@
 self.__precacheManifest = [
   {
-    "revision": "29d2a4194513f4b7fb48",
-    "url": "/Mirror/static/js/app.7f0f3da0.chunk.js"
+    "revision": "f188026be21a46a891b7",
+    "url": "/Mirror/static/js/app.53e46a56.chunk.js"
   },
   {
     "revision": "cad3ab7bd5be36417125",
     "url": "/Mirror/static/js/runtime~app.734cff29.js"
   },
   {
-    "revision": "7cd20e71df0a9c261534",
-    "url": "/Mirror/static/js/2.d1979069.chunk.js"
+    "revision": "9eb29b4f7c4a231bab0a",
+    "url": "/Mirror/static/js/2.3a2c5d12.chunk.js"
   },
   {
-    "revision": "80c94f122a2eb02b22e0eadaf2abced0",
+    "revision": "213d9f3d0aff1193ee31ee97238bb741",
     "url": "/Mirror/index.html"
   },
   {
@@ -29,7 +29,7 @@ self.__precacheManifest = [
   },
   {
     "revision": "e7d9d4e9e43f67471ee52058047bc1f2",
-    "url": "/Mirror/static/js/2.d1979069.chunk.js.LICENSE.txt"
+    "url": "/Mirror/static/js/2.3a2c5d12.chunk.js.LICENSE.txt"
   },
   {
     "revision": "f4a03895e54d068176f6c81552ff98d4",
