@@ -10,6 +10,7 @@
  */
 
 import * as React from 'react';
+import { View } from 'react-native';
 import { AppBar, Tabs, Tab, Typography, Box } from '@material-ui/core';
 
 const TabPanel = ({ show, children }) => (
@@ -33,7 +34,7 @@ export default ({ tabs, render, children }) => {
           {tabs.map(tab => (
             <Tab label={tab} key={tab} />
           ))}
-          <div style={{flexGrow: 1}} />
+          <View style={{flexGrow: 1}}></View>
           {children}
         </Tabs>
       </AppBar>

@@ -17,12 +17,14 @@ export const transferCard = createAction('kanban/TRANSFER_CARD');
 export const reorderCard = createAction('kanban/REORDER_CARD');
 export const addCard = createAction('kanban/ADD_CARD'); // takes { content, colID }
 export const editCardContent = createAction('kanban/EDIT_CARD_CONTENT');//takes {content, cardID}
+export const deleteCard = createAction('kanban/DELETE_CARD');//takes cardID
 
 export const moveCard = (srcColID, dstColID, srcIndex, dstIndex) =>
   srcColID === dstColID
     ? reorderCard({ colID: srcColID, srcIndex, dstIndex })
     : transferCard({ srcColID, dstColID, srcIndex, dstIndex });
 
+export const addColumn = createAction('kanban/ADD_COLUMN'); // takes { name, tabID }
 export const deleteColumn = createAction('kanban/DELETE_COLUMN'); // takes string column ID
 export const renameColumn = createAction('kanban/RENAME_COLUMN'); // takes { colID, name }
 
@@ -86,7 +88,17 @@ const reducer = createReducer(initialState, {
   },
   [editCardContent]: (s, a) => {
     s.cards[indexFromID(s.cards, a.payload.cardID)].content = a.payload.content;
-  }
+  },
+  [deleteCard]: (s, a) => {
+    const cardIdx = indexFromID(s.cards, a.payload);
+    s.columns.forEach(col => deleteInList(col.items, a.payload));
+    deleteByID(s.cards)(a.payload);
+  },
+  [addColumn]: (s, a) => {
+    const id = generateID();
+    s.columns.push({ id, items: [], name: a.payload.name });
+    s.tabs[indexFromID(s.tabs, a.payload.tabID)].columns.push(id);
+  },
 });
 
 export default undoable(reducer);

@@ -28,7 +28,7 @@ export const ConfirmDialog = ({ open, respond, title, subtitle, labels = ["Cance
 
 export const PromptDialog = ({
   open, respond, title, subtitle, labels = ["Cancel", "OK"],
-  label, inputType = "text", placeholder
+  label, inputType = "text", placeholder = "", buttons = null
 }) => {
   const [value, setValue] = React.useState(placeholder);
   const done = x => { respond(x); setValue(placeholder) };
@@ -45,6 +45,7 @@ export const PromptDialog = ({
           label={label} type={inputType} value={value} onChange={e => setValue(e.target.value)} />
       </DialogContent>
       <DialogActions>
+        {buttons}
         <Button onClick={() => done(false)} color="primary">
           {labels[0]}
         </Button>

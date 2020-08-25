@@ -31,7 +31,7 @@ export const dummyCols = colnums => {
 
 export const dummyState = () => {
   let initial = {
-    tabs: [{ name: "Main" }, { name: "Secondary" }],
+    tabs: [{ name: "Main", id: generateID() }, { name: "Secondary", id: generateID() }],
     ...dummyCols([12,9,6,8,10])
   };
   const colIDs = initial.columns.map(col => col.id);

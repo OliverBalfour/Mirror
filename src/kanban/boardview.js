@@ -91,7 +91,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default ({ tab }) => {
+export default ({ tabInfo }) => {
+  const tab = tabInfo.index;
+  const tabObj = tabInfo.tab;
   const dispatch = useDispatch();
   const styles = useStyles();
 
@@ -105,13 +107,23 @@ export default ({ tab }) => {
     res.source.index, res.destination.index
   )) : null;
 
+  const [promptOpen, setPromptOpen] = React.useState(false);
+  const promptRespond = name => setPromptOpen(false) ||
+    typeof name === "string" && name.length &&
+      dispatch(duck.addColumn({ tabID: tabObj.id, name }));
+
   return (
     <View>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className={styles.root}>
           {columns.map(col => <Column col={col} styles={styles} key={col.id} />)}
+          <AddColumn styles={styles} add={() => setPromptOpen(true)} />
         </div>
       </DragDropContext>
+      {promptOpen && (
+        <PromptDialog open respond={promptRespond}
+          title="Add column" label="Name" />
+      )}
     </View>
   );
 }
@@ -245,6 +257,8 @@ const Card = ({ card, styles, index }) => {
     typeof res === "string" && res.length &&
       dispatch(duck.editCardContent({ cardID: id, content: res }));
 
+  const deleteCard = () => dispatch(duck.deleteCard(id));
+
   return (
     <React.Fragment>
       <Draggable draggableId={id} index={index}>
@@ -261,8 +275,22 @@ const Card = ({ card, styles, index }) => {
       </Draggable>
       {promptOpen && (
         <PromptDialog open respond={promptRespond}
-          title="Edit card" label="Contents" placeholder={content} />
+          title="Edit card" label="Contents" placeholder={content}
+          buttons={<Button onClick={deleteCard}>Delete</Button>} />
       )}
     </React.Fragment>
+  );
+}
+
+const AddColumn = ({ styles, add }) => {
+  return (
+    <div className={styles.column} style={{
+        width: cardWidth, display: 'flex', justifyContent: 'center',
+        alignItems: 'center', height: '100px'
+      }}>
+      <IconButton onClick={add}>
+        <AddIcon />
+      </IconButton>
+    </div>
   );
 }
