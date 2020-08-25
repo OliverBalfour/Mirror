@@ -12,12 +12,12 @@ import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import * as duck from '../ducks/kanban';
 import { View, Text } from 'react-native';
-import { makeStyles } from '@material-ui/core/styles';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import classNames from 'classnames';
-import { IconButton, Chip, TextField, Button } from '@material-ui/core';
+import { makeStyles, Button, IconButton, ButtonGroup, TextField, Chip } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import classNames from 'classnames';
 import { PopoverMenu, ConfirmDialog, PromptDialog } from '../components';
 
 const grid = 8;
@@ -123,10 +123,11 @@ const Column = ({ styles, col }) => {
   const [editingValue, setEditingValue] = React.useState("");
   const dispatch = useDispatch();
   const addCard = () => {
-    dispatch(duck.addCard({
-      content: editingValue,
-      colID: id
-    }));
+    if (editingValue.length)
+      dispatch(duck.addCard({
+        content: editingValue,
+        colID: id
+      }));
     setEditingValue("");
     setEditingNew(false);
   };
@@ -149,7 +150,10 @@ const Column = ({ styles, col }) => {
           )}>
           <ColumnHeader styles={styles} col={col} add={addButton} menu={menuButton} />
           <div style={{ width: cardWidth, overflowY: 'auto', overflowX: 'hidden', height: "100%" }}>
-            { editingNew && <EditingCard value={editingValue} setValue={setEditingValue} add={addCard} /> }
+            {editingNew && (
+              <EditingCard value={editingValue} setValue={setEditingValue}
+                add={addCard} cancel={() => { setEditingValue(""); setEditingNew(false) }} />
+            )}
             <div style={{ width: cardWidth }}> {/* could -20 to avoid clipping cards */}
               {items.map((card, index) => <Card card={card} styles={styles} index={index} key={card.id} />)}
             </div>
@@ -161,7 +165,7 @@ const Column = ({ styles, col }) => {
   );
 }
 
-const EditingCard = ({ value, setValue, add }) => {
+const EditingCard = ({ value, setValue, add, cancel }) => {
   return (
     <div>
       <TextField
@@ -172,14 +176,13 @@ const EditingCard = ({ value, setValue, add }) => {
         onChange={e => setValue(e.target.value)}
         variant="filled"
         style={{ width: "100%" }} />
-      <Button
-        style={{
-          width: "100%", marginBottom: 8,
-          boxShadow: "0px 4px 2px -2px rgba(0,0,0,0.15)"
-        }} variant='contained'
-        onClick={ () => { if (value.length) add(); } }>
-        Done
-      </Button>
+      <ButtonGroup variant="contained" size='small'
+        style={{marginBottom: 8, boxShadow: "0px 4px 2px -2px rgba(0,0,0,0.15)", width: "100%"}}>
+        <Button style={{flexGrow: 1}} variant='contained' onClick={add}>
+          Done
+        </Button>
+        <Button onClick={cancel}><DeleteIcon style={{color: '#555'}} /></Button>
+      </ButtonGroup>
     </div>
   );
 };
@@ -191,13 +194,11 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmRespond = res => setConfirmOpen(false) ||
     res === true && dispatch(duck.deleteColumn(col.id));
-  const deleteColumn = () => setConfirmOpen(true);
 
   const [promptOpen, setPromptOpen] = React.useState(false);
   const promptRespond = res => setPromptOpen(false) ||
     typeof res === "string" && res.length &&
       dispatch(duck.renameColumn({ colID: col.id, name: res }));
-  const renameColumn = () => setPromptOpen(true);
 
   return (
     <div>
@@ -212,8 +213,8 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
             <AddIcon />
           </IconButton>
           <PopoverMenu map={{
-            "Rename": renameColumn,
-            "Delete": deleteColumn,
+            "Rename": () => setPromptOpen(true),
+            "Delete": () => setConfirmOpen(true),
           }}>
             <IconButton size='small'>
               <MoreVertIcon />
@@ -222,29 +223,46 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
         </div>
       </div>
       <hr className={styles.columnHeaderRule} />
-      <ConfirmDialog open={confirmOpen} respond={confirmRespond}
-        title="Delete this column?" subtitle="Don't worry, this action can be undone." />
-      <PromptDialog open={promptOpen} respond={promptRespond}
-        title={`Rename column "${col.name}"`} subtitle="Don't worry, this action can be undone."
-        label="Name" />
-      <hr className={styles.columnHeaderRule} />
+      {confirmOpen && (
+        <ConfirmDialog open respond={confirmRespond}
+          title="Delete this column?" subtitle="Don't worry, this action can be undone." />
+      )}
+      {promptOpen && (
+        <PromptDialog open respond={promptRespond}
+          title={`Rename column "${col.name}"`} subtitle="Don't worry, this action can be undone."
+          label="Name" placeholder={col.name} />
+      )}
     </div>
   );
 };
 
 const Card = ({ card, styles, index }) => {
   const { id, content } = card;
+  const dispatch = useDispatch();
+
+  const [promptOpen, setPromptOpen] = React.useState(false);
+  const promptRespond = res => setPromptOpen(false) ||
+    typeof res === "string" && res.length &&
+      dispatch(duck.editCardContent({ cardID: id, content: res }));
+
   return (
-    <Draggable draggableId={id} index={index}>
-      {(provided, snapshot) => (
-        <div ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          className={classNames(styles.card, { [styles.draggingCard]: snapshot.isDragging })}
-          style={provided.draggableProps.style}>
-          {content.split('\n').map((x,i)=><p key={i}>{x}</p>)}
-        </div>
+    <React.Fragment>
+      <Draggable draggableId={id} index={index}>
+        {(provided, snapshot) => (
+          <div ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            className={classNames(styles.card, { [styles.draggingCard]: snapshot.isDragging })}
+            style={provided.draggableProps.style}
+            onClick={() => setPromptOpen(true)}>
+            {content.split('\n').map((x,i)=><p key={i}>{x}</p>)}
+          </div>
+        )}
+      </Draggable>
+      {promptOpen && (
+        <PromptDialog open respond={promptRespond}
+          title="Edit card" label="Contents" placeholder={content} />
       )}
-    </Draggable>
+    </React.Fragment>
   );
 }

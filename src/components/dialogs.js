@@ -28,17 +28,19 @@ export const ConfirmDialog = ({ open, respond, title, subtitle, labels = ["Cance
 
 export const PromptDialog = ({
   open, respond, title, subtitle, labels = ["Cancel", "OK"],
-  label, inputType = "text"
+  label, inputType = "text", placeholder
 }) => {
-  const [value, setValue] = React.useState("");
-  const done = x => { respond(x); setValue("") };
+  const [value, setValue] = React.useState(placeholder);
+  const done = x => { respond(x); setValue(placeholder) };
   return (
     <Dialog open={open} onClose={() => done(null)}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          {subtitle}
-        </DialogContentText>
+        {typeof subtitle === "string" && (
+          <DialogContentText>
+            {subtitle}
+          </DialogContentText>
+        )}
         <TextField autoFocus margin="dense" fullWidth
           label={label} type={inputType} value={value} onChange={e => setValue(e.target.value)} />
       </DialogContent>

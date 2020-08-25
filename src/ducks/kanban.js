@@ -15,6 +15,7 @@ import { dummyState, generateID } from '../common/utils';
 export const transferCard = createAction('kanban/TRANSFER_CARD');
 export const reorderCard = createAction('kanban/REORDER_CARD');
 export const addCard = createAction('kanban/ADD_CARD'); // takes { content, colID }
+export const editCardContent = createAction('kanban/EDIT_CARD_CONTENT');//takes {content, cardID}
 
 export const moveCard = (srcColID, dstColID, srcIndex, dstIndex) =>
   srcColID === dstColID
@@ -82,6 +83,9 @@ const reducer = createReducer(initialState, {
   [renameColumn]: (s, a) => {
     s.columns[indexFromID(s.columns, a.payload.colID)].name = a.payload.name;
   },
+  [editCardContent]: (s, a) => {
+    s.cards[indexFromID(s.cards, a.payload.cardID)].content = a.payload.content;
+  }
 });
 
 export default reducer;
