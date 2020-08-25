@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
 import boards from './ducks/kanban';
+import { saveState } from './common/utils';
 
 const reducer = combineReducers({
   boards,
@@ -20,5 +21,10 @@ try {
       store.dispatch(UndoActionCreators.redo());
   });
 } catch (e) {}
+
+// Save board state (excluding history)
+// TODO: how can we include history? We cannot serialise all state easily with our combineReducers
+// approach unfortunately
+store.subscribe(() => saveState(store.getState().boards.present));
 
 export default store;

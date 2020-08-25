@@ -39,3 +39,26 @@ export const dummyState = () => {
   initial.tabs[1].columns = [colIDs[3], colIDs[4]];
   return initial;
 }
+
+// load persisted state
+export const loadState = () => {
+  try {
+    // web
+    if (localStorage.hasOwnProperty("kanban"))
+      return JSON.parse(localStorage.getItem("kanban"));
+    else
+      return dummyState();
+  } catch (e) {
+    // native
+    return dummyState();
+  }
+}
+
+export const saveState = state => {
+  try {
+    if (localStorage) {
+      const serialised = JSON.stringify(state);
+      localStorage.setItem("kanban", serialised);
+    }
+  } catch (e) {}
+}

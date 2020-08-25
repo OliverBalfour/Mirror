@@ -9,7 +9,7 @@
 
 import { createReducer, createAction, createSelector } from '@reduxjs/toolkit';
 import undoable from 'redux-undo';
-import { dummyState, generateID } from '../common/utils';
+import { loadState, generateID } from '../common/utils';
 
 // Action creators
 
@@ -51,7 +51,7 @@ export const getColumnsInTab = tab => state =>
 
 // Reducers
 
-const initialState = dummyState();
+const initialState = loadState();
 
 const reducer = createReducer(initialState, {
   [transferCard]: (s, a) => {
