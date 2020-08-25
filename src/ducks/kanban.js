@@ -14,13 +14,15 @@ import { dummyState, generateID } from '../common/utils';
 
 export const transferCard = createAction('kanban/TRANSFER_CARD');
 export const reorderCard = createAction('kanban/REORDER_CARD');
+export const addCard = createAction('kanban/ADD_CARD');
 
 export const moveCard = (srcColID, dstColID, srcIndex, dstIndex) =>
   srcColID === dstColID
     ? reorderCard({ colID: srcColID, srcIndex, dstIndex })
     : transferCard({ srcColID, dstColID, srcIndex, dstIndex });
 
-export const addCard = createAction('kanban/ADD_CARD');
+// takes string column ID
+export const deleteColumn = createAction('kanban/DELETE_COLUMN');
 
 // Selectors
 
@@ -28,6 +30,11 @@ const _getColByID = state => id => state.columns.filter(col => col.id === id)[0]
 const _getCardByID = state => id => state.cards.filter(card => card.id === id)[0];
 
 const indexFromID = (list, id) => list.map(item => item.id === id).indexOf(true);
+const deleteByID = list => id => list.splice(indexFromID(list, id), 1);
+const deleteInList = (list, elem) => {
+  let index = list.indexOf(elem);
+  if (index !== -1) list.splice(index, 1); // undesired behaviour when splicing at (-1, 1)
+};
 
 // higher order function which creates a selector for a specific tab
 // it un-normalises the state for that tab, returning:
@@ -65,6 +72,12 @@ const reducer = createReducer(initialState, {
     const cardID = generateID();
     s.cards.push({ id: cardID, content });   // add to cards list
     s.columns[colIdx].items.unshift(cardID); // add to top of column
+  },
+  [deleteColumn]: (s, a) => {
+    const colIdx = indexFromID(s.columns, a.payload);
+    s.columns[colIdx].items.forEach(deleteByID(s.cards));
+    s.tabs.forEach(tab => deleteInList(tab.columns, a.payload));
+    deleteByID(s.columns)(a.payload);
   }
 });
 

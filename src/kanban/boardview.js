@@ -18,6 +18,7 @@ import classNames from 'classnames';
 import { IconButton, Chip, TextField, Button } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
+import { PopoverMenu } from '../components';
 
 const grid = 8;
 const cardWidth = 350;
@@ -134,6 +135,9 @@ const Column = ({ styles, col }) => {
       setEditingValue("");
     setEditingNew(!editingNew);
   };
+  const menuButton = () => {
+    console.log('pressed menu button');
+  };
 
   return (
     <Droppable droppableId={id} style={{ flexGrow: 1 }}>
@@ -143,7 +147,7 @@ const Column = ({ styles, col }) => {
             styles.column,
             {[styles.draggingOverColumn]: snapshot.isDraggingOver }
           )}>
-          <ColumnHeader styles={styles} name={name} add={addButton} />
+          <ColumnHeader styles={styles} col={col} add={addButton} menu={menuButton} />
           <div style={{ width: cardWidth, overflowY: 'auto', overflowX: 'hidden', height: "100%" }}>
             { editingNew && <EditingCard value={editingValue} setValue={setEditingValue} add={addCard} /> }
             <div style={{ width: cardWidth }}> {/* could -20 to avoid clipping cards */}
@@ -168,32 +172,50 @@ const EditingCard = ({ value, setValue, add }) => {
         onChange={e => setValue(e.target.value)}
         variant="filled"
         style={{ width: "100%" }} />
-      <Button style={{ width: "100%", marginBottom: 8, boxShadow: "0px 4px 2px -2px rgba(0,0,0,0.15)" }} variant='contained' onClick={ add }>Done</Button>
+      <Button
+        style={{
+          width: "100%", marginBottom: 8,
+          boxShadow: "0px 4px 2px -2px rgba(0,0,0,0.15)"
+        }} variant='contained'
+        onClick={ () => { if (value.length) add(); } }>
+        Done
+      </Button>
     </div>
   );
 };
 
 // header name, add button, chips for each addon (WIP limit, EBS time estimate, etc), menu button
-const ColumnHeader = ({ styles, name, add }) => (
-  <div>
-    <div className={styles.columnHeaderContainer}>
-      <div className={styles.columnHeaderText}>
-        {name}
+const ColumnHeader = ({ styles, col, add, menu }) => {
+  const dispatch = useDispatch();
+  // TODO: confirm dialog for deleting column
+  const deleteColumn = () => dispatch(duck.deleteColumn(col.id));
+  const renameColumn = () => console.log("TODO: renameColumn");
+  return (
+    <div>
+      <div className={styles.columnHeaderContainer}>
+        <div className={styles.columnHeaderText}>
+          {col.name}
+        </div>
+        <div>
+          <Chip size='small' label="0/6" />
+          <Chip size='small' label="3h" />
+          <IconButton size='small' onClick={() => add()}>
+            <AddIcon />
+          </IconButton>
+          <PopoverMenu map={{
+            "Rename": renameColumn,
+            "Delete": deleteColumn,
+          }}>
+            <IconButton size='small'>
+              <MoreVertIcon />
+            </IconButton>
+          </PopoverMenu>
+        </div>
       </div>
-      <div>
-        <Chip size='small' label="0/6" />
-        <Chip size='small' label="3h" />
-        <IconButton size='small' onClick={() => add()}>
-          <AddIcon />
-        </IconButton>
-        <IconButton size='small'>
-          <MoreVertIcon />
-        </IconButton>
-      </div>
+      <hr className={styles.columnHeaderRule} />
     </div>
-    <hr className={styles.columnHeaderRule} />
-  </div>
-);
+  );
+};
 
 const Card = ({ card, styles, index }) => {
   const { id, content } = card;
@@ -205,7 +227,7 @@ const Card = ({ card, styles, index }) => {
           {...provided.dragHandleProps}
           className={classNames(styles.card, { [styles.draggingCard]: snapshot.isDragging })}
           style={provided.draggableProps.style}>
-          {content.split('\n').map(x=><p>{x}</p>)}
+          {content.split('\n').map((x,i)=><p key={i}>{x}</p>)}
         </div>
       )}
     </Draggable>
