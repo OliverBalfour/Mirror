@@ -15,6 +15,9 @@ import { View, Text } from 'react-native';
 import { makeStyles } from '@material-ui/core/styles';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames';
+import { IconButton, Chip, TextField, Button } from '@material-ui/core';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import AddIcon from '@material-ui/icons/Add';
 
 const grid = 8;
 const cardWidth = 350;
@@ -48,7 +51,9 @@ const useStyles = makeStyles(theme => ({
     border: '1px solid #BBCBCB'
   },
   columnHeaderContainer: {
-    padding: "8 0"
+    padding: "8 0",
+    display: "flex",
+    justifyContent: "space-between"
   },
   columnHeaderText: {
     marginBottom: 4,
@@ -71,8 +76,12 @@ const useStyles = makeStyles(theme => ({
     margin: `0 0 ${grid}px 0`,
     background: 'white',
     borderRadius: 5,
+    overflow: 'hidden',
     "&:hover, &:focus": {
       boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)'
+    },
+    "&>p": {
+      margin: 0
     }
   },
   draggingCard: {
@@ -107,8 +116,25 @@ export default ({ tab }) => {
 }
 
 const Column = ({ styles, col }) => {
-  console.log(col)
   const { id, items, name } = col;
+
+  const [editingNew, setEditingNew] = React.useState(false);
+  const [editingValue, setEditingValue] = React.useState("");
+  const dispatch = useDispatch();
+  const addCard = () => {
+    dispatch(duck.addCard({
+      content: editingValue,
+      colID: id
+    }));
+    setEditingValue("");
+    setEditingNew(false);
+  };
+  const addButton = () => {
+    if (editingNew)
+      setEditingValue("");
+    setEditingNew(!editingNew);
+  };
+
   return (
     <Droppable droppableId={id} style={{ flexGrow: 1 }}>
       {(provided, snapshot) => (
@@ -117,8 +143,9 @@ const Column = ({ styles, col }) => {
             styles.column,
             {[styles.draggingOverColumn]: snapshot.isDraggingOver }
           )}>
-          <ColumnHeader styles={styles} name={name} />
+          <ColumnHeader styles={styles} name={name} add={addButton} />
           <div style={{ width: cardWidth, overflowY: 'auto', overflowX: 'hidden', height: "100%" }}>
+            { editingNew && <EditingCard value={editingValue} setValue={setEditingValue} add={addCard} /> }
             <div style={{ width: cardWidth }}> {/* could -20 to avoid clipping cards */}
               {items.map((card, index) => <Card card={card} styles={styles} index={index} key={card.id} />)}
             </div>
@@ -130,10 +157,39 @@ const Column = ({ styles, col }) => {
   );
 }
 
-const ColumnHeader = ({ styles, name }) => (
-  <div className={styles.columnHeaderContainer}>
-    <div className={styles.columnHeaderText}>
-      {name}
+const EditingCard = ({ value, setValue, add }) => {
+  return (
+    <div>
+      <TextField
+        label="New Card"
+        multiline
+        rowsMax={6}
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        variant="filled"
+        style={{ width: "100%" }} />
+      <Button style={{ width: "100%", marginBottom: 8, boxShadow: "0px 4px 2px -2px rgba(0,0,0,0.15)" }} variant='contained' onClick={ add }>Done</Button>
+    </div>
+  );
+};
+
+// header name, add button, chips for each addon (WIP limit, EBS time estimate, etc), menu button
+const ColumnHeader = ({ styles, name, add }) => (
+  <div>
+    <div className={styles.columnHeaderContainer}>
+      <div className={styles.columnHeaderText}>
+        {name}
+      </div>
+      <div>
+        <Chip size='small' label="0/6" />
+        <Chip size='small' label="3h" />
+        <IconButton size='small' onClick={() => add()}>
+          <AddIcon />
+        </IconButton>
+        <IconButton size='small'>
+          <MoreVertIcon />
+        </IconButton>
+      </div>
     </div>
     <hr className={styles.columnHeaderRule} />
   </div>
@@ -149,7 +205,7 @@ const Card = ({ card, styles, index }) => {
           {...provided.dragHandleProps}
           className={classNames(styles.card, { [styles.draggingCard]: snapshot.isDragging })}
           style={provided.draggableProps.style}>
-          {content}
+          {content.split('\n').map(x=><p>{x}</p>)}
         </div>
       )}
     </Draggable>

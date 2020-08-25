@@ -8,7 +8,7 @@
  */
 
 import { createReducer, createAction, createSelector } from '@reduxjs/toolkit';
-import { dummyState } from '../common/utils';
+import { dummyState, generateID } from '../common/utils';
 
 // Action creators
 
@@ -19,6 +19,8 @@ export const moveCard = (srcColID, dstColID, srcIndex, dstIndex) =>
   srcColID === dstColID
     ? reorderCard({ colID: srcColID, srcIndex, dstIndex })
     : transferCard({ srcColID, dstColID, srcIndex, dstIndex });
+
+export const addCard = createAction('kanban/ADD_CARD');
 
 // Selectors
 
@@ -56,6 +58,13 @@ const reducer = createReducer(initialState, {
     const [removed] = newitems.splice(a.payload.srcIndex, 1);
     newitems.splice(a.payload.dstIndex, 0, removed);
     s.columns[colIdx].items = newitems;
+  },
+  [addCard]: (s, a) => {
+    const { content, colID } = a.payload;
+    const colIdx = indexFromID(s.columns, a.payload.colID);
+    const cardID = generateID();
+    s.cards.push({ id: cardID, content });   // add to cards list
+    s.columns[colIdx].items.unshift(cardID); // add to top of column
   }
 });
 
