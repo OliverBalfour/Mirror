@@ -30,6 +30,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'row',
     flexWrap: 'nowrap',
     padding: grid,
+    fontSize: "14px",
     "& *": {flexShrink: 0}
   },
   column: {
