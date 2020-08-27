@@ -14,7 +14,7 @@ import { View } from 'react-native';
 import { AppBar, Tabs, Tab, Typography, Box } from '@material-ui/core';
 
 const TabPanel = ({ show, children }) => (
-  <div hidden={!show}>
+  <div hidden={!show} style={{ height: 'calc(100% - 48px)' }}>
     {show && children}
   </div>
 );

@@ -17,7 +17,7 @@ import store from './store';
 export default () => {
   const [active, setActive] = React.useState(0);
   const style = Platform.OS === "web"
-    ? { maxHeight: "calc(100% - 48px)" }
+    ? { height: "calc(100% - 48px)" }
     : { flexGrow: 1 };
 
   return (

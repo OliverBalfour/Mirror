@@ -29,7 +29,8 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'nowrap',
-    padding: grid
+    padding: grid,
+    "& *": {flexShrink: 0}
   },
   column: {
     background: '#DFEEEE',
@@ -113,7 +114,7 @@ export default ({ tabInfo }) => {
       dispatch(duck.addColumn({ tabID: tabObj.id, name }));
 
   return (
-    <View>
+    <View style={{ width: '100vw', overflowX: 'auto', height: '100%' }}>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className={styles.root}>
           {columns.map(col => <Column col={col} styles={styles} key={col.id} />)}
