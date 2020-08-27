@@ -17,6 +17,7 @@ export const transferCard = createAction('kanban/TRANSFER_CARD');
 export const reorderCard = createAction('kanban/REORDER_CARD');
 export const addCard = createAction('kanban/ADD_CARD'); // takes { content, colID }
 export const editCardContent = createAction('kanban/EDIT_CARD_CONTENT');//takes {content, cardID}
+export const editCard = createAction('kanban/EDIT_CARD'); // takes a card object; allows editing all of a card's params
 export const deleteCard = createAction('kanban/DELETE_CARD');//takes cardID
 
 export const moveCard = (srcColID, dstColID, srcIndex, dstIndex) =>
@@ -98,6 +99,11 @@ const reducer = createReducer(initialState, {
     const id = generateID();
     s.columns.push({ id, items: [], name: a.payload.name });
     s.tabs[indexFromID(s.tabs, a.payload.tabID)].columns.push(id);
+  },
+  [editCard]: (s, a) => {
+    s.cards[indexFromID(s.cards, a.payload.card.id)] = a.payload.card;
+    s.columns.forEach(col => deleteInList(col.items, a.payload.card.id));
+    s.columns[indexFromID(s.columns, a.payload.colID)].items.unshift(a.payload.card.id);
   },
 });
 

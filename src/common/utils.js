@@ -1,6 +1,5 @@
 
-// random ID: base64 encoded 8 char string of random number and current time
-export const generateID = () => Math.random().toString().substring(15);
+export const generateID = () => Math.random().toString();
 
 // generate { cards, columns } where each column has colnum[i] cards
 // both of these are objects where the keys are unique IDs

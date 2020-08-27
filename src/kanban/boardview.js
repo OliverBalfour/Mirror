@@ -18,7 +18,7 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames';
-import { PopoverMenu, ConfirmDialog, PromptDialog } from '../components';
+import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog } from '../components';
 
 const grid = 8;
 const cardWidth = 350;
@@ -251,13 +251,7 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
 const Card = ({ card, styles, index }) => {
   const { id, content } = card;
   const dispatch = useDispatch();
-
   const [promptOpen, setPromptOpen] = React.useState(false);
-  const promptRespond = res => setPromptOpen(false) ||
-    typeof res === "string" && res.length &&
-      dispatch(duck.editCardContent({ cardID: id, content: res }));
-
-  const deleteCard = () => dispatch(duck.deleteCard(id));
 
   return (
     <React.Fragment>
@@ -274,9 +268,7 @@ const Card = ({ card, styles, index }) => {
         )}
       </Draggable>
       {promptOpen && (
-        <PromptDialog open respond={promptRespond}
-          title="Edit card" label="Contents" placeholder={content}
-          buttons={<Button onClick={deleteCard}>Delete</Button>} />
+        <CardEditDialog respond={() => setPromptOpen(false)} card={card} />
       )}
     </React.Fragment>
   );
