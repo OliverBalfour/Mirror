@@ -21,7 +21,7 @@ import classNames from 'classnames';
 import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog } from '../components';
 
 const grid = 8;
-const cardWidth = 350;
+const cardWidth = 300;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -40,6 +40,7 @@ const useStyles = makeStyles(theme => ({
     border: '1px solid #CCDCDC',
     borderRadius: 5,
     margin: grid,
+    transition: "border 0.2s",
 
     // TODO: install react-custom-scrollbars and use this instead with autohide
     // there is a bug where moving cards to the tallest column leads to a scrollbar flashing up
@@ -49,7 +50,7 @@ const useStyles = makeStyles(theme => ({
     overflow: 'hidden'
   },
   draggingOverColumn: {
-    background: '#DAEBEB',
+    // background: '#DAEBEB',
     border: '1px solid #BBCBCB'
   },
   columnHeaderContainer: {
@@ -58,10 +59,9 @@ const useStyles = makeStyles(theme => ({
     justifyContent: "space-between"
   },
   columnHeaderText: {
-    marginBottom: 4,
-    fontFamily: 'sans-serif',
-    fontWeight: 500,
-    fontSize: '1.2em'
+    paddingLeft: 8,
+    paddingBottom: 0,
+    fontSize: '1.4em'
   },
   columnHeaderRule: {
     overflow: "hidden",
@@ -74,10 +74,11 @@ const useStyles = makeStyles(theme => ({
   },
   card: {
     userSelect: 'none',
-    padding: grid * 2,
+    padding: "10px 13px",
     margin: `0 0 ${grid}px 0`,
     background: 'white',
     borderRadius: 5,
+    transition: "opacity 0.3s",
     overflow: 'hidden',
     "&:hover, &:focus": {
       boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)'
@@ -87,7 +88,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   draggingCard: {
-    background: 'rgba(255, 255, 255, 0.6)',
+    opacity: 0.7,
     boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)'
   }
 }));

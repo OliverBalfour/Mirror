@@ -25,6 +25,8 @@ try {
 // Save board state (excluding history)
 // TODO: how can we include history? We cannot serialise all state easily with our combineReducers
 // approach unfortunately
-store.subscribe(() => saveState(store.getState().boards.present));
+const localStorageSubscriber = () => saveState(store.getState().boards.present);
+store.subscribe(localStorageSubscriber);
+localStorageSubscriber(); // save data generated on first run
 
 export default store;

@@ -14,6 +14,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import NotesIcon from '@material-ui/icons/Notes';
+import PopoverMenu from './popovermenu';
 
 export default ({ active, setActive }) => {
   return (
@@ -31,9 +32,13 @@ export default ({ active, setActive }) => {
             <Tab label={<div><NotesIcon style={{verticalAlign: 'middle'}} /> Notes</div>}  />
           </Tabs>
           <div style={{ flexGrow: 1 }} />
-          <IconButton edge="end" color="inherit">
-            <MoreIcon />
-          </IconButton>
+          <PopoverMenu map={{
+            "Clear saved state": () => localStorage.clear(), // need lambda because of binding
+          }}>
+            <IconButton edge="end" color="inherit">
+              <MoreIcon />
+            </IconButton>
+          </PopoverMenu>
         </Toolbar>
       </AppBar>
     </React.Fragment>
