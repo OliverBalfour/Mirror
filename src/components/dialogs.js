@@ -74,6 +74,8 @@ export const CardEditDialog = ({ respond, card }) => {
   //TODO: extract global boards selector so we can change state.boards.present to anything
   // else we need as new requirements arise without causing serious problems
   const columns = useSelector(state => state.boards.present.columns);
+  const tabs = useSelector(state => state.boards.present.tabs);
+  const getTabByColID = colID => tabs[tabs.map(tab => tab.columns.indexOf(colID) !== -1).indexOf(true)];
 
   const done = () => (respond(), setContent(card.content));
   const deleteCard = () => (dispatch(duck.deleteCard(card.id)), done());
@@ -87,7 +89,7 @@ export const CardEditDialog = ({ respond, card }) => {
         <InputLabel id={labelIDs[0]}>Column</InputLabel>
         <Select labelId={labelIDs[0]} value={newCard.colID} onChange={e => setColID(e.target.value)}>
           {columns.map(col => (
-            <MenuItem value={col.id} key={col.id}>{col.name}</MenuItem>
+            <MenuItem value={col.id} key={col.id}>{getTabByColID(col.id).name}: {col.name}</MenuItem>
           ))}
         </Select>
 
