@@ -14,6 +14,7 @@ import { View } from 'react-native';
 import { AppBar, Tabs, Tab, IconButton } from '@material-ui/core';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import PopoverMenu from './popovermenu';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 const TabPanel = ({ show, children }) => (
   <div hidden={!show} style={{ height: 'calc(100% - 48px)' }}>
@@ -21,8 +22,11 @@ const TabPanel = ({ show, children }) => (
   </div>
 );
 
-export default ({ tabs, render, children, index, setIndex, addTab, renameTab, deleteTab }) => {
-  const handleChange = (event, newValue) => setIndex(newValue);
+export default ({
+  tabs, render, children, index, setIndex,
+  addTab, renameTab, deleteTab, moveTab
+}) => {
+  const handleChange = (event, newValue) => newValue >= 0 && newValue < tabs.length && setIndex(newValue);
 
   return (
     <div style={{ flex: 1 }}>
@@ -40,6 +44,8 @@ export default ({ tabs, render, children, index, setIndex, addTab, renameTab, de
             "Add tab": () => addTab(),
             "Rename tab": () => renameTab(index),
             "Delete tab": () => deleteTab(index),
+            "Move tab left": () => (moveTab([index, index-1]), handleChange(null, index-1)),
+            "Move tab right": () => (moveTab([index, index+1]), handleChange(null, index+1)),
           }}>
             <IconButton>
               <MoreIcon />

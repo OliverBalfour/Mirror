@@ -33,6 +33,7 @@ export const moveColumn = createAction('kanban/MOVE_COLUMN'); // takes [srcIdx, 
 export const addTab = createAction('kanban/ADD_TAB'); // takes name
 export const deleteTab = createAction('kanban/DELETE_TAB'); // takes tabIdx
 export const renameTab = createAction('kanban/RENAME_TAB'); // takes { tabID, name }
+export const moveTab = createAction('kanban/MOVE_TAB'); // takes [srcIdx, dstIdx]
 
 // Helpers
 
@@ -137,6 +138,14 @@ const reducer = createReducer(initialState, {
     const [removed] = newitems.splice(srcIdx, 1);
     newitems.splice(dstIdx, 0, removed);
     s.tabs[tabIdx].columns = newitems;
+  },
+  [moveTab]: (s, a) => {
+    const [srcIdx, dstIdx] = a.payload;
+    if (dstIdx < 0 || dstIdx >= s.tabs.length) return;
+    let newitems = s.tabs;
+    const [removed] = newitems.splice(srcIdx, 1);
+    newitems.splice(dstIdx, 0, removed);
+    s.tabs = newitems;
   },
 });
 

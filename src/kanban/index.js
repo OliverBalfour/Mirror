@@ -36,6 +36,7 @@ export default () => {
         addTab={() => setAddPromptOpen(true)}
         renameTab={() => setRenamePromptOpen(true)}
         deleteTab={() => tabs.length > 1 ? setConfirmOpen(true) : alert("Cannot delete only tab")}
+        moveTab={data => dispatch(duck.moveTab(data))}
         children={<UndoRedo />}
         index={currentTab} setIndex={setCurrentTab}
       />
