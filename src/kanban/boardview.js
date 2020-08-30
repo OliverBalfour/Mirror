@@ -18,6 +18,7 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog } from '../components';
+import ReactMarkdown from 'react-markdown';
 
 const grid = 8;
 const cardWidth = 300;
@@ -296,7 +297,7 @@ const Card = ({ card, styles, index }) => {
             className={styles.card + (snapshot.isDragging ? " "+styles.draggingCard : "")}
             style={provided.draggableProps.style}
             onClick={() => setPromptOpen(true)}>
-            {content.split('\n').map((x,i)=><p key={i}>{x}</p>)}
+            <ReactMarkdown source={content} />
           </div>
         )}
       </Draggable>
