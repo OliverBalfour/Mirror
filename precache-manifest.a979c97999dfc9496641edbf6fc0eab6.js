@@ -1,22 +1,22 @@
 self.__precacheManifest = [
   {
-    "revision": "bf7e11c6b0c99fc69885",
-    "url": "/Mirror/static/js/app.2d6037ce.chunk.js"
+    "revision": "46d372399248f9fe5eca",
+    "url": "/Mirror/static/js/app.a0a1ed74.chunk.js"
   },
   {
     "revision": "cad3ab7bd5be36417125",
     "url": "/Mirror/static/js/runtime~app.734cff29.js"
   },
   {
-    "revision": "9262ab4291d577468985",
-    "url": "/Mirror/static/js/2.8fdbec33.chunk.js"
+    "revision": "3b19aacc664e61fa5a80",
+    "url": "/Mirror/static/js/2.b38a52cc.chunk.js"
   },
   {
     "revision": "342e22b6ddf691bf8fe11da9efd02de2",
     "url": "/Mirror/favicon.ico"
   },
   {
-    "revision": "9aa37494b103fc746c6674dd143d88ca",
+    "revision": "a210da9a20bc9d47978eda067bc1231b",
     "url": "/Mirror/index.html"
   },
   {
@@ -32,8 +32,8 @@ self.__precacheManifest = [
     "url": "/Mirror/register-service-worker.js"
   },
   {
-    "revision": "e7d9d4e9e43f67471ee52058047bc1f2",
-    "url": "/Mirror/static/js/2.8fdbec33.chunk.js.LICENSE.txt"
+    "revision": "e581c02e4fcd4529f1222f334b1e4a1f",
+    "url": "/Mirror/static/js/2.b38a52cc.chunk.js.LICENSE.txt"
   },
   {
     "revision": "f4a03895e54d068176f6c81552ff98d4",
