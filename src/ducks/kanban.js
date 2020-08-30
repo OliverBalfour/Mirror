@@ -33,7 +33,7 @@ export const addTab = createAction('kanban/ADD_TAB'); // takes name
 export const deleteTab = createAction('kanban/DELETE_TAB'); // takes tabIdx
 export const renameTab = createAction('kanban/RENAME_TAB'); // takes { tabID, name }
 
-// Selectors
+// Helpers
 
 const _getColByID = state => id => state.columns.filter(col => col.id === id)[0];
 const _getCardByID = state => id => state.cards.filter(card => card.id === id)[0];
@@ -44,6 +44,8 @@ const deleteInList = (list, elem) => {
   let index = list.indexOf(elem);
   if (index !== -1) list.splice(index, 1); // undesired behaviour when splicing at (-1, 1)
 };
+
+// Selectors
 
 // higher order function which creates a selector for a specific tab
 // it un-normalises the state for that tab, returning:
@@ -110,8 +112,12 @@ const reducer = createReducer(initialState, {
   },
   [editCard]: (s, a) => {
     s.cards[indexFromID(s.cards, a.payload.card.id)] = a.payload.card;
-    s.columns.forEach(col => deleteInList(col.items, a.payload.card.id));
-    s.columns[indexFromID(s.columns, a.payload.colID)].items.unshift(a.payload.card.id);
+    const srcColIdx = s.columns.map(col => col.items.indexOf(a.payload.card.id) !== -1).indexOf(true);
+    const dstColIdx = indexFromID(s.columns, a.payload.colID);
+    if (srcColIdx !== dstColIdx) {
+      deleteInList(s.columns[srcColIdx].items, a.payload.card.id);
+      s.columns[dstColIdx].items.unshift(a.payload.card.id);
+    }
   },
   [deleteTab]: (s, a) => {
     while (s.tabs[a.payload].columns.length)
