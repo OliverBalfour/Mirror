@@ -29,6 +29,10 @@ export const addColumn = createAction('kanban/ADD_COLUMN'); // takes { name, tab
 export const deleteColumn = createAction('kanban/DELETE_COLUMN'); // takes string column ID
 export const renameColumn = createAction('kanban/RENAME_COLUMN'); // takes { colID, name }
 
+export const addTab = createAction('kanban/ADD_TAB'); // takes name
+export const deleteTab = createAction('kanban/DELETE_TAB'); // takes tabIdx
+export const renameTab = createAction('kanban/RENAME_TAB'); // takes { tabID, name }
+
 // Selectors
 
 const _getColByID = state => id => state.columns.filter(col => col.id === id)[0];
@@ -53,6 +57,13 @@ export const getColumnsInTab = tab => state =>
 // Reducers
 
 const initialState = loadState();
+
+const _deleteColumn = (s, id) => {
+  const colIdx = indexFromID(s.columns, id);
+  s.columns[colIdx].items.forEach(deleteByID(s.cards));
+  s.tabs.forEach(tab => deleteInList(tab.columns, id));
+  deleteByID(s.columns)(id);
+};
 
 const reducer = createReducer(initialState, {
   [transferCard]: (s, a) => {
@@ -79,10 +90,7 @@ const reducer = createReducer(initialState, {
     s.columns[colIdx].items.unshift(cardID); // add to top of column
   },
   [deleteColumn]: (s, a) => {
-    const colIdx = indexFromID(s.columns, a.payload);
-    s.columns[colIdx].items.forEach(deleteByID(s.cards));
-    s.tabs.forEach(tab => deleteInList(tab.columns, a.payload));
-    deleteByID(s.columns)(a.payload);
+    _deleteColumn(s, a.payload);
   },
   [renameColumn]: (s, a) => {
     s.columns[indexFromID(s.columns, a.payload.colID)].name = a.payload.name;
@@ -105,6 +113,17 @@ const reducer = createReducer(initialState, {
     s.columns.forEach(col => deleteInList(col.items, a.payload.card.id));
     s.columns[indexFromID(s.columns, a.payload.colID)].items.unshift(a.payload.card.id);
   },
+  [deleteTab]: (s, a) => {
+    while (s.tabs[a.payload].columns.length)
+      _deleteColumn(s, s.tabs[a.payload].columns[0]);
+    s.tabs.splice(a.payload, 1);
+  },
+  [addTab]: (s, a) => {
+    s.tabs.push({ name: a.payload, id: generateID(), columns: [] });
+  },
+  [renameTab]: (s, a) => {
+    s.tabs[indexFromID(s.tabs, a.payload.tabID)].name = a.payload.name;
+  }
 });
 
 export default undoable(reducer, {limit:10});

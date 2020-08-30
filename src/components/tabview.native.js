@@ -25,8 +25,7 @@ const renderTabBar = props => (
   />
 );
 
-export default ({ tabs, render }) => {
-  const [index, setIndex] = React.useState(0);
+export default ({ tabs, render, index, setIndex }) => {
   const [routes] = React.useState(tabs.map((tab, i) => ({ key: i, title: tab })));
 
   return (

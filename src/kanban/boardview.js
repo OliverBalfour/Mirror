@@ -208,7 +208,7 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmRespond = res => setConfirmOpen(false) ||
-    res === true && dispatch(duck.deleteColumn(col.id));
+    res && dispatch(duck.deleteColumn(col.id));
 
   const [promptOpen, setPromptOpen] = React.useState(false);
   const promptRespond = res => setPromptOpen(false) ||
