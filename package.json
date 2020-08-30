@@ -14,7 +14,6 @@
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@reduxjs/toolkit": "^1.4.0",
-    "classnames": "^2.2.6",
     "expo": "~38.0.9",
     "expo-splash-screen": "^0.5.0",
     "expo-status-bar": "^1.0.0",

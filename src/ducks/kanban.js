@@ -20,7 +20,7 @@ export const editCardContent = createAction('kanban/EDIT_CARD_CONTENT');//takes 
 export const editCard = createAction('kanban/EDIT_CARD'); // takes a card object; allows editing all of a card's params
 export const deleteCard = createAction('kanban/DELETE_CARD');//takes cardID
 
-export const moveCard = (srcColID, dstColID, srcIndex, dstIndex) =>
+export const moveCard = ([srcColID, dstColID, srcIndex, dstIndex]) =>
   srcColID === dstColID
     ? reorderCard({ colID: srcColID, srcIndex, dstIndex })
     : transferCard({ srcColID, dstColID, srcIndex, dstIndex });
@@ -28,6 +28,7 @@ export const moveCard = (srcColID, dstColID, srcIndex, dstIndex) =>
 export const addColumn = createAction('kanban/ADD_COLUMN'); // takes { name, tabID }
 export const deleteColumn = createAction('kanban/DELETE_COLUMN'); // takes string column ID
 export const renameColumn = createAction('kanban/RENAME_COLUMN'); // takes { colID, name }
+export const moveColumn = createAction('kanban/MOVE_COLUMN'); // takes [srcIdx, dstIdx, tabIdx]
 
 export const addTab = createAction('kanban/ADD_TAB'); // takes name
 export const deleteTab = createAction('kanban/DELETE_TAB'); // takes tabIdx
@@ -129,7 +130,14 @@ const reducer = createReducer(initialState, {
   },
   [renameTab]: (s, a) => {
     s.tabs[indexFromID(s.tabs, a.payload.tabID)].name = a.payload.name;
-  }
+  },
+  [moveColumn]: (s, a) => {
+    const [srcIdx, dstIdx, tabIdx] = a.payload;
+    let newitems = s.tabs[tabIdx].columns;
+    const [removed] = newitems.splice(srcIdx, 1);
+    newitems.splice(dstIdx, 0, removed);
+    s.tabs[tabIdx].columns = newitems;
+  },
 });
 
 export default undoable(reducer, {limit:10});

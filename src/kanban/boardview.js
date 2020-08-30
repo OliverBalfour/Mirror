@@ -17,7 +17,6 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import classNames from 'classnames';
 import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog } from '../components';
 
 const grid = 8;
@@ -87,7 +86,13 @@ const useStyles = makeStyles(theme => ({
   draggingCard: {
     opacity: 0.7,
     boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)'
-  }
+  },
+  columnContainer: {
+    transition: "opacity 0.6s",
+  },
+  draggingColumn: {
+    opacity: 0.7,
+  },
 }));
 
 export default ({ tabInfo }) => {
@@ -101,10 +106,19 @@ export default ({ tabInfo }) => {
   const columns = useSelector(state => duck.getColumnsInTab(tab)(state.boards.present));
 
   // dispatch move card action
-  const onDragEnd = res => res.destination ? dispatch(duck.moveCard(
-    res.source.droppableId, res.destination.droppableId,
-    res.source.index, res.destination.index
-  )) : null;
+  const onDragEnd = res => {
+    if (!res.destination) return;
+    if (res.type === "card") {
+      dispatch(duck.moveCard([
+        res.source.droppableId, res.destination.droppableId,
+        res.source.index, res.destination.index
+      ]));
+    } else if (res.type === "column") {
+      dispatch(duck.moveColumn([
+        res.source.index, res.destination.index, tab
+      ]));
+    }
+  };
 
   const [promptOpen, setPromptOpen] = React.useState(false);
   const promptRespond = name => setPromptOpen(false) ||
@@ -114,10 +128,17 @@ export default ({ tabInfo }) => {
   return (
     <View style={{ width: '100vw', overflowX: 'auto', height: '100%' }}>
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className={styles.root}>
-          {columns.map(col => <Column col={col} styles={styles} key={col.id} />)}
-          <AddColumn styles={styles} add={() => setPromptOpen(true)} />
-        </div>
+        <Droppable droppableId="default" style={{ flexGrow: 1, height: "100%" }} direction="horizontal" type="column">
+          {(provided, snapshot) => (
+            <React.Fragment>
+              <div className={styles.root} ref={provided.innerRef}>
+                {columns.map((col, i) => <Column col={col} styles={styles} key={col.id} index={i} />)}
+                <AddColumn styles={styles} add={() => setPromptOpen(true)} hide={snapshot.isDraggingOver || snapshot.draggingFromThisWith} />
+              </div>
+              {provided.placeholder}
+            </React.Fragment>
+          )}
+        </Droppable>
       </DragDropContext>
       {promptOpen && (
         <PromptDialog open respond={promptRespond}
@@ -127,7 +148,7 @@ export default ({ tabInfo }) => {
   );
 }
 
-const Column = ({ styles, col }) => {
+const Column = ({ styles, col, index }) => {
   const { id, items, name } = col;
 
   const [editingNew, setEditingNew] = React.useState(false);
@@ -151,26 +172,41 @@ const Column = ({ styles, col }) => {
     console.log('pressed menu button');
   };
 
+  const internals = (
+    <Droppable droppableId={id} style={{ flexGrow: 1, height: "100%" }} type="card">
+      {(provided, snapshot) => (
+        <React.Fragment>
+          <div style={{
+              width: cardWidth, overflowY: 'auto', overflowX: 'hidden', height: "100%"
+            }} ref={provided.innerRef}>
+            {editingNew && (
+              <EditingCard value={editingValue} setValue={setEditingValue}
+                add={addCard} cancel={() => { setEditingValue(""); setEditingNew(false) }} />
+            )}
+            {items.map((card, index) => <Card card={card} styles={styles} index={index} key={card.id} />)}
+          </div>
+          {provided.placeholder}
+        </React.Fragment>
+      )}
+    </Droppable>
+  );
+
   return (
-    <div className={styles.column}>
-      <ColumnHeader styles={styles} col={col} add={addButton} menu={menuButton} />
-      <Droppable droppableId={id} style={{ flexGrow: 1, height: "100%" }}>
-        {(provided, snapshot) => (
-          <React.Fragment>
-            <div style={{
-                width: cardWidth, overflowY: 'auto', overflowX: 'hidden', height: "100%"
-              }} ref={provided.innerRef}>
-              {editingNew && (
-                <EditingCard value={editingValue} setValue={setEditingValue}
-                  add={addCard} cancel={() => { setEditingValue(""); setEditingNew(false) }} />
-              )}
-              {items.map((card, index) => <Card card={card} styles={styles} index={index} key={card.id} />)}
+    <Draggable draggableId={id} index={index}>
+      {(provided, snapshot) => (
+        <div ref={provided.innerRef}
+          {...provided.draggableProps}
+          className={styles.columnContainer + (snapshot.isDragging ? " "+styles.draggingColumn : "")}
+          style={provided.draggableProps.style}>
+          <div className={styles.column}>
+            <div {...provided.dragHandleProps}>
+              <ColumnHeader styles={styles} col={col} add={addButton} menu={menuButton} />
             </div>
-            {provided.placeholder}
-          </React.Fragment>
-        )}
-      </Droppable>
-    </div>
+            {internals}
+          </div>
+        </div>
+      )}
+    </Draggable>
   );
 }
 
@@ -257,7 +293,7 @@ const Card = ({ card, styles, index }) => {
           <div ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            className={classNames(styles.card, { [styles.draggingCard]: snapshot.isDragging })}
+            className={styles.card + (snapshot.isDragging ? " "+styles.draggingCard : "")}
             style={provided.draggableProps.style}
             onClick={() => setPromptOpen(true)}>
             {content.split('\n').map((x,i)=><p key={i}>{x}</p>)}
@@ -271,11 +307,11 @@ const Card = ({ card, styles, index }) => {
   );
 }
 
-const AddColumn = ({ styles, add }) => {
+const AddColumn = ({ styles, add, hide }) => {
   return (
     <div className={styles.column} style={{
         width: cardWidth, display: 'flex', justifyContent: 'center',
-        alignItems: 'center', height: '100px'
+        alignItems: 'center', height: '100px', opacity: hide ? 0 : 1
       }}>
       <IconButton onClick={add}>
         <AddIcon />
