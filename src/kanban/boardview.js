@@ -47,12 +47,8 @@ const useStyles = makeStyles(theme => ({
     // there is a bug where moving cards to the tallest column leads to a scrollbar flashing up
     // and we don't want the scrollbar to take up horizontal space and force the cards to reflow
 
-    maxHeight: 'calc(100vh - 160px)',
+    height: 'calc(100vh - 160px)',
     overflow: 'hidden'
-  },
-  draggingOverColumn: {
-    // background: '#DAEBEB',
-    border: '1px solid #BBCBCB'
   },
   columnHeaderContainer: {
     padding: "8 0",
@@ -156,27 +152,25 @@ const Column = ({ styles, col }) => {
   };
 
   return (
-    <Droppable droppableId={id} style={{ flexGrow: 1 }}>
-      {(provided, snapshot) => (
-        <div ref={provided.innerRef}
-          className={classNames(
-            styles.column,
-            {[styles.draggingOverColumn]: snapshot.isDraggingOver }
-          )}>
-          <ColumnHeader styles={styles} col={col} add={addButton} menu={menuButton} />
-          <div style={{ width: cardWidth, overflowY: 'auto', overflowX: 'hidden', height: "100%" }}>
-            {editingNew && (
-              <EditingCard value={editingValue} setValue={setEditingValue}
-                add={addCard} cancel={() => { setEditingValue(""); setEditingNew(false) }} />
-            )}
-            <div style={{ width: cardWidth }}> {/* could -20 to avoid clipping cards */}
+    <div className={styles.column}>
+      <ColumnHeader styles={styles} col={col} add={addButton} menu={menuButton} />
+      <Droppable droppableId={id} style={{ flexGrow: 1, height: "100%" }}>
+        {(provided, snapshot) => (
+          <React.Fragment>
+            <div style={{
+                width: cardWidth, overflowY: 'auto', overflowX: 'hidden', height: "100%"
+              }} ref={provided.innerRef}>
+              {editingNew && (
+                <EditingCard value={editingValue} setValue={setEditingValue}
+                  add={addCard} cancel={() => { setEditingValue(""); setEditingNew(false) }} />
+              )}
               {items.map((card, index) => <Card card={card} styles={styles} index={index} key={card.id} />)}
             </div>
-          </div>
-          {provided.placeholder}
-        </div>
-      )}
-    </Droppable>
+            {provided.placeholder}
+          </React.Fragment>
+        )}
+      </Droppable>
+    </div>
   );
 }
 
