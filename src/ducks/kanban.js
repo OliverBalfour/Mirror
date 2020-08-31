@@ -151,4 +151,4 @@ const reducer = createReducer(initialState, {
   },
 });
 
-export default undoable(reducer, {limit:10});
+export default undoable(reducer, {limit:50});

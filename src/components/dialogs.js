@@ -81,7 +81,8 @@ export const CardEditDialog = ({ respond, card }) => {
   const getTabByColID = colID => tabs[tabs.map(tab => tab.columns.indexOf(colID) !== -1).indexOf(true)];
 
   const done = () => (respond(), setContent(card.content));
-  const deleteCard = () => (dispatch(duck.deleteCard(card.id)), done());
+  // save and then delete so you can undo the delete without losing your unsaved draft of a card
+  const deleteCard = () => (dispatch(duck.editCard(newCard)), dispatch(duck.deleteCard(card.id)), done());
   const editCard = () => (dispatch(duck.editCard(newCard)), done());
 
   const labelIDs = [generateID()];

@@ -303,8 +303,12 @@ const Card = ({ card, styles, index }) => {
             <ReactMarkdown source={content} />
             {card.description && (() => {
               const Icon = icons.description;
-              return <Chip size='small' icon={Icon ? <Icon/> : null} label={icons.description.label}
-                style={{ borderRadius: 3, background: 'white' }} title="Description" variant="outlined" />
+              return <Chip size='small' icon={Icon ? <Icon/> : null}
+                label={icons.description.label}
+                style={{ borderRadius: 3, background: 'white' }}
+                title={"Description: " + card.description.substring(0,256)
+                  + (card.description.length > 256 ? "..." : "")}
+                variant="outlined" />
             })()}
           </div>
         )}
