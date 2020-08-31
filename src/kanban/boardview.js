@@ -15,6 +15,7 @@ import { View, Text } from 'react-native';
 import { makeStyles, Button, IconButton, ButtonGroup, TextField, Chip } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
+import NotesIcon from '@material-ui/icons/Notes';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog } from '../components';
@@ -286,6 +287,9 @@ const Card = ({ card, styles, index }) => {
   const { id, content } = card;
   const dispatch = useDispatch();
   const [promptOpen, setPromptOpen] = React.useState(false);
+  const icons = {
+    description: NotesIcon
+  }
 
   return (
     <React.Fragment>
@@ -298,6 +302,11 @@ const Card = ({ card, styles, index }) => {
             style={provided.draggableProps.style}
             onClick={() => setPromptOpen(true)}>
             <ReactMarkdown source={content} />
+            {card.description && (() => {
+              const Icon = icons.description;
+              return <Chip size='small' icon={Icon ? <Icon/> : null} label={icons.description.label}
+                style={{ borderRadius: 3, background: 'white' }} title="Description" variant="outlined" />
+            })()}
           </div>
         )}
       </Draggable>

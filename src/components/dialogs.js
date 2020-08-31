@@ -1,10 +1,11 @@
 
 import * as React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-         TextField, InputLabel, Select, MenuItem } from '@material-ui/core';
+         TextField, InputLabel, Select, MenuItem, ClickAwayListener } from '@material-ui/core';
 import * as duck from '../ducks/kanban';
 import { useDispatch, useSelector } from 'react-redux';
 import { generateID } from '../common/utils';
+import ReactMarkdown from 'react-markdown';
 
 // TODO: can we have a promise API for generating dialogs on the fly and getting their results?
 // This method means the user has to manage 'open' state
@@ -70,6 +71,8 @@ export const CardEditDialog = ({ respond, card }) => {
   const [newCard, setCard] = React.useState({ card: {...card}, colID: currentColID });
   const setColID = colID => setCard({ ...newCard, colID });
   const setContent = content => setCard({ ...newCard, card: {...newCard.card, content} });
+  const setDescription = description => setCard({ ...newCard, card: {...newCard.card, description: description.length ? description : undefined} });
+  const [editingDescription, setEditingDescription] = React.useState(false);
 
   //TODO: extract global boards selector so we can change state.boards.present to anything
   // else we need as new requirements arise without causing serious problems
@@ -94,7 +97,18 @@ export const CardEditDialog = ({ respond, card }) => {
         </Select>
 
         <TextField label="Title" margin="dense" autoFocus fullWidth variant="filled"
-          multiline rowsMax={6} value={newCard.card.content} onChange={e => setContent(e.target.value)} />
+          multiline rowsMax={3} value={newCard.card.content} onChange={e => setContent(e.target.value)} />
+        {!editingDescription ? (
+          <div onClick={() => setEditingDescription(true)} style={{marginTop: 8}}>
+            <span style={{color: 'grey'}}>Description</span>
+            <ReactMarkdown source={newCard.card.description} />
+          </div>
+        ) : (
+          <ClickAwayListener onClickAway={() => setEditingDescription(false)}>
+            <TextField label="Description" margin="dense" autoFocus fullWidth variant="outlined"
+              multiline rows={6} value={newCard.card.description} onChange={e => setDescription(e.target.value)} />
+          </ClickAwayListener>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={deleteCard}>Delete</Button>
