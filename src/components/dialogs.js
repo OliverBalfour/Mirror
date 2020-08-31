@@ -106,7 +106,7 @@ export const CardEditDialog = ({ respond, card }) => {
         ) : (
           <ClickAwayListener onClickAway={() => setEditingDescription(false)}>
             <TextField label="Description" margin="dense" autoFocus fullWidth variant="outlined"
-              multiline rows={6} value={newCard.card.description} onChange={e => setDescription(e.target.value)} />
+              multiline rows={6} rowsMax={16} value={newCard.card.description} onChange={e => setDescription(e.target.value)} />
           </ClickAwayListener>
         )}
       </DialogContent>
