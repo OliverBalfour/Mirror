@@ -11,6 +11,7 @@
 import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import * as duck from '../ducks/kanban';
+import { selectors } from '../store';
 import { View, Text } from 'react-native';
 import { makeStyles, Button, IconButton, ButtonGroup, TextField, Chip } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -103,9 +104,7 @@ export default ({ tabInfo }) => {
   const dispatch = useDispatch();
   const styles = useStyles();
 
-  // TODO: is there a way to memoise these higher order selectors?
-  // TODO: how do we deal with .boards namespace being only needed part of the time
-  const columns = useSelector(state => duck.getColumnsInTab(tab)(state.boards.present));
+  const columns = useSelector(selectors.boards.getColumnsInTabs)[tab];
 
   // dispatch move card action
   const onDragEnd = res => {

@@ -2,8 +2,8 @@
 import { combineReducers } from 'redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
-import boards from './ducks/kanban';
-import { saveState } from './common/utils';
+import boards, { selectors as boardSelectors } from './ducks/kanban';
+import { saveState, objectMap } from './common/utils';
 
 const reducer = combineReducers({
   boards,
@@ -30,3 +30,11 @@ store.subscribe(localStorageSubscriber);
 localStorageSubscriber(); // save data generated on first run
 
 export default store;
+
+// produce global selectors
+export const globalSelectors = {
+  boards: state => state.boards.present
+}
+export const selectors = {
+  boards: objectMap(boardSelectors, localSelector => state => localSelector(globalSelectors.boards(state)))
+};

@@ -77,3 +77,11 @@ export const saveState = state => {
     }
   } catch (e) {}
 }
+
+// Source: https://stackoverflow.com/a/14810722/4642943
+// returns a new object with the values at each key mapped using mapFn(value)
+export const objectMap = (object, mapFn) =>
+  Object.keys(object).reduce(function(result, key) {
+    result[key] = mapFn(object[key])
+    return result
+  }, {});

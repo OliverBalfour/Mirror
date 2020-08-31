@@ -46,14 +46,19 @@ const deleteInList = (list, elem) => {
 
 // Selectors
 
-// higher order function which creates a selector for a specific tab
-// it un-normalises the state for that tab, returning:
-// return :: List[column], column :: { id, items: List[card] }, card :: { id, content }
-export const getColumnsInTab = tab => state =>
-  state.tabs[tab].columns.map(col => state.columns[indexFromID(state.columns, col)])
-    .map(col => ({
-      ...col, items: col.items.map(card => state.cards[indexFromID(state.cards, card)])
-    }));
+export const selectors = {
+  // higher order function which creates a selector for a specific tab
+  // it un-normalises the state for that tab, returning:
+  // return :: List[column], column :: { id, items: List[card] }, card :: { id, content }
+  getColumnsInTabs: state =>
+    state.tabs.map((_, tab) => state.tabs[tab].columns.map(col => state.columns[indexFromID(state.columns, col)])
+      .map(col => ({
+        ...col, items: col.items.map(card => state.cards[indexFromID(state.cards, card)])
+      }))),
+  columns: state => state.columns,
+  tabs: state => state.tabs,
+  cards: state => state.cards,
+};
 
 // Reducers
 

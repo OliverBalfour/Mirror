@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
          TextField, InputLabel, Select, MenuItem, ClickAwayListener } from '@material-ui/core';
 import * as duck from '../ducks/kanban';
+import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { generateID } from '../common/utils';
 import ReactMarkdown from 'react-markdown';
@@ -64,8 +65,7 @@ export const PromptDialog = ({
 export const CardEditDialog = ({ respond, card }) => {
   const dispatch = useDispatch();
 
-  const currentColID = useSelector(state =>
-    state.boards.present.columns
+  const currentColID = useSelector(state => sel.boards(state).columns
       .filter(col => col.items.indexOf(card.id) !== -1)[0].id);
 
   const [newCard, setCard] = React.useState({ card: {...card}, colID: currentColID });
@@ -76,8 +76,8 @@ export const CardEditDialog = ({ respond, card }) => {
 
   //TODO: extract global boards selector so we can change state.boards.present to anything
   // else we need as new requirements arise without causing serious problems
-  const columns = useSelector(state => state.boards.present.columns);
-  const tabs = useSelector(state => state.boards.present.tabs);
+  const columns = useSelector(selectors.boards.columns);
+  const tabs = useSelector(selectors.boards.tabs);
   const getTabByColID = colID => tabs[tabs.map(tab => tab.columns.indexOf(colID) !== -1).indexOf(true)];
 
   const done = () => (respond(), setContent(card.content));

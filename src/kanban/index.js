@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { TabView, UndoRedo } from '../components';
 import BoardView from './boardview';
 import * as duck from '../ducks/kanban';
+import { selectors } from '../store';
 import { PopoverMenu, ConfirmDialog, PromptDialog } from '../components';
 
 // TODO: tabview should not handle tab no state
@@ -27,7 +28,7 @@ export default () => {
       dispatch(duck.renameTab({ tabID: tabs[currentTab].id, name: res }));
 
   // [{name, id, columns (ids)},...]
-  const tabs = useSelector(state => state.boards.present.tabs);
+  const tabs = useSelector(selectors.boards.tabs);
   return (
     <React.Fragment>
       <TabView
