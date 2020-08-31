@@ -37,11 +37,8 @@ export const moveTab = createAction('kanban/MOVE_TAB'); // takes [srcIdx, dstIdx
 
 // Helpers
 
-const _getColByID = state => id => state.columns.filter(col => col.id === id)[0];
-const _getCardByID = state => id => state.cards.filter(card => card.id === id)[0];
-
 const indexFromID = (list, id) => list.map(item => item.id === id).indexOf(true);
-const deleteByID = list => id => list.splice(indexFromID(list, id), 1);
+const deleteByID = (list, id) => list.splice(indexFromID(list, id), 1);
 const deleteInList = (list, elem) => {
   let index = list.indexOf(elem);
   if (index !== -1) list.splice(index, 1); // undesired behaviour when splicing at (-1, 1)
@@ -53,9 +50,9 @@ const deleteInList = (list, elem) => {
 // it un-normalises the state for that tab, returning:
 // return :: List[column], column :: { id, items: List[card] }, card :: { id, content }
 export const getColumnsInTab = tab => state =>
-  state.tabs[tab].columns.map(_getColByID(state))
+  state.tabs[tab].columns.map(col => state.columns[indexFromID(state.columns, col)])
     .map(col => ({
-      ...col, items: col.items.map(_getCardByID(state))
+      ...col, items: col.items.map(card => state.cards[indexFromID(state.cards, card)])
     }));
 
 // Reducers
@@ -64,9 +61,9 @@ const initialState = loadState();
 
 const _deleteColumn = (s, id) => {
   const colIdx = indexFromID(s.columns, id);
-  s.columns[colIdx].items.forEach(deleteByID(s.cards));
+  s.columns[colIdx].items.forEach(cardID => deleteByID(s.cards, cardID));
   s.tabs.forEach(tab => deleteInList(tab.columns, id));
-  deleteByID(s.columns)(id);
+  deleteByID(s.columns, id);
 };
 
 const reducer = createReducer(initialState, {
@@ -105,7 +102,7 @@ const reducer = createReducer(initialState, {
   [deleteCard]: (s, a) => {
     const cardIdx = indexFromID(s.cards, a.payload);
     s.columns.forEach(col => deleteInList(col.items, a.payload));
-    deleteByID(s.cards)(a.payload);
+    deleteByID(s.cards, a.payload);
   },
   [addColumn]: (s, a) => {
     const id = generateID();

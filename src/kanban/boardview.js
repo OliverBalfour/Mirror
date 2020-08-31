@@ -312,7 +312,8 @@ const AddColumn = ({ styles, add, hide }) => {
   return (
     <div className={styles.column} style={{
         width: cardWidth, display: 'flex', justifyContent: 'center',
-        alignItems: 'center', height: '100px', opacity: hide ? 0 : 1
+        alignItems: 'center', height: '100px',
+        marginLeft: hide ? cardWidth + 5*grid + 2 : grid
       }}>
       <IconButton onClick={add}>
         <AddIcon />
