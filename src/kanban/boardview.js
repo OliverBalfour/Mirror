@@ -249,6 +249,8 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
     typeof res === "string" && res.length &&
       dispatch(duck.renameColumn({ colID: col.id, name: res }));
 
+  const archiveAll = () => dispatch(duck.archiveCardsInColumn(col.id));
+
   return (
     <div>
       <div className={styles.columnHeaderContainer}>
@@ -262,6 +264,7 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
             <AddIcon />
           </IconButton>
           <PopoverMenu map={{
+            "Archive all": () => archiveAll(),
             "Rename": () => setPromptOpen(true),
             "Delete": () => setConfirmOpen(true),
           }}>

@@ -29,6 +29,7 @@ export const addColumn = createAction('kanban/ADD_COLUMN'); // takes { name, tab
 export const deleteColumn = createAction('kanban/DELETE_COLUMN'); // takes string column ID
 export const renameColumn = createAction('kanban/RENAME_COLUMN'); // takes { colID, name }
 export const moveColumn = createAction('kanban/MOVE_COLUMN'); // takes [srcIdx, dstIdx, tabIdx]
+export const archiveCardsInColumn = createAction('kanban/ARCHIVE_ALL_COLUMN'); // takes colID
 
 export const addTab = createAction('kanban/ADD_TAB'); // takes name
 export const deleteTab = createAction('kanban/DELETE_TAB'); // takes tabIdx
@@ -58,6 +59,8 @@ export const selectors = {
   columns: state => state.columns,
   tabs: state => state.tabs,
   cards: state => state.cards,
+  archivedCards: state => state.cards.filter(card => Object.keys(card).indexOf("archived") !== -1),
+  activeCards:   state => state.cards.filter(card => Object.keys(card).indexOf("archived") === -1),
 };
 
 // Reducers
@@ -148,6 +151,16 @@ const reducer = createReducer(initialState, {
     const [removed] = newitems.splice(srcIdx, 1);
     newitems.splice(dstIdx, 0, removed);
     s.tabs = newitems;
+  },
+  [archiveCardsInColumn]: (s, a) => {
+    // archived cards still exist in memory but are not listed in a column's items
+    // they do have a archived: {date, colID} field added however for future use
+    const colIdx = indexFromID(s.columns, a.payload);
+    s.columns[colIdx].items.forEach(cardID => {
+      let card = s.cards[indexFromID(s.cards, cardID)];
+      card.archived = { date: new Date().getTime(), colID: a.payload };
+    });
+    s.columns[colIdx].items = [];
   },
 });
 
