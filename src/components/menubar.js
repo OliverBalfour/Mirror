@@ -15,6 +15,7 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import NotesIcon from '@material-ui/icons/Notes';
 import PopoverMenu from './popovermenu';
+import { downloadData } from '../common/utils';
 
 export default ({ active, setActive }) => {
   return (
@@ -33,7 +34,7 @@ export default ({ active, setActive }) => {
           </Tabs>
           <div style={{ flexGrow: 1 }} />
           <PopoverMenu map={{
-            "Export state": () => window.prompt("Copy/paste this into a file", localStorage.kanban),
+            "Export state": () => downloadData(localStorage.kanban, "mirror-backup.json", "application/json"),
             "Import state": () => { localStorage.kanban = window.prompt("Paste your exported state here. Press cancel (or the undo button after pressing OK) to revert. Refresh the page to confirm and reload state.") },
             "Clear saved state": () => window.prompt("Delete all saved state? Pressing undo will fix this. Type YES to confirm", "NO") === "YES" && localStorage.clear(),
           }}>

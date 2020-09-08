@@ -118,3 +118,13 @@ export const prettyPrintDate = epochMilliseconds => {
   const time = getTime(date);
   return getDate(date) + (time ? " " + time : "");
 };
+
+// Download content as filename with specificed MIME type
+export const downloadData = (content, filename, type) => {
+    if(!type) type = 'application/octet-stream';
+    const a = document.createElement('a');
+    const blob = new Blob([content], { type });
+    a.href = window.URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+}
