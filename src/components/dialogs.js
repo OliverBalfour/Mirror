@@ -1,7 +1,8 @@
 
 import * as React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-         TextField, InputLabel, Select, MenuItem, ClickAwayListener } from '@material-ui/core';
+         TextField, InputLabel, Select, MenuItem, ClickAwayListener,
+         ListSubheader } from '@material-ui/core';
 import * as duck from '../ducks/kanban';
 import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
@@ -77,11 +78,18 @@ export const CardEditDialog = ({ respond, card }) => {
   const setDateTime = time => setCard({ ...newCard, card: {...newCard.card, time } })
   const [editingDescription, setEditingDescription] = React.useState(false);
 
-  //TODO: extract global boards selector so we can change state.boards.present to anything
-  // else we need as new requirements arise without causing serious problems
-  const columns = useSelector(selectors.boards.columns);
+  const columns = [...useSelector(selectors.boards.columns)];
   const tabs = useSelector(selectors.boards.tabs);
-  const getTabByColID = colID => tabs[tabs.map(tab => tab.columns.indexOf(colID) !== -1).indexOf(true)];
+  const getTabIdxByColID = colID => tabs.map(tab => tab.columns.indexOf(colID) !== -1).indexOf(true);
+  // // order columns by tab and column orders (compareFunction returns -1 if colA is before colB)
+  // columns.sort((colA, colB) => {
+  //   const [tabA, tabB] = [getTabIdxByColID(colA.id), getTabIdxByColID(colB.id)];
+  //   if (tabA < tabB) return -1;
+  //   else if (tabA > tabB) return 1;
+  //   // tabA == tabB, so sort in left-to-right order in tab
+  //   return tabs[tabA].columns.indexOf(colA.id) - tabs[tabA].columns.indexOf(colB.id);
+  // });
+  const getColIdxByID = colID => columns.map(col => col.id === colID).indexOf(true);
 
   const done = () => (respond(), setContent(card.content));
   // save and then delete so you can undo the delete without losing your unsaved draft of a card
@@ -95,9 +103,15 @@ export const CardEditDialog = ({ respond, card }) => {
       <DialogContent>
         <InputLabel id={labelIDs[0]}>Column</InputLabel>
         <Select labelId={labelIDs[0]} value={newCard.colID} onChange={e => setColID(e.target.value)}>
-          {columns.map(col => (
-            <MenuItem value={col.id} key={col.id}>{getTabByColID(col.id).name}: {col.name}</MenuItem>
-          ))}
+          {tabs.flatMap(tab => ([
+            // the subheader can be clicked so we add the following CSS hack (per mui#18200)
+            // .MuiListSubheader-root { pointer-events: none; }
+            <ListSubheader key={tab.id}>{tab.name}</ListSubheader>,
+            ...tab.columns.map(colID => {
+              const col = columns[getColIdxByID(colID)];
+              return (<MenuItem value={colID} key={colID}>{col.name}</MenuItem>);
+            })
+          ]))}
         </Select>
 
         <TextField label="Title" margin="dense" autoFocus fullWidth variant="filled"

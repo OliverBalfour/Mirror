@@ -36,6 +36,8 @@
         -moz-osx-font-smoothing: grayscale;
         -ms-overflow-style: scrollbar;
       }
+      /* patch for mui-org/material-ui#18200: clicking on group headers in select causes crash */
+      .MuiListSubheader-root { pointer-events: none; }
     </style>
   </head>
   <body>
