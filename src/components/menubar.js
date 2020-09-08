@@ -33,7 +33,9 @@ export default ({ active, setActive }) => {
           </Tabs>
           <div style={{ flexGrow: 1 }} />
           <PopoverMenu map={{
-            "Clear saved state": () => localStorage.clear(), // need lambda because of binding
+            "Export state": () => window.prompt("Copy/paste this into a file", localStorage.kanban),
+            "Import state": () => { localStorage.kanban = window.prompt("Paste your exported state here. Press cancel (or the undo button after pressing OK) to revert. Refresh the page to confirm and reload state.") },
+            "Clear saved state": () => window.prompt("Delete all saved state? Pressing undo will fix this. Type YES to confirm", "NO") === "YES" && localStorage.clear(),
           }}>
             <IconButton edge="end" color="inherit">
               <MoreIcon />

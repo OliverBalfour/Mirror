@@ -18,9 +18,12 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
 import NotesIcon from '@material-ui/icons/Notes';
 import DeleteIcon from '@material-ui/icons/Delete';
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog } from '../components';
 import ReactMarkdown from 'react-markdown';
+import { format } from 'date-fns';
+import { prettyPrintDate } from '../common/utils';
 
 const grid = 8;
 const cardWidth = 300;
@@ -287,7 +290,8 @@ const Card = ({ card, styles, index }) => {
   const dispatch = useDispatch();
   const [promptOpen, setPromptOpen] = React.useState(false);
   const icons = {
-    description: NotesIcon
+    description: NotesIcon,
+    time: AccessTimeIcon,
   }
 
   return (
@@ -304,10 +308,18 @@ const Card = ({ card, styles, index }) => {
             {card.description && (() => {
               const Icon = icons.description;
               return <Chip size='small' icon={Icon ? <Icon/> : null}
-                label={icons.description.label}
+                label=""
                 style={{ borderRadius: 3, background: 'white' }}
-                title={"Description: " + card.description.substring(0,256)
+                title={card.description.split("\n\n").join("\n").substring(0,256)
                   + (card.description.length > 256 ? "..." : "")}
+                variant="outlined" />
+            })()}
+            {card.time && (() => {
+              const Icon = icons.time;
+              return <Chip size='small' icon={Icon ? <Icon/> : null}
+                label={prettyPrintDate(card.time)}
+                title={format(new Date(card.time), "dd/MM/yyyy hh:mmaaa")}
+                style={{ borderRadius: 3, background: 'white' }}
                 variant="outlined" />
             })()}
           </div>

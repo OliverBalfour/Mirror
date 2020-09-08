@@ -7,6 +7,8 @@ import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { generateID } from '../common/utils';
 import ReactMarkdown from 'react-markdown';
+import { MuiPickersUtilsProvider, DateTimePicker } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 
 // TODO: can we have a promise API for generating dialogs on the fly and getting their results?
 // This method means the user has to manage 'open' state
@@ -72,6 +74,7 @@ export const CardEditDialog = ({ respond, card }) => {
   const setColID = colID => setCard({ ...newCard, colID });
   const setContent = content => setCard({ ...newCard, card: {...newCard.card, content} });
   const setDescription = description => setCard({ ...newCard, card: {...newCard.card, description: description.length ? description : undefined} });
+  const setDateTime = time => setCard({ ...newCard, card: {...newCard.card, time } })
   const [editingDescription, setEditingDescription] = React.useState(false);
 
   //TODO: extract global boards selector so we can change state.boards.present to anything
@@ -109,6 +112,22 @@ export const CardEditDialog = ({ respond, card }) => {
             <TextField label="Description" margin="dense" autoFocus fullWidth variant="outlined"
               multiline rows={6} rowsMax={16} value={newCard.card.description} onChange={e => setDescription(e.target.value)} />
           </ClickAwayListener>
+        )}
+        {newCard.card.time ? (
+          <div style={{marginTop: 10}}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <DateTimePicker
+                value={new Date(newCard.card.time)}
+                onChange={newDate => setDateTime(newDate.getTime())}
+                label="Due date / event time"
+                showTodayButton
+                format="MMMM do hh:mm aaa"
+              />
+          </MuiPickersUtilsProvider>
+          <Button color="primary" variant="outlined" style={{float:'right',marginTop:12}} onClick={() => setDateTime(null)}>Reset date</Button>
+          </div>
+        ) : (
+          <span style={{color: 'grey'}} onClick={() => setDateTime(new Date().getTime())}>Due date / event time</span>
         )}
       </DialogContent>
       <DialogActions>

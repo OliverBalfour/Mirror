@@ -1,4 +1,6 @@
 
+import * as fn from 'date-fns';
+
 export const generateID = () => Math.random().toString().substring(2);
 
 // generate { cards, columns } where each column has colnum[i] cards
@@ -59,10 +61,10 @@ export const dummyState = () => {
 export const loadState = () => {
   try {
     // web
-    if (localStorage.hasOwnProperty("kanban"))
-      return JSON.parse(localStorage.getItem("kanban"));
-    else
-      return dummyState();
+    if (localStorage.hasOwnProperty("kanban")) {
+      const state = JSON.parse(localStorage.getItem("kanban"));
+      if (state !== null) return state;
+    } else return dummyState();
   } catch (e) {
     // native
     return dummyState();
@@ -85,3 +87,34 @@ export const objectMap = (object, mapFn) =>
     result[key] = mapFn(object[key])
     return result
   }, {});
+
+/**
+ * Returns a heavily abbreviated pretty printed date using date-fns
+ * - Only includes time if within a week and not midnight
+ * - Only includes minutes if nonzero
+ * - Replaces date with "Tomorrow" or "Next Fri" for days within a fortnight
+ */
+export const prettyPrintDate = epochMilliseconds => {
+  const date = new Date(epochMilliseconds);
+  const now = new Date();
+
+  const getDate = date => {
+    const diff = fn.differenceInCalendarDays(date, now);
+    if (diff === 0) return "Today";
+    else if (diff === -1) return "Yesterday";
+    else if (diff === 1) return "Tomorrow";
+    else if (diff > 0 && diff < 7) return fn.format(date, "EEE"); // ex: Wed
+    // else if (diff < 14) return fn.format(date, "EEE") + " Week"; // ex: Fri Week
+    else if (diff > -7 && diff < 0) return "Last " + fn.format(date, "EEE"); // ex: Last Fri
+    return fn.format(date, "MMM do"); // ex: Sep 17th
+  }
+
+  const getTime = date => {
+    if (date.getHours() === 0 && date.getMinutes() === 0) return null; // ignore time if midnight
+    if (date.getMinutes() === 0) return fn.format(date, "haaa"); // ex: 4PM
+    return fn.format(date, "h:mmaaa");
+  }
+
+  const time = getTime(date);
+  return getDate(date) + (time ? " " + time : "");
+};
