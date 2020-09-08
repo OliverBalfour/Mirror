@@ -177,11 +177,17 @@ const Column = ({ styles, col, index }) => {
   };
 
   const internals = (
-    <Droppable droppableId={id} style={{ flexGrow: 1, height: "100%" }} type="card">
+    <Droppable droppableId={id} style={{ flexGrow: 1, height: "100%" }} type="card" ignoreContainerClipping>
       {(provided, snapshot) => (
         <React.Fragment>
           <div style={{
-              width: cardWidth, overflowY: 'auto', overflowX: 'hidden', height: "100%"
+              width: cardWidth, overflowY: 'auto', overflowX: 'hidden',
+              // 1) height is -20px to avoid bottom being clipped off
+              // 2) 100px padding and -100px height while dragging to give a 100px buffer of
+              // droppable space to avoid glitching due to dynamic resizing while moving
+              // cards to the bottom
+              height: snapshot.isDraggingOver ? "calc(100% - 120px)" : "calc(100% - 20px)",
+              paddingBottom: snapshot.isDraggingOver ? 100 : 0
             }} ref={provided.innerRef}>
             {editingNew && (
               <EditingCard value={editingValue} setValue={setEditingValue}
