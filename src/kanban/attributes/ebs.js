@@ -7,7 +7,7 @@
 
 import * as React from 'react';
 import { useSelector } from 'react-redux';
-import { Button, Chip, TextField } from '@material-ui/core';
+import { Button, Chip, TextField, FormControlLabel, Checkbox } from '@material-ui/core';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import HourglassFullIcon from '@material-ui/icons/HourglassFull';
 import { globalSelectors as sel } from '../../store';
@@ -46,26 +46,33 @@ export const Edit = ({ card, setCard }) => {
       <br/></React.Fragment>
     );
 
-  // ebs :: { estimate :: seconds, computed :: seconds, elapsed :: seconds, done :: boolean }
+  // ebs :: { estimate :: seconds, computed :: seconds, elapsed :: seconds,
+  //   done :: boolean, exact :: boolean }
   // estimate is user estimate, computed is a function of historical estimation accuracy
-  // and elapsed is current time spent on the task
+  // and elapsed is current time spent on the task, and exact is whether the estimate is exact (eg duration)
   // TODO: add timer feature or column powerup to automatically time
 
   const getPrettyPredicted = () => prettySeconds(computeEstimate(unprettySeconds(estStr) || 0, historical));
 
   return (
     <div style={{marginTop: 10}}>
-      <div style={{width: '30%',float:'left',marginRight:10}}>
+      <div style={{width: '30%',float:'left',marginRight:16}}>
         <TextField label={`Estimate (predicted ${getPrettyPredicted()})`}
           margin="dense" autoFocus fullWidth
           value={estStr}
           onChange={e => setEBSEstimate(e.target.value)} />
       </div>
-      <div style={{width: '30%',float:'left'}}>
+      <div style={{width: '30%',float:'left',marginRight:16}}>
         <TextField label="Elapsed"
           margin="dense" fullWidth
           value={elapStr}
           onChange={e => setEBSElapsed(e.target.value)} />
+      </div>
+      <div style={{marginTop: 12, float:'left'}}>
+        <FormControlLabel label="Exact duration" control={
+            <Checkbox color="primary"
+              checked={Boolean(card.ebs.exact)} onChange={e => setEBS({ exact: e.target.checked })} />
+          }/>
       </div>
       <div style={{flexGrow:1}}></div>
       <Button color="primary" variant="outlined" size='medium' style={{float:'right',marginTop:12}}
@@ -127,10 +134,13 @@ const unprettySeconds = s => {
 
 export const Indicator = ({ card }) => {
   if (card.ebs) {
+    // display 'elapsed/computed' where the 'elapsed/' is only present if nonzero
+    // displays estimate instead of computed iff card.ebs.exact (checkbox ticked)
     const label = (card.ebs.elapsed ? prettySeconds(card.ebs.elapsed) + '/' : "")
-      + prettySeconds(card.ebs.computed); // displays computed estimate, not user's estimate
+      + prettySeconds(card.ebs.exact ? card.ebs.estimate : card.ebs.computed);
     const elapsed = card.ebs.elapsed ? `Elapsed: ${prettySeconds(card.ebs.elapsed)}` : "";
-    const title = `Estimate: ${prettySeconds(card.ebs.estimate)}\nComputed: ${prettySeconds(card.ebs.computed)}\n${elapsed}`;
+    const title = card.ebs.exact ? "Duration of " + prettySeconds(card.ebs.estimate) :
+      `Estimate: ${prettySeconds(card.ebs.estimate)}\nComputed: ${prettySeconds(card.ebs.computed)}\n${elapsed}`;
     // const icon = card.ebs.done ? <HourglassEmptyIcon /> : <HourglassFullIcon />
     const icon = <HourglassEmptyIcon />;
     return <Chip size='small' icon={icon}
