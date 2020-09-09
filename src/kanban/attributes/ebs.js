@@ -54,18 +54,25 @@ export const Edit = ({ card, setCard }) => {
 
   const getPrettyPredicted = () => prettySeconds(computeEstimate(unprettySeconds(estStr) || 0, historical));
 
+  // returns true iff the string is non-empty but in incorrect format (not HHhMMm like 1h30m)
+  const invalid = str => str !== "" && str !== null && unprettySeconds(str) === null;
+
   return (
     <div style={{marginTop: 10}}>
       <div style={{width: '30%',float:'left',marginRight:16}}>
         <TextField label={`Estimate (predicted ${getPrettyPredicted()})`}
           margin="dense" autoFocus fullWidth
           value={estStr}
+          error={invalid(estStr)}
+          helperText={invalid(estStr) ? "Example format: 1h30m" : null}
           onChange={e => setEBSEstimate(e.target.value)} />
       </div>
       <div style={{width: '30%',float:'left',marginRight:16}}>
         <TextField label="Elapsed"
           margin="dense" fullWidth
           value={elapStr}
+          error={invalid(elapStr)}
+          helperText={invalid(elapStr) ? "Example format: 1h30m" : null}
           onChange={e => setEBSElapsed(e.target.value)} />
       </div>
       <div style={{marginTop: 12, float:'left'}}>
@@ -117,19 +124,20 @@ const prettySeconds = s => {
 };
 
 // Inverse of prettySeconds; used so the input field can be edited in pretty form
-const unprettySeconds = s => {
+let unprettySeconds = s => {
   if (s === '0') return 0;
-  const h = s.indexOf('h');
-  if (h > 0) {
-    const hours = parseFloat(s.substring(0, h));
-    if (h + 1 == s.length) return hours * 3600; // no minutes
-    if (s[s.length-1] !== 'm') return null; // last char should be 'm'
-    const minutes = parseFloat(s.substring(h + 1, s.length - 1))
-    return hours * 3600 + minutes * 60;
-  }
-  const minutes = parseFloat(s.substring(0, s.length - 1));
-  if (!isNaN(minutes)) return 60*minutes;
-  return null; // invalid; return source string
+
+  // this parses it to [x,'1h', '30m'] if possible, or [x,'1h',undefined] or [x,undefined,'30m']
+  // if only one is present, where x is irrelevant
+  let groups = (/^(\d+h|\d*\.\d+h)?(\d+m|\d*\.\d+m)?$/m).exec(s);
+
+  // check there are 3 matches where at least one of the latter two are defined
+  if (!groups || groups.length !== 3 || !groups.slice(1).filter(x=>x).length)
+    return null;
+  else groups = groups.slice(1);
+
+  const pf = k => parseFloat(k.substring(0, k.length-1)); // "1.5h" -> 1.5
+  return 3600*pf(groups[0] || '00') + 60*pf(groups[1] || '00');
 };
 
 export const Indicator = ({ card }) => {
