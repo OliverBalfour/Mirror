@@ -63,6 +63,14 @@ export const PromptDialog = ({
 }
 
 export const CardEditDialog = ({ respond, card }) => {
+  // create confirm dialog if closing the tab while editing a card
+  React.useEffect(() => {
+    // componentDidMount
+    window.onbeforeunload = e => "Are you sure you want to quit?";
+    // componentWillUnmount
+    return () => window.onbeforeunload = null;
+  }, []);
+
   const dispatch = useDispatch();
 
   const currentColID = useSelector(state => sel.boards(state).columns
@@ -83,7 +91,7 @@ export const CardEditDialog = ({ respond, card }) => {
   const editCard = () => (dispatch(duck.editCard({ card: newCard, colID })), done());
 
   return (
-    <Dialog open onClose={() => done(null)} fullWidth maxWidth='md'>
+    <Dialog open onClose={() => done(null)} fullWidth maxWidth='md' disableBackdropClick>
       <DialogTitle>Edit card</DialogTitle>
       <DialogContent>
         <InputLabel id="kanban/card-column" className="custom-label">Column</InputLabel>
