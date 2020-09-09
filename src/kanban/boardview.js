@@ -20,9 +20,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog } from '../components';
 import ReactMarkdown from 'react-markdown';
-import * as Description from './attributes/description';
-import * as DateTime from './attributes/datetime';
-import * as EBS from './attributes/ebs';
+import { Description, DateTime, EBS } from './attributes';
 
 const grid = 8;
 const cardWidth = 300;

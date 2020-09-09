@@ -4,13 +4,13 @@
  * See: https://www.joelonsoftware.com/2007/10/26/evidence-based-scheduling/
  */
 
-
 import * as React from 'react';
 import { useSelector } from 'react-redux';
-import { Button, Chip, TextField, FormControlLabel, Checkbox } from '@material-ui/core';
+import { Button, TextField, FormControlLabel, Checkbox, InputLabel } from '@material-ui/core';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import HourglassFullIcon from '@material-ui/icons/HourglassFull';
 import { globalSelectors as sel } from '../../store';
+import { IndicatorBuilder, AttributeHeader } from '.';
 
 export const Edit = ({ card, setCard }) => {
   // edit a subset of the EBS fields
@@ -40,10 +40,9 @@ export const Edit = ({ card, setCard }) => {
 
   if (!card.ebs)
     return (
-      <React.Fragment>
-        <span style={{color: 'grey'}} onClick={() => setEBSEstimate('1h')}>
-        Time estimate</span>
-      <br/></React.Fragment>
+      <AttributeHeader onClick={() => setEBSEstimate('1h')}>
+        Add time estimate
+      </AttributeHeader>
     );
 
   // ebs :: { estimate :: seconds, computed :: seconds, elapsed :: seconds,
@@ -59,9 +58,10 @@ export const Edit = ({ card, setCard }) => {
 
   return (
     <div style={{marginTop: 10}}>
+      <InputLabel className="custom-label">Time estimate</InputLabel>
       <div style={{width: '30%',float:'left',marginRight:16}}>
         <TextField label={`Estimate (predicted ${getPrettyPredicted()})`}
-          margin="dense" autoFocus fullWidth
+          margin="dense" fullWidth
           value={estStr}
           error={invalid(estStr)}
           helperText={invalid(estStr) ? "Example format: 1h30m" : null}
@@ -147,14 +147,11 @@ export const Indicator = ({ card }) => {
     const label = (card.ebs.elapsed ? prettySeconds(card.ebs.elapsed) + '/' : "")
       + prettySeconds(card.ebs.exact ? card.ebs.estimate : card.ebs.computed);
     const elapsed = card.ebs.elapsed ? `Elapsed: ${prettySeconds(card.ebs.elapsed)}` : "";
-    const title = card.ebs.exact ? "Duration of " + prettySeconds(card.ebs.estimate) :
+    const title = card.ebs.exact ?
+      `Duration: ${prettySeconds(card.ebs.estimate)}\n${elapsed}` :
       `Estimate: ${prettySeconds(card.ebs.estimate)}\nComputed: ${prettySeconds(card.ebs.computed)}\n${elapsed}`;
     // const icon = card.ebs.done ? <HourglassEmptyIcon /> : <HourglassFullIcon />
     const icon = <HourglassEmptyIcon />;
-    return <Chip size='small' icon={icon}
-      label={label}
-      title={title}
-      style={{ borderRadius: 3, background: 'white' }}
-      variant="outlined" />
+    return <IndicatorBuilder label={label} title={title} icon={icon} />;
   } else return null;
 };

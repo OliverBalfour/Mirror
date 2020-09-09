@@ -6,10 +6,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import * as duck from '../ducks/kanban';
 import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
-import { generateID } from '../common/utils';
-import * as Description from '../kanban/attributes/description';
-import * as DateTime from '../kanban/attributes/datetime';
-import * as EBS from '../kanban/attributes/ebs';
+import { Description, DateTime, EBS } from '../kanban/attributes';
 
 // TODO: can we have a promise API for generating dialogs on the fly and getting their results?
 // This method means the user has to manage 'open' state
@@ -85,13 +82,12 @@ export const CardEditDialog = ({ respond, card }) => {
   const deleteCard = () => (dispatch(duck.editCard({ card: newCard, colID })), dispatch(duck.deleteCard(card.id)), done());
   const editCard = () => (dispatch(duck.editCard({ card: newCard, colID })), done());
 
-  const labelIDs = [generateID()];
   return (
     <Dialog open onClose={() => done(null)} fullWidth maxWidth='md'>
       <DialogTitle>Edit card</DialogTitle>
       <DialogContent>
-        <InputLabel id={labelIDs[0]}>Column</InputLabel>
-        <Select labelId={labelIDs[0]} value={colID} onChange={e => setColID(e.target.value)}>
+        <InputLabel id="kanban/card-column" className="custom-label">Column</InputLabel>
+        <Select labelId="kanban/card-column" value={colID} onChange={e => setColID(e.target.value)}>
           {tabs.flatMap(tab => ([
             // the subheader can be clicked so we add the following CSS hack (per mui#18200)
             // .MuiListSubheader-root { pointer-events: none; }
@@ -102,8 +98,8 @@ export const CardEditDialog = ({ respond, card }) => {
             })
           ]))}
         </Select>
-
-        <TextField label="Title" margin="dense" autoFocus fullWidth variant="filled"
+        <InputLabel id="kanban/card-title" className="custom-label">Title</InputLabel>
+        <TextField margin="dense" autoFocus fullWidth
           multiline rowsMax={3} value={newCard.content} onChange={e => setContent(e.target.value)} />
         <Description.Edit card={newCard} setCard={setCard} />
         <DateTime.Edit    card={newCard} setCard={setCard} />
