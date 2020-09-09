@@ -22,6 +22,7 @@ import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog } from '../com
 import ReactMarkdown from 'react-markdown';
 import * as Description from './attributes/description';
 import * as DateTime from './attributes/datetime';
+import * as EBS from './attributes/ebs';
 
 const grid = 8;
 const cardWidth = 300;
@@ -310,6 +311,7 @@ const Card = ({ card, styles, index }) => {
             <ReactMarkdown source={content} />
             <Description.Indicator card={card} />
             <DateTime.Indicator    card={card} />
+            <EBS.Indicator         card={card} />
           </div>
         )}
       </Draggable>

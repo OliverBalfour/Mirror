@@ -24,7 +24,7 @@ export const Edit = ({ card, setCard }) => {
     <Button color="primary" variant="outlined" style={{float:'right',marginTop:12}} onClick={() => setDateTime(null)}>Reset date</Button>
     </div>
   ) : (
-    <span style={{color: 'grey'}} onClick={() => setDateTime(new Date().getTime())}>Due date / event time</span>
+    <><span style={{color: 'grey'}} onClick={() => setDateTime(new Date().getTime())}>Due date / event time</span><br/></>
   );
 };
 

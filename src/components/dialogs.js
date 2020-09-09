@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { generateID } from '../common/utils';
 import * as Description from '../kanban/attributes/description';
 import * as DateTime from '../kanban/attributes/datetime';
+import * as EBS from '../kanban/attributes/ebs';
 
 // TODO: can we have a promise API for generating dialogs on the fly and getting their results?
 // This method means the user has to manage 'open' state
@@ -106,6 +107,7 @@ export const CardEditDialog = ({ respond, card }) => {
           multiline rowsMax={3} value={newCard.content} onChange={e => setContent(e.target.value)} />
         <Description.Edit card={newCard} setCard={setCard} />
         <DateTime.Edit    card={newCard} setCard={setCard} />
+        <EBS.Edit         card={newCard} setCard={setCard} />
       </DialogContent>
       <DialogActions>
         <Button onClick={deleteCard}>Delete</Button>
