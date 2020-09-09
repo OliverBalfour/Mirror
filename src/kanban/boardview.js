@@ -16,14 +16,12 @@ import { View, Text } from 'react-native';
 import { makeStyles, Button, IconButton, ButtonGroup, TextField, Chip } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
-import NotesIcon from '@material-ui/icons/Notes';
 import DeleteIcon from '@material-ui/icons/Delete';
-import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog } from '../components';
 import ReactMarkdown from 'react-markdown';
-import { format } from 'date-fns';
-import { prettyPrintDate } from '../common/utils';
+import * as Description from './attributes/description';
+import * as DateTime from './attributes/datetime';
 
 const grid = 8;
 const cardWidth = 300;
@@ -298,10 +296,6 @@ const Card = ({ card, styles, index }) => {
   const { id, content } = card;
   const dispatch = useDispatch();
   const [promptOpen, setPromptOpen] = React.useState(false);
-  const icons = {
-    description: NotesIcon,
-    time: AccessTimeIcon,
-  }
 
   return (
     <React.Fragment>
@@ -314,23 +308,8 @@ const Card = ({ card, styles, index }) => {
             style={provided.draggableProps.style}
             onClick={() => setPromptOpen(true)}>
             <ReactMarkdown source={content} />
-            {card.description && (() => {
-              const Icon = icons.description;
-              return <Chip size='small' icon={Icon ? <Icon/> : null}
-                label=""
-                style={{ borderRadius: 3, background: 'white' }}
-                title={card.description.split("\n\n").join("\n").substring(0,256)
-                  + (card.description.length > 256 ? "..." : "")}
-                variant="outlined" />
-            })()}
-            {card.time && (() => {
-              const Icon = icons.time;
-              return <Chip size='small' icon={Icon ? <Icon/> : null}
-                label={prettyPrintDate(card.time)}
-                title={format(new Date(card.time), "dd/MM/yyyy hh:mmaaa")}
-                style={{ borderRadius: 3, background: 'white' }}
-                variant="outlined" />
-            })()}
+            <Description.Indicator card={card} />
+            <DateTime.Indicator    card={card} />
           </div>
         )}
       </Draggable>
