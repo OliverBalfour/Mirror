@@ -20,7 +20,8 @@ export const Edit = ({ card, setCard }) => {
 
   // list of EBS objects for all cards
   const historical = useSelector(s => sel.boards(s).cards
-    .filter(card => card.hasOwnProperty('ebs'))
+    .filter(card => card.hasOwnProperty('ebs') && card.ebs !== null)
+    .filter(card => card.ebs.elapsed && card.ebs.estimate)
     .map(card => card.ebs));
 
   const setEBSEstimate = str => {
@@ -76,8 +77,27 @@ export const Edit = ({ card, setCard }) => {
 // historical :: List[{ estimate, computed, elapsed }]
 const computeEstimate = (s, historical) => {
   if (typeof s !== 'number') return s;
+
+  // Compute average ratio elapsed / estimated
+  let ratio = historical.reduce(
+    (acc, ebs) => acc + ebs.elapsed / ebs.estimate / historical.length
+    , 0);
+  // if few samples average with 1
+  if (!ratio) ratio = 1;
+  if (historical.length < 10) ratio = (ratio + 1) / 2;
+
   // computes an estimate of the time given all of the cards' EBS values
-  return s / 0.8; // assume you estimate 80% of the actual time
+  const computed = s * ratio;
+
+  // round rough estimate to a reasonable level of precision
+  // nearest hr, 15min or 5min interval if that is the same level of precision as the input
+  const precisions = [3600, 60*15, 60*5];
+  for (let seconds of precisions) {
+    if (s % seconds === 0 && Math.abs(computed - s) > seconds / 2)
+      return seconds * Math.round(computed / seconds);
+  }
+  // otherwise nearest minute
+  return 60 * Math.round(computed / 60);
 };
 
 // Pretty print seconds in short form like 3600->1h, 6300->1h45m (no days or seconds)
