@@ -121,3 +121,26 @@ export const CardEditDialog = ({ respond, card }) => {
     </Dialog>
   );
 }
+
+export const AboutDialog = ({ open, respond }) => {
+  return (
+    <Dialog open={open} onClose={respond} fullWidth>
+      <DialogTitle>About Mirror</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          A free and open source personal task management and note taking app.<br/>
+
+          Made by Oliver Balfour. &copy; 2020.<br/>
+
+          App icon is <a href="https://thenounproject.com/term/mirror/340140/">Mirror</a>&nbsp;
+          by Lastspark from <a href="http://thenounproject.com/">The Noun Project</a>.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={respond} color="primary" variant="contained" autoFocus>
+          OK
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}

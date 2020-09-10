@@ -16,8 +16,10 @@ import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import NotesIcon from '@material-ui/icons/Notes';
 import PopoverMenu from './popovermenu';
 import { downloadData } from '../common/utils';
+import { AboutDialog } from './dialogs';
 
 export default ({ active, setActive }) => {
+  const [aboutOpen, setAboutOpen] = React.useState(false);
   return (
     <React.Fragment>
       <AppBar color="primary" style={{ top: 'auto', bottom: 0 }}>
@@ -34,9 +36,11 @@ export default ({ active, setActive }) => {
           </Tabs>
           <div style={{ flexGrow: 1 }} />
           <PopoverMenu map={{
-            "Export state": () => downloadData(localStorage.kanban, "mirror-backup.json", "application/json"),
-            "Import state": () => { localStorage.kanban = window.prompt("Paste your exported state here. Press cancel (or the undo button after pressing OK) to revert. Refresh the page to confirm and reload state.") },
+            "Submit feedback": () => window.open('mailto'+':oliver.'+'leo.balfour+mirrorsupport'+'@googlemail'+'.com', '_blank'),
+            "About": () => setAboutOpen(true),
             "Clear saved state": () => window.prompt("Delete all saved state? Pressing undo will fix this. Type YES to confirm", "NO") === "YES" && localStorage.clear(),
+            "Import state": () => { localStorage.kanban = window.prompt("Paste your exported state here. Press cancel (or the undo button after pressing OK) to revert. Refresh the page to confirm and reload state.") },
+            "Export state": () => downloadData(localStorage.kanban, "mirror-backup.json", "application/json"),
           }}>
             <IconButton edge="end" color="inherit">
               <MoreIcon />
@@ -44,6 +48,7 @@ export default ({ active, setActive }) => {
           </PopoverMenu>
         </Toolbar>
       </AppBar>
+      <AboutDialog open={aboutOpen} respond={() => setAboutOpen(false)} />
     </React.Fragment>
   );
 }
