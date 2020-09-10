@@ -1,20 +1,20 @@
 {
   "files": {
-    "app.js": "/Mirror/static/js/app.4da6f70a.chunk.js",
-    "app.js.map": "/Mirror/static/js/app.4da6f70a.chunk.js.map",
+    "app.js": "/Mirror/static/js/app.c285a7f7.chunk.js",
+    "app.js.map": "/Mirror/static/js/app.c285a7f7.chunk.js.map",
     "runtime~app.js": "/Mirror/static/js/runtime~app.734cff29.js",
     "runtime~app.js.map": "/Mirror/static/js/runtime~app.734cff29.js.map",
-    "static/js/2.203fbcad.chunk.js": "/Mirror/static/js/2.203fbcad.chunk.js",
-    "static/js/2.203fbcad.chunk.js.map": "/Mirror/static/js/2.203fbcad.chunk.js.map",
+    "static/js/2.d93d4950.chunk.js": "/Mirror/static/js/2.d93d4950.chunk.js",
+    "static/js/2.d93d4950.chunk.js.map": "/Mirror/static/js/2.d93d4950.chunk.js.map",
     "favicon.ico": "/Mirror/favicon.ico",
     "index.html": "/Mirror/index.html",
     "manifest.json": "/Mirror/manifest.json",
     "serve.json": "/Mirror/serve.json",
-    "static/js/2.203fbcad.chunk.js.LICENSE.txt": "/Mirror/static/js/2.203fbcad.chunk.js.LICENSE.txt"
+    "static/js/2.d93d4950.chunk.js.LICENSE.txt": "/Mirror/static/js/2.d93d4950.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime~app.734cff29.js",
-    "static/js/2.203fbcad.chunk.js",
-    "static/js/app.4da6f70a.chunk.js"
+    "static/js/2.d93d4950.chunk.js",
+    "static/js/app.c285a7f7.chunk.js"
   ]
 }
