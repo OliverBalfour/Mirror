@@ -7,8 +7,6 @@ import * as duck from '../ducks/kanban';
 import { selectors } from '../store';
 import { PopoverMenu, ConfirmDialog, PromptDialog } from '../components';
 
-// TODO: tabview should not handle tab no state
-
 export default () => {
   const dispatch = useDispatch();
   const [currentTab, setCurrentTab] = React.useState(0);

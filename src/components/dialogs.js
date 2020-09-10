@@ -8,8 +8,6 @@ import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { Description, DateTime, EBS } from '../kanban/attributes';
 
-// TODO: can we have a promise API for generating dialogs on the fly and getting their results?
-// This method means the user has to manage 'open' state
 export const ConfirmDialog = ({ open, respond, title, subtitle, labels = ["Cancel", "OK"] }) => {
   return (
     <Dialog open={open} onClose={() => respond(null)}>
@@ -66,10 +64,11 @@ export const CardEditDialog = ({ respond, card }) => {
   // create confirm dialog if closing the tab while editing a card
   React.useEffect(() => {
     // componentDidMount
-    window.onbeforeunload = e => "Are you sure you want to quit?";
+    if (JSON.stringify(newCard) !== JSON.stringify(card))
+      window.onbeforeunload = e => "Are you sure you want to quit?";
     // componentWillUnmount
     return () => window.onbeforeunload = null;
-  }, []);
+  });
 
   const dispatch = useDispatch();
 
@@ -91,7 +90,8 @@ export const CardEditDialog = ({ respond, card }) => {
   const editCard = () => (dispatch(duck.editCard({ card: newCard, colID })), done());
 
   return (
-    <Dialog open onClose={() => done(null)} fullWidth maxWidth='md' disableBackdropClick>
+    <Dialog open onClose={() => done(null)} fullWidth maxWidth='md'
+      disableBackdropClick={JSON.stringify(newCard) !== JSON.stringify(card)}>
       <DialogTitle>Edit card</DialogTitle>
       <DialogContent>
         <InputLabel id="kanban/card-column" className="custom-label">Column</InputLabel>

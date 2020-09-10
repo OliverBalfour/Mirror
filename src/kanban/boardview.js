@@ -52,6 +52,23 @@ const useStyles = makeStyles(theme => ({
     height: 'calc(100vh - 160px)',
     overflow: 'hidden'
   },
+  addColumnContainer: {
+    width: cardWidth + 5*grid
+  },
+  addColumn: {
+    // we also apply a margin conditionally in the JSX when dragging columns
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100px',
+    background: '#DFEEEE',
+    padding: grid,
+    paddingBottom: 24,
+    width: cardWidth,
+    border: '1px solid #CCDCDC',
+    borderRadius: 5,
+    margin: grid,
+  },
   columnHeaderContainer: {
     padding: "8 0",
     display: "flex",
@@ -322,14 +339,13 @@ const Card = ({ card, styles, index }) => {
 
 const AddColumn = ({ styles, add, hide }) => {
   return (
-    <div className={styles.column} style={{
-        width: cardWidth, display: 'flex', justifyContent: 'center',
-        alignItems: 'center', height: '100px',
-        marginLeft: hide ? cardWidth + 5*grid + 2 : grid
-      }}>
-      <IconButton onClick={add}>
-        <AddIcon />
-      </IconButton>
+    <div className={styles.addColumnContainer} style={{
+      marginLeft: hide ? cardWidth + 4*grid + 2 : 0 }}>
+      <div className={styles.addColumn}>
+        <IconButton onClick={add}>
+          <AddIcon />
+        </IconButton>
+      </div>
     </div>
   );
 }

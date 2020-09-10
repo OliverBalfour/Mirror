@@ -110,6 +110,8 @@ Building for iOS is not yet set up. Theoretically you should be able to just ope
 
 Deploy to [GitHub Pages](https://oliverbalfour.github.io/Mirror/) via `npm run deploy`.
 
+To force refresh in Chrome without losing data (perhaps export just in case) open devtools, right click on browser refresh button, choose "Empty Cache & Hard Reload".
+
 **Android APK**
 
 1. Start JS server: `npm start`
