@@ -19,7 +19,7 @@ export const Edit = ({ card, setCard }) => {
   const [elapStr, setElapStr] = React.useState(card.ebs ? prettySeconds(card.ebs.elapsed) : "");
 
   // list of EBS objects for all cards
-  const historical = useSelector(s => sel.boards(s).cards
+  const historical = useSelector(s => Object.values(sel.boards(s).cards)
     .filter(card => card.hasOwnProperty('ebs') && card.ebs !== null)
     .filter(card => card.ebs.elapsed && card.ebs.estimate)
     .map(card => card.ebs));

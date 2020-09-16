@@ -72,17 +72,17 @@ export const CardEditDialog = ({ respond, card }) => {
 
   const dispatch = useDispatch();
 
-  const currentColID = useSelector(state => sel.boards(state).columns
+  const currentColID = useSelector(state => Object.values(sel.boards(state).columns)
       .filter(col => col.items.indexOf(card.id) !== -1)[0].id);
 
   const [colID, setColID] = React.useState(currentColID);
   const [newCard, setCard] = React.useState(card);
   const setContent = content => setCard({...newCard, content});
 
-  const columns = [...useSelector(selectors.boards.columns)];
+  const columns = useSelector(selectors.boards.columns);
   const tabs = useSelector(selectors.boards.tabs);
-  const getTabIdxByColID = colID => tabs.map(tab => tab.columns.indexOf(colID) !== -1).indexOf(true);
-  const getColIdxByID = colID => columns.map(col => col.id === colID).indexOf(true);
+  const getTabIdxByColID = colID => Object.values(tabs).map(tab => tab.columns.indexOf(colID) !== -1).indexOf(true);
+  const getColIdxByID = colID => Object.values(columns).map(col => col.id === colID).indexOf(true);
 
   const done = () => (respond(), setContent(card.content));
   // save and then delete so you can undo the delete without losing your unsaved draft of a card
@@ -96,14 +96,13 @@ export const CardEditDialog = ({ respond, card }) => {
       <DialogContent>
         <InputLabel id="kanban/card-column" className="custom-label">Column</InputLabel>
         <Select labelId="kanban/card-column" value={colID} onChange={e => setColID(e.target.value)}>
-          {tabs.flatMap(tab => ([
+          {Object.values(tabs).flatMap(tab => ([
             // the subheader can be clicked so we add the following CSS hack (per mui#18200)
             // .MuiListSubheader-root { pointer-events: none; }
             <ListSubheader key={tab.id}>{tab.name}</ListSubheader>,
-            ...tab.columns.map(colID => {
-              const col = columns[getColIdxByID(colID)];
-              return (<MenuItem value={colID} key={colID}>{col.name}</MenuItem>);
-            })
+            ...tab.columns.map(colID =>
+              <MenuItem value={colID} key={colID}>{columns[colID].name}</MenuItem>
+            )
           ]))}
         </Select>
         <InputLabel id="kanban/card-title" className="custom-label">Title</InputLabel>

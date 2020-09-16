@@ -117,7 +117,9 @@ export default ({ tabInfo }) => {
   const dispatch = useDispatch();
   const styles = useStyles();
 
-  const columns = useSelector(selectors.boards.getColumnsInTabs)[tab];
+  const tabOrder = useSelector(selectors.boards.tabOrder);
+  const columns = useSelector(selectors.boards.getColumnsInTabs)[tabOrder[tab]];
+  const colIDs = useSelector(selectors.boards.tabs)[tabOrder[tab]].columns;
 
   // dispatch move card action
   const onDragEnd = res => {
@@ -146,7 +148,7 @@ export default ({ tabInfo }) => {
           {(provided, snapshot) => (
             <React.Fragment>
               <div className={styles.root} ref={provided.innerRef}>
-                {columns.map((col, i) => <Column col={col} styles={styles} key={col.id} index={i} />)}
+                {colIDs.map((colID, i) => <Column col={columns[i]} styles={styles} key={colID} index={i} />)}
                 <AddColumn styles={styles} add={() => setPromptOpen(true)} hide={snapshot.isDraggingOver || snapshot.draggingFromThisWith} />
               </div>
               {provided.placeholder}
@@ -274,8 +276,11 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
           {col.name}
         </div>
         <div>
-          <Chip size='small' label="0/6" />
-          <Chip size='small' label="3h" />
+          {/*
+            // TODO: column powerup API with Chip indicators
+            <Chip size='small' label="0/6" />
+            <Chip size='small' label="3h" />
+          */}
           <IconButton size='small' onClick={() => add()}>
             <AddIcon />
           </IconButton>

@@ -2,7 +2,16 @@
 type CardID, ColID, TabID = String
 type EpochMS = Int -- epoch milliseconds via `new Date().getTime()`
 
-card :: {
+type State = {
+  cards :: Map[CardID, Card],
+  columns :: Map[Column, ColID],
+  tabs :: Map[TabID, Tab],
+  tabOrdr :: List[TabID],
+}
+
+TODO: unify Kanban with Zettelkasten
+
+type Card = {
   -- core
   content :: String,
   id :: CardID,
@@ -24,7 +33,7 @@ card :: {
   },
 }
 
-column :: {
+type Column = {
   id :: ColID,
   items :: List[CardID],
   name :: String,
@@ -33,10 +42,10 @@ column :: {
                      -- changes to the items themselves, traverse the items for this
 }
 
-tab :: {
+type Tab = {
   name :: String,
   id :: TabID,
-  columns :: List[ColID],
+  columns :: [ColID],
   created :: EpochMS,
   edited :: EpochMS, -- same as column edited; accounts for change in list of columns
                      -- but not changes to the underlying columns

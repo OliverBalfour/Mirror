@@ -9,6 +9,9 @@ import { PopoverMenu, ConfirmDialog, PromptDialog } from '../components';
 
 export default () => {
   const dispatch = useDispatch();
+  // {id:{name, id, columns (ids)},...}
+  const tabs = useSelector(selectors.boards.tabs);
+  const tabOrder = useSelector(selectors.boards.tabOrder);
   const [currentTab, setCurrentTab] = React.useState(0);
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
@@ -23,18 +26,16 @@ export default () => {
   const [renamePromptOpen, setRenamePromptOpen] = React.useState(false);
   const renamePromptRespond = res => setRenamePromptOpen(false) ||
     typeof res === "string" && res.length &&
-      dispatch(duck.renameTab({ tabID: tabs[currentTab].id, name: res }));
+      dispatch(duck.renameTab({ tabID: tabOrder[currentTab], name: res }));
 
-  // [{name, id, columns (ids)},...]
-  const tabs = useSelector(selectors.boards.tabs);
   return (
     <React.Fragment>
       <TabView
-        tabs={tabs.map(tab => tab.name)}
-        render={i => <BoardView tabInfo={{ tab: tabs[i], index: i }} />}
+        tabs={tabOrder.map(tabID => tabs[tabID].name)}
+        render={i => <BoardView tabInfo={{ tab: tabs[tabOrder[i]], index: i }} />}
         addTab={() => setAddPromptOpen(true)}
         renameTab={() => setRenamePromptOpen(true)}
-        deleteTab={() => tabs.length > 1 ? setConfirmOpen(true) : alert("Cannot delete only tab")}
+        deleteTab={() => Object.values(tabs).length > 1 ? setConfirmOpen(true) : alert("Cannot delete only tab")}
         moveTab={data => dispatch(duck.moveTab(data))}
         children={<UndoRedo />}
         index={currentTab} setIndex={setCurrentTab}
@@ -48,7 +49,7 @@ export default () => {
       )}
       {renamePromptOpen && (
         <PromptDialog open respond={renamePromptRespond}
-          title={`Rename tab ${tabs[currentTab].name}`} label="Name" />
+          title={`Rename tab ${tabs[tabOrder[currentTab]].name}`} label="Name" />
       )}
     </React.Fragment>
   );

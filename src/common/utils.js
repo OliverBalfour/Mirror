@@ -27,7 +27,7 @@ export const generateID = () => {
 // }
 export const dummyCols = (colnums, colnames) => {
   let numcards = colnums.reduce((a, b) => a + b, 0);
-  let cards = [];
+  let cards = {};
   let sampleCards = [
     "Wash the dishes",
     "Make cool app",
@@ -45,15 +45,15 @@ export const dummyCols = (colnums, colnames) => {
     "🙂"];
   const epochms = new Date().getTime();
   for (let i = 0; i < numcards; i++) {
-    let id = (i+1).toString() + "-" + generateID();
-    cards.push({ id, content: sampleCards[Math.floor(Math.random()*sampleCards.length)],
-      created: epochms, edited: epochms, moved: epochms });
+    let id = generateID();
+    cards[id] = { id, content: sampleCards[Math.floor(Math.random()*sampleCards.length)],
+      created: epochms, edited: epochms, moved: epochms };
   }
-  let columns = [];
+  let columns = {};
   for (let i = 0, cnt = 0; i < colnums.length; i++) {
-    let items = cards.slice(cnt, cnt + colnums[i]).map(card => card.id);
-    let id = (i + 1).toString() + "-" + generateID();
-    columns.push({ id, items, name: colnames[i], created: epochms, edited: epochms });
+    let items = Object.keys(cards).slice(cnt, cnt + colnums[i]);
+    let id = generateID();
+    columns[id] = { id, items, name: colnames[i], created: epochms, edited: epochms };
     cnt += colnums[i];
   }
   return { cards, columns };
@@ -62,14 +62,18 @@ export const dummyCols = (colnums, colnames) => {
 // generate initial dummy state
 export const dummyState = () => {
   const epochms = new Date().getTime();
+  const ids = [generateID(), generateID()];
   let initial = {
-    tabs: [{ name: "Main",      id: generateID(), created: epochms, edited: epochms },
-           { name: "Secondary", id: generateID(), created: epochms, edited: epochms }],
+    tabs: {
+      [ids[0]]: { name: "Main",      id: ids[0], created: epochms, edited: epochms },
+      [ids[1]]: { name: "Secondary", id: ids[1], created: epochms, edited: epochms }
+    },
     ...dummyCols([9,2,6,5,4], ["To Do","Doing","Done","Misc 1","Misc 2"])
   };
-  const colIDs = initial.columns.map(col => col.id);
-  initial.tabs[0].columns = [colIDs[0], colIDs[1], colIDs[2]];
-  initial.tabs[1].columns = [colIDs[3], colIDs[4]];
+  const colIDs = Object.keys(initial.columns);
+  initial.tabs[ids[0]].columns = [colIDs[0], colIDs[1], colIDs[2]];
+  initial.tabs[ids[1]].columns = [colIDs[3], colIDs[4]];
+  initial.tabOrder = ids;
   return initial;
 }
 
