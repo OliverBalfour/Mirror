@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
     flexWrap: 'nowrap',
     padding: grid,
     fontSize: "14px",
-    "& *": {flexShrink: 0}
+    "& *": {flexShrink: 0},
   },
   column: {
     background: '#DFEEEE',
@@ -44,16 +44,11 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 5,
     margin: grid,
     transition: "border 0.2s",
-
-    // TODO: install react-custom-scrollbars and use this instead with autohide
-    // there is a bug where moving cards to the tallest column leads to a scrollbar flashing up
-    // and we don't want the scrollbar to take up horizontal space and force the cards to reflow
-
     height: 'calc(100vh - 160px)',
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   addColumnContainer: {
-    width: cardWidth + 5*grid
+    width: cardWidth + 5*grid,
   },
   addColumn: {
     // we also apply a margin conditionally in the JSX when dragging columns
@@ -72,12 +67,13 @@ const useStyles = makeStyles(theme => ({
   columnHeaderContainer: {
     padding: "8 0",
     display: "flex",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   columnHeaderText: {
     paddingLeft: 8,
     paddingBottom: 0,
-    fontSize: '1.4em'
+    fontSize: '1.4em',
+    fontWeight: 500,
   },
   columnHeaderRule: {
     overflow: "hidden",
@@ -86,7 +82,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "#CCDCDC",
     height: "1px",
     width: cardWidth + grid * 2 + 1, //+1 is border
-    marginLeft: -(grid+1)
+    marginLeft: -(grid+1),
   },
   card: {
     userSelect: 'none',
@@ -97,15 +93,15 @@ const useStyles = makeStyles(theme => ({
     transition: "opacity 0.3s",
     overflow: 'hidden',
     "&:hover, &:focus": {
-      boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)'
+      boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)',
     },
     "&>p": {
-      margin: 0
+      margin: 0,
     }
   },
   draggingCard: {
     opacity: 0.7,
-    boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)'
+    boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)',
   },
   columnContainer: {
     transition: "opacity 0.6s",

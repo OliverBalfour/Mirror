@@ -1,7 +1,10 @@
 
 # Mirror Project
 
-> *Mirror is a cross-platform app for task management and time management. Your everyday tasks are a reflection of who you are, and you deserve high quality tools to efficiently manage your time and endless work.*
+> *Mirror is a cross-platform app for task management and time management. Your everyday tasks are a reflection of who you are, and you deserve high quality tools to stay on top.*
+
+* Web: https://oliverbalfour.github.io/Mirror/
+* Android: copy the APK in the root of this repo onto your phone
 
 **Features**
 
@@ -29,17 +32,11 @@ Performance ideas:
 
 Evidence based scheduling is incorporated into the Kanban board. You can estimate times and get corrected estimates back. There is a timeline view where you can look at how long it will take you to finish everything on a probability distribution curve (web only).
 
-Web
-
-- Multiple boards use tabs
-
-Mobile
-
-- Multiple boards use [tab-view](https://github.com/satya164/react-native-tab-view) with `swipeEnabled=false`.
-- Each tab contains a [draganddrop-board](https://github.com/bear-junior/react-native-draganddrop-board).
-- The global hamburger menu (at the bottom?) allows changing to the notes section and signing in.
+- Each mobile tab contains a [draganddrop-board](https://github.com/bear-junior/react-native-draganddrop-board).
 
 **Possible future features**
+
+- Directed graph of Markdown notes (cf Zettelkasten). Could be used to create a Cherrytree-like interface if users desire.
 
 - Tree of Markdown notes (cf Cherrytree)
   - [This renderer](https://github.com/mientjan/react-native-markdown-renderer) and [this editor](https://github.com/outline/rich-markdown-editor) or [this editor](https://github.com/wxik/react-native-rich-editor)
@@ -52,12 +49,12 @@ Mobile
   - Automatic archival
   - Automatic import from GitHub issues
 
-- Card powerup system. Each card can have certain extra features added to it.
-  - EBS estimate
-  - Priority
-  - Due date/time
-  - Links
-  - Markdown/plaintext
+- Card powerup system. Each card can have certain extra features added to it. DONE
+  - EBS estimate - DONE
+  - Priority - TODO
+  - Due date/time - DONE
+  - Links - embedded
+  - Markdown/plaintext - DONE
   - Link to another board, with embedded progress bar (eg have board Main and board Mirror Project; you can have a card in Main that references Mirror Project to manage subprojects at a high level of abstraction)
   - Stow for period of time (like a reminder); useful to keep a record of something in the future without causing clutter (eg holidays todo list).
 

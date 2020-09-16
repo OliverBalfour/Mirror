@@ -43,6 +43,13 @@ const deleteByID = (list, id) => list.splice(indexFromID(list, id), 1);
 const deleteInList = (list, elem) => {
   let index = list.indexOf(elem);
   if (index !== -1) list.splice(index, 1); // undesired behaviour when splicing at (-1, 1)
+  return index !== -1;
+};
+const _deleteColumn = (s, id) => {
+  const colIdx = indexFromID(s.columns, id);
+  s.columns[colIdx].items.forEach(cardID => deleteByID(s.cards, cardID));
+  s.tabs.forEach(tab => deleteInList(tab.columns, id));
+  deleteByID(s.columns, id);
 };
 
 // Selectors
@@ -67,13 +74,6 @@ export const selectors = {
 
 const initialState = loadState();
 
-const _deleteColumn = (s, id) => {
-  const colIdx = indexFromID(s.columns, id);
-  s.columns[colIdx].items.forEach(cardID => deleteByID(s.cards, cardID));
-  s.tabs.forEach(tab => deleteInList(tab.columns, id));
-  deleteByID(s.columns, id);
-};
-
 const reducer = createReducer(initialState, {
   [transferCard]: (s, a) => {
     const srcColIdx = indexFromID(s.columns, a.payload.srcColID);
@@ -82,12 +82,19 @@ const reducer = createReducer(initialState, {
     let srcCol = s.columns[srcColIdx].items;
     let dstCol = s.columns[dstColIdx].items;
     const [removed] = srcCol.splice(a.payload.srcIndex, 1);
+    const epochms = new Date().getTime();
+    s.cards[indexFromID(s.cards, removed)].moved = epochms;
+    s.columns[srcColIdx].edited = epochms;
+    s.columns[dstColIdx].edited = epochms;
     dstCol.splice(a.payload.dstIndex, 0, removed);
   },
   [reorderCard]: (s, a) => {
     const colIdx = indexFromID(s.columns, a.payload.colID);
+    const epochms = new Date().getTime();
+    s.columns[colIdx].edited = epochms;
     let newitems = s.columns[colIdx].items;
     const [removed] = newitems.splice(a.payload.srcIndex, 1);
+    s.cards[indexFromID(s.cards, removed)].moved = epochms;
     newitems.splice(a.payload.dstIndex, 0, removed);
     s.columns[colIdx].items = newitems;
   },
@@ -95,35 +102,55 @@ const reducer = createReducer(initialState, {
     const { content, colID } = a.payload;
     const colIdx = indexFromID(s.columns, a.payload.colID);
     const cardID = generateID();
-    s.cards.push({ id: cardID, content });   // add to cards list
+    const epochms = new Date().getTime();
+    // add to cards list
+    s.cards.push({ id: cardID, content,
+      created: epochms,  edited: epochms, moved: epochms });
     s.columns[colIdx].items.unshift(cardID); // add to top of column
+    s.columns[colIdx].edited = epochms;
   },
   [deleteColumn]: (s, a) => {
+    const tabIdx = s.tabs.map(tab => tab.columns.indexOf(a.payload) !== -1).indexOf(true);
+    if (tabIdx >= 0) s.tabs[tabIdx].edited = new Date().getTime();
     _deleteColumn(s, a.payload);
   },
   [renameColumn]: (s, a) => {
-    s.columns[indexFromID(s.columns, a.payload.colID)].name = a.payload.name;
+    const idx = indexFromID(s.columns, a.payload.colID);
+    s.columns[idx].name = a.payload.name;
+    s.columns[idx].edited = new Date().getTime();
   },
   [editCardContent]: (s, a) => {
-    s.cards[indexFromID(s.cards, a.payload.cardID)].content = a.payload.content;
+    const idx = indexFromID(s.cards, a.payload.cardID);
+    s.cards[idx].content = a.payload.content;
+    s.cards[idx].edited = new Date().getTime();
   },
   [deleteCard]: (s, a) => {
     const cardIdx = indexFromID(s.cards, a.payload);
-    s.columns.forEach(col => deleteInList(col.items, a.payload));
+    s.columns.forEach(col => {
+      if (deleteInList(col.items, a.payload))
+        col.edited = new Date().getTime();
+    });
     deleteByID(s.cards, a.payload);
   },
   [addColumn]: (s, a) => {
     const id = generateID();
-    s.columns.push({ id, items: [], name: a.payload.name });
-    s.tabs[indexFromID(s.tabs, a.payload.tabID)].columns.push(id);
+    const epochms = new Date().getTime();
+    s.columns.push({ id, items: [], name: a.payload.name, created: epochms, edited: epochms });
+    const idx = indexFromID(s.tabs, a.payload.tabID);
+    s.tabs[idx].columns.push(id);
+    s.tabs[idx].edited = epochms;
   },
   [editCard]: (s, a) => {
-    s.cards[indexFromID(s.cards, a.payload.card.id)] = a.payload.card;
+    const cardIdx = indexFromID(s.cards, a.payload.card.id);
+    const epochms = new Date().getTime();
+    s.cards[cardIdx] = a.payload.card;
+    s.cards[cardIdx].edited = epochms;
     const srcColIdx = s.columns.map(col => col.items.indexOf(a.payload.card.id) !== -1).indexOf(true);
     const dstColIdx = indexFromID(s.columns, a.payload.colID);
     if (srcColIdx !== dstColIdx) {
       deleteInList(s.columns[srcColIdx].items, a.payload.card.id);
       s.columns[dstColIdx].items.unshift(a.payload.card.id);
+      s.columns[srcColIdx].edited = s.columns[dstColIdx].edited = epochms;
     }
   },
   [deleteTab]: (s, a) => {
@@ -132,10 +159,12 @@ const reducer = createReducer(initialState, {
     s.tabs.splice(a.payload, 1);
   },
   [addTab]: (s, a) => {
-    s.tabs.push({ name: a.payload, id: generateID(), columns: [] });
+    s.tabs.push({ name: a.payload, id: generateID(), columns: [], created: new Date().getTime() });
   },
   [renameTab]: (s, a) => {
-    s.tabs[indexFromID(s.tabs, a.payload.tabID)].name = a.payload.name;
+    const idx = indexFromID(s.tabs, a.payload.tabID);
+    s.tabs[idx].name = a.payload.name;
+    s.tabs[idx].edited = new Date().getTime();
   },
   [moveColumn]: (s, a) => {
     const [srcIdx, dstIdx, tabIdx] = a.payload;
@@ -143,6 +172,7 @@ const reducer = createReducer(initialState, {
     const [removed] = newitems.splice(srcIdx, 1);
     newitems.splice(dstIdx, 0, removed);
     s.tabs[tabIdx].columns = newitems;
+    s.tabs[tabIdx].edited = new Date().getTime();
   },
   [moveTab]: (s, a) => {
     const [srcIdx, dstIdx] = a.payload;
@@ -154,14 +184,16 @@ const reducer = createReducer(initialState, {
   },
   [archiveCardsInColumn]: (s, a) => {
     // archived cards still exist in memory but are not listed in a column's items
-    // they do have a archived: {date, colID} field added however for future use
     const colIdx = indexFromID(s.columns, a.payload);
+    const epochms = new Date().getTime();
     s.columns[colIdx].items.forEach(cardID => {
       let card = s.cards[indexFromID(s.cards, cardID)];
-      card.archived = { date: new Date().getTime(), colID: a.payload };
+      card.moved = card.edited = card.archived = epochms;
+      card.archivedFromColID = a.payload;
     });
     s.columns[colIdx].items = [];
+    s.columns[colIdx].edited = epochms;
   },
 });
 
-export default undoable(reducer, {limit:50});
+export default undoable(reducer, {limit:20});

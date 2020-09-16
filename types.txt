@@ -1,0 +1,43 @@
+
+type CardID, ColID, TabID = String
+type EpochMS = Int -- epoch milliseconds via `new Date().getTime()`
+
+card :: {
+  -- core
+  content :: String,
+  id :: CardID,
+  -- timestamps
+  created :: EpochMS,
+  edited :: EpochMS,
+  moved :: EpochMS,
+  archived :: Maybe EpochMS,
+  archivedFromColID :: Maybe String,
+  -- attributes
+  description :: Maybe String,
+  time :: Maybe EpochMS, -- due date / event time
+  ebs :: Maybe { -- evidence based scheduling
+    estimate :: Seconds,
+    computed :: Seconds,
+    elapsed :: Seconds,
+    done :: Bool,
+    exact :: Bool,
+  },
+}
+
+column :: {
+  id :: ColID,
+  items :: List[CardID],
+  name :: String,
+  created :: EpochMS,
+  edited :: EpochMS, -- includes changes to the items stored in the list or order, but not
+                     -- changes to the items themselves, traverse the items for this
+}
+
+tab :: {
+  name :: String,
+  id :: TabID,
+  columns :: List[ColID],
+  created :: EpochMS,
+  edited :: EpochMS, -- same as column edited; accounts for change in list of columns
+                     -- but not changes to the underlying columns
+}

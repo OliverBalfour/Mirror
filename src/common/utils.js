@@ -1,7 +1,19 @@
 
 import * as fn from 'date-fns';
 
-export const generateID = () => Math.random().toString().substring(2);
+let __lastGeneratedID = null;
+export const generateID = () => {
+  const format = "yyyyMMdd-hhmmss";
+  let newID = fn.format(new Date(), format);
+  // if we generate multiple IDs in one second, we add "-n" where n is 1,2,...
+  // the only time this causes collisions is if you add a card, refresh, add a card within 1s
+  if (__lastGeneratedID !== null && __lastGeneratedID.substring(0, format.length) === newID) {
+    if (__lastGeneratedID.length === format.length) newID += "-1";
+    else newID += '-' + (parseInt(__lastGeneratedID.substring(format.length + 1, __lastGeneratedID.length)) + 1)
+  }
+  __lastGeneratedID = newID;
+  return newID;
+}
 
 // generate { cards, columns } where each column has colnum[i] cards
 // both of these are objects where the keys are unique IDs
@@ -31,15 +43,17 @@ export const dummyCols = (colnums, colnames) => {
     "Stop eating so much chocolate",
     "Write witty comment",
     "🙂"];
+  const epochms = new Date().getTime();
   for (let i = 0; i < numcards; i++) {
     let id = (i+1).toString() + "-" + generateID();
-    cards.push({ id, content: sampleCards[Math.floor(Math.random()*sampleCards.length)] });
+    cards.push({ id, content: sampleCards[Math.floor(Math.random()*sampleCards.length)],
+      created: epochms, edited: epochms, moved: epochms });
   }
   let columns = [];
   for (let i = 0, cnt = 0; i < colnums.length; i++) {
     let items = cards.slice(cnt, cnt + colnums[i]).map(card => card.id);
     let id = (i + 1).toString() + "-" + generateID();
-    columns.push({ id, items, name: colnames[i] });
+    columns.push({ id, items, name: colnames[i], created: epochms, edited: epochms });
     cnt += colnums[i];
   }
   return { cards, columns };
@@ -47,8 +61,10 @@ export const dummyCols = (colnums, colnames) => {
 
 // generate initial dummy state
 export const dummyState = () => {
+  const epochms = new Date().getTime();
   let initial = {
-    tabs: [{ name: "Main", id: generateID() }, { name: "Secondary", id: generateID() }],
+    tabs: [{ name: "Main",      id: generateID(), created: epochms, edited: epochms },
+           { name: "Secondary", id: generateID(), created: epochms, edited: epochms }],
     ...dummyCols([9,2,6,5,4], ["To Do","Doing","Done","Misc 1","Misc 2"])
   };
   const colIDs = initial.columns.map(col => col.id);
@@ -104,7 +120,7 @@ export const prettyPrintDate = epochMilliseconds => {
     else if (diff === -1) return "Yesterday";
     else if (diff === 1) return "Tomorrow";
     else if (diff > 0 && diff < 7) return fn.format(date, "EEE"); // ex: Wed
-    // else if (diff < 14) return fn.format(date, "EEE") + " Week"; // ex: Fri Week
+    else if (diff > 0 && diff < 14) return fn.format(date, "EEE") + " Week"; // ex: Fri Week
     else if (diff > -7 && diff < 0) return "Last " + fn.format(date, "EEE"); // ex: Last Fri
     return fn.format(date, "MMM do"); // ex: Sep 17th
   }
