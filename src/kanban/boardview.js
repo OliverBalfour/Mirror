@@ -21,6 +21,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog } from '../components';
 import ReactMarkdown from 'react-markdown';
 import { Description, DateTime, EBS } from './attributes';
+import { useHashLocation } from '../common/utils';
 
 const grid = 8;
 const cardWidth = 300;
@@ -312,7 +313,11 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
 const Card = ({ card, styles, index }) => {
   const { id, content } = card;
   const dispatch = useDispatch();
-  const [promptOpen, setPromptOpen] = React.useState(false);
+  // TODO: refactor this to board level
+  const [loc, setLoc] = useHashLocation();
+  // editing card if URL is /board/CARD_ID/edit
+  const promptOpen = loc.split("/")[3] === card.id && loc.split("/")[4] === "edit";
+  const setPromptOpen = yes => yes ? setLoc(`/boards/${loc.split("/")[2]}/${id}/edit`) : setLoc(`/boards/${loc.split("/")[2]}`);
 
   return (
     <React.Fragment>

@@ -6,13 +6,17 @@ import BoardView from './boardview';
 import * as duck from '../ducks/kanban';
 import { selectors } from '../store';
 import { PopoverMenu, ConfirmDialog, PromptDialog } from '../components';
+import { useHashLocation } from '../common/utils';
 
 export default () => {
   const dispatch = useDispatch();
+  const [loc, setLoc] = useHashLocation();
   // {id:{name, id, columns (ids)},...}
   const tabs = useSelector(selectors.boards.tabs);
   const tabOrder = useSelector(selectors.boards.tabOrder);
-  const [currentTab, setCurrentTab] = React.useState(0);
+  let currentTab = tabOrder.map(tabID => tabs[tabID].name.toLowerCase() === loc.split("/")[2]).indexOf(true);
+  const setCurrentTab = num => setLoc("/boards/"+tabs[tabOrder[num]].name.toLowerCase());
+  if (currentTab < 0) currentTab = 0;
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmRespond = res => setConfirmOpen(false) ||

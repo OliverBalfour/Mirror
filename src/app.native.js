@@ -9,29 +9,13 @@
 import React from 'react';
 import { StyleSheet, Text, View, Platform } from 'react-native';
 import { Provider } from 'react-redux';
-import { useHashLocation } from './common/utils';
 
 import { Button, MenuBar } from './components';
 import Kanban from './kanban';
-import store, { globalSelectors as sel } from './store';
-
-const screenNames = ["/board", "/notes"];
-const getScreen = loc => {
-  const name = "/" + loc.split("/")[1]; // strip to / or /board, etc
-  return Math.max(screenNames.indexOf(name), 0);
-};
-const getScreenName = n => {
-  if (n === 0) {
-    // boards get special treatment of /board/FIRST_TAB
-    const state = sel.boards(store.getState());
-    return "/board/" + state.tabs[state.tabOrder[0]].name.toLowerCase();;
-  } else return screenNames[n];
-}
+import store from './store';
 
 export default () => {
-  const [loc, setLoc] = useHashLocation();
-  const active = getScreen(loc);
-  const setActive = n => setLoc(getScreenName(n));
+  const [active, setActive] = React.useState(0);
   const style = Platform.OS === "web"
     ? { height: "calc(100% - 48px)" }
     : { flexGrow: 1 };

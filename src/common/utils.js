@@ -1,5 +1,6 @@
 
 import * as fn from 'date-fns';
+import * as React from 'react';
 
 let __lastGeneratedID = null;
 export const generateID = () => {
@@ -150,3 +151,18 @@ export const downloadData = (content, filename, type) => {
     a.download = filename;
     a.click();
 }
+
+// Web only
+// returns the current hash location (excluding the '#' symbol)
+// Based on Wouter: https://codesandbox.io/s/wouter-hash-based-hook-5fp9g?file=/index.js
+const currentLoc = () => window.location.hash.replace("#", "") || "/";
+export const useHashLocation = () => {
+  const [loc, setLoc] = React.useState(currentLoc());
+  React.useEffect(() => {
+    const handler = () => setLoc(currentLoc());
+    window.addEventListener("hashchange", handler);
+    return () => window.removeEventListener("hashchange", handler);
+  }, []);
+  const navigate = React.useCallback(to => window.location.hash = to, []);
+  return [loc, navigate];
+};
