@@ -11,7 +11,7 @@
 import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import * as duck from '../ducks/kanban';
-import { selectors } from '../store';
+import { selectors, globalSelectors as sel } from '../store';
 import { View, Text } from 'react-native';
 import { makeStyles, Button, IconButton, ButtonGroup, TextField, Chip } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -317,7 +317,12 @@ const Card = ({ card, styles, index }) => {
   const [loc, setLoc] = useHashLocation();
   // editing card if URL is /board/CARD_ID/edit
   const promptOpen = loc.split("/")[3] === card.id && loc.split("/")[4] === "edit";
-  const setPromptOpen = yes => yes ? setLoc(`/boards/${loc.split("/")[2]}/${id}/edit`) : setLoc(`/boards/${loc.split("/")[2]}`);
+  const tabName = useSelector(s => {
+    const state = sel.boards(s);
+    const colID = Object.values(state.columns).filter(col => col.items.indexOf(id) !== -1)[0].id;
+    return Object.values(state.tabs).filter(tab => tab.columns.indexOf(colID) !== -1)[0].name.toLowerCase();
+  });
+  const setPromptOpen = yes => yes ? setLoc(`/boards/${tabName}/${id}/edit`) : setLoc(`/boards/${loc.split("/")[2]}`);
 
   return (
     <React.Fragment>
