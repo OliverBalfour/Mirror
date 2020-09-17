@@ -81,6 +81,7 @@ export const dummyState = () => {
 export const loadState = () => {
   try {
     // web
+    if (localStorage.version !== "0.1.0") throw new Error();
     if (localStorage.hasOwnProperty("kanban")) {
       const state = JSON.parse(localStorage.getItem("kanban"));
       if (state !== null) return state;
@@ -96,6 +97,7 @@ export const saveState = state => {
     if (localStorage) {
       const serialised = JSON.stringify(state);
       localStorage.setItem("kanban", serialised);
+      localStorage.setItem("version", "0.1.0");
     }
   } catch (e) {}
 }
