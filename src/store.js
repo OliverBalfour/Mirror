@@ -10,7 +10,9 @@ const store = configureStore({ reducer: boards });
 // Undo/redo keyboard shortcuts if supported
 try {
   document.addEventListener('keyup', e => {
-    if (e.ctrlKey && e.which === 90)
+    const ignored = ['input', 'textarea'];
+    if (ignored.indexOf(document.activeElement.tagName.toLowerCase()) !== -1) return;
+    if (e.ctrlKey && e.which === 90 && !e.shiftKey)
       store.dispatch(UndoActionCreators.undo());
     else if (e.ctrlKey && e.shiftKey && e.which === 90 || e.ctrlKey && e.which === 89)
       store.dispatch(UndoActionCreators.redo());
