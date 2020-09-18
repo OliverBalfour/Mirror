@@ -75,7 +75,7 @@ export const dummyState = () => {
   initial.tabs[ids[0]].columns = [colIDs[0], colIDs[1], colIDs[2]];
   initial.tabs[ids[1]].columns = [colIDs[3], colIDs[4]];
   initial.tabOrder = ids;
-  initial.cards['main'] = { id:'main', content: 'Welcome to your Zettelkasten! You can edit this and use `[[wikilink]]` syntax to link to other nodes.',
+  initial.cards['main'] = { id:'main', content: 'Welcome', description: 'Welcome to your Zettelkasten! You can edit this and use `[[wikilink]]` syntax to link to other nodes.',
     created: epochms, edited: epochms }
   return initial;
 }
@@ -93,21 +93,23 @@ const modifyVersion = (oldSemver, newSemver, mutation) => {
 const currentVersion = "0.2.0"; // IMPORTANT
 export const loadState = () => {
   try {
+
     // web
     if (!localStorage.version) throw new Error();
+
     // avert breaking changes
     modifyVersion("0.1.0", "0.2.0", state => {
       const epochms = new Date().getTime();
-      state.cards['main'] = { id:'main', content: 'Welcome to your Zettelkasten! You can edit this and use `[[wikilink]]` syntax to link to other nodes.',
+      state.cards['main'] = { id:'main', content: 'Welcome', description: 'Welcome to your Zettelkasten! You can edit this and use `[[wikilink]]` syntax to link to other nodes.',
       created: epochms, edited: epochms }
       return state;
     });
-    const state = JSON.parse(localStorage.getItem("kanban"));
-    if (state !== null) return state;
-  } catch (e) {
-    // native or first load on web
-    return dummyState();
-  }
+
+    if (localStorage.hasOwnProperty('kanban'))
+      return JSON.parse(localStorage.kanban) || dummyState();
+
+  } catch (e) {}
+  return dummyState();
 }
 
 export const saveState = state => {
@@ -187,7 +189,7 @@ export const useHashLocation = () => {
 const linkName = card => {
   if (card.name) return card.name;
   const firstLine = card.content.split('\n')[0];
-  if (firstLine.length > 20) return firstLine.substring(0,17) + '...';
+  if (firstLine.length > 40) return firstLine.substring(0,37) + '...';
   return firstLine;
 };
 export const parseWikilinks = (source, cards, prefix = '#/notes/') => {
@@ -200,7 +202,7 @@ export const parseWikilinks = (source, cards, prefix = '#/notes/') => {
     if (!parseable) continue;
     // m[1] is the actual match
     let cardID = m[1].substring(2, m[1].length - 2);
-    source = source.substring(0, m.index) + '[' + linkName(cards[cardID]) + '](' + prefix + cardID + ')';
+    source = source.substring(0, m.index) + '[' + linkName(cards[cardID]) + '](' + prefix + cardID + ')' + source.substring(m.index + m[1].length, source.length);
   }
   return source;
 };
