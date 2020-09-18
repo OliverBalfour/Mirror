@@ -105,7 +105,6 @@ export const loadState = () => {
     const state = JSON.parse(localStorage.getItem("kanban"));
     if (state !== null) return state;
   } catch (e) {
-    console.log(e)
     // native or first load on web
     return dummyState();
   }
@@ -201,8 +200,6 @@ export const parseWikilinks = (source, cards, prefix = '#/notes/') => {
     if (!parseable) continue;
     // m[1] is the actual match
     let cardID = m[1].substring(2, m[1].length - 2);
-    console.log(cardID);
-    console.log(cards);
     source = source.substring(0, m.index) + '[' + linkName(cards[cardID]) + '](' + prefix + cardID + ')';
   }
   return source;

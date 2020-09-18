@@ -1,14 +1,17 @@
 
 import * as React from 'react';
-import ReactMarkdown from 'react-markdown';
+import Markdown from '../../components/markdown';
 import { ClickAwayListener, TextField, InputLabel } from '@material-ui/core';
 import NotesIcon from '@material-ui/icons/Notes';
 import { IndicatorBuilder, AttributeHeader } from '.';
+import { selectors } from '../../store';
+import { useSelector } from 'react-redux';
 
 export const Edit = ({ card, setCard }) => {
   const [editingDescription, setEditingDescription] = React.useState(false);
   const setDescription = description => setCard({...card,
       description: description.length ? description : undefined});
+  const cards = useSelector(selectors.boards.cards);
 
   if (!editingDescription && typeof card.description !== 'string')
     return (
@@ -18,9 +21,11 @@ export const Edit = ({ card, setCard }) => {
     );
 
   return !editingDescription ? (
-    <div onClick={() => setEditingDescription(true)} style={{marginTop: 8}}>
-      <InputLabel className="custom-label">Description</InputLabel>
-      <ReactMarkdown source={card.description} />
+    <div style={{marginTop: 8}}>
+      <div onClick={() => setEditingDescription(true)}>
+        <InputLabel className="custom-label">Description</InputLabel>
+      </div>
+      <Markdown source={card.description} cards={cards} />
     </div>
   ) : (
     <React.Fragment>

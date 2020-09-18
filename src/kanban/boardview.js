@@ -18,8 +18,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog } from '../components';
-import ReactMarkdown from 'react-markdown';
+import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog, Markdown } from '../components';
 import { Description, DateTime, EBS } from './attributes';
 import { useHashLocation } from '../common/utils';
 
@@ -322,6 +321,7 @@ const Card = ({ card, styles, index }) => {
     const colID = Object.values(state.columns).filter(col => col.items.indexOf(id) !== -1)[0].id;
     return Object.values(state.tabs).filter(tab => tab.columns.indexOf(colID) !== -1)[0].name.toLowerCase();
   });
+  const cards = useSelector(selectors.boards.cards);
   const setPromptOpen = yes => yes ? setLoc(`/boards/${tabName}/${id}/edit`) : setLoc(`/boards/${loc.split("/")[2]}`);
 
   return (
@@ -334,7 +334,7 @@ const Card = ({ card, styles, index }) => {
             className={styles.card + (snapshot.isDragging ? " "+styles.draggingCard : "")}
             style={provided.draggableProps.style}
             onClick={() => setPromptOpen(true)}>
-            <ReactMarkdown source={content} />
+            <Markdown source={content} cards={cards} />
             <Description.Indicator card={card} />
             <DateTime.Indicator    card={card} />
             <EBS.Indicator         card={card} />
