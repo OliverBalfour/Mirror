@@ -13,6 +13,7 @@ import { useHashLocation } from './common/utils';
 
 import { Button, MenuBar } from './components';
 import Kanban from './kanban';
+import Zettelkasten from './zettelkasten';
 import store, { globalSelectors as sel } from './store';
 
 const screenNames = ["/board", "/notes"];
@@ -43,6 +44,9 @@ export default () => {
         <View style={style}>
           { active === 0 && (
             <Kanban />
+          )}
+          { active === 1 && (
+            <Zettelkasten />
           )}
         </View>
 

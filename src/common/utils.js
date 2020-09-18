@@ -75,20 +75,38 @@ export const dummyState = () => {
   initial.tabs[ids[0]].columns = [colIDs[0], colIDs[1], colIDs[2]];
   initial.tabs[ids[1]].columns = [colIDs[3], colIDs[4]];
   initial.tabOrder = ids;
+  initial.cards['main'] = { id:'main', content: 'Welcome to your Zettelkasten! You can edit this and use `[[wikilink]]` syntax to link to other nodes.',
+    created: epochms, edited: epochms }
   return initial;
 }
 
+const modifyVersion = (oldSemver, newSemver, mutation) => {
+  if (localStorage.version === oldSemver) {
+    let state = JSON.parse(localStorage.kanban);
+    mutation(state);
+    localStorage.kanban = JSON.stringify(state);
+    localStorage.version = newSemver;
+  }
+};
+
 // load persisted state
+const currentVersion = "0.2.0"; // IMPORTANT
 export const loadState = () => {
   try {
     // web
-    if (localStorage.version !== "0.1.0") throw new Error();
-    if (localStorage.hasOwnProperty("kanban")) {
-      const state = JSON.parse(localStorage.getItem("kanban"));
-      if (state !== null) return state;
-    } else return dummyState();
+    if (!localStorage.version) throw new Error();
+    // avert breaking changes
+    modifyVersion("0.1.0", "0.2.0", state => {
+      const epochms = new Date().getTime();
+      state.cards['main'] = { id:'main', content: 'Welcome to your Zettelkasten! You can edit this and use `[[wikilink]]` syntax to link to other nodes.',
+      created: epochms, edited: epochms }
+      return state;
+    });
+    const state = JSON.parse(localStorage.getItem("kanban"));
+    if (state !== null) return state;
   } catch (e) {
-    // native
+    console.log(e)
+    // native or first load on web
     return dummyState();
   }
 }
@@ -98,7 +116,7 @@ export const saveState = state => {
     if (localStorage) {
       const serialised = JSON.stringify(state);
       localStorage.setItem("kanban", serialised);
-      localStorage.setItem("version", "0.1.0");
+      localStorage.setItem("version", currentVersion);
     }
   } catch (e) {}
 }

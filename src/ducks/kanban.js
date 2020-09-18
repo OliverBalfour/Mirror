@@ -36,6 +36,10 @@ export const deleteTab = createAction('kanban/DELETE_TAB'); // takes tabIdx
 export const renameTab = createAction('kanban/RENAME_TAB'); // takes { tabID, name }
 export const moveTab = createAction('kanban/MOVE_TAB'); // takes [srcIdx, dstIdx]
 
+export const addZettel = createAction('zettelkasten/ADD_ZETTEL'); // takes { zettel: {...} }
+export const editZettel = createAction('zettelkasten/EDIT_ZETTEL'); // takes { zettel }
+export const deleteZettel = createAction('zettelkasten/DELETE_ZETTEL'); // takes zettelID
+
 // Helpers
 
 // const indexFromID = (list, id) => list.map(item => item.id === id).indexOf(true);
@@ -202,6 +206,23 @@ const reducer = createReducer(initialState, {
     });
     s.columns[colID].items = [];
     s.columns[colID].edited = epochms;
+  },
+  [addZettel]: (s, a) => {
+    const { zettel } = a.payload;
+    const id = generateID();
+    const epochms = new Date().getTime();
+    s.cards[id] = { id, created: epochms,  edited: epochms, moved: epochms,
+      ...zettel };
+  },
+  [editZettel]: (s, a) => {
+    const { zettel } = a.payload;
+    const epochms = new Date().getTime();
+    s.cards[zettel.id] = zettel;
+    s.cards[zettel.id].edited = epochms;
+  },
+  [deleteZettel]: (s, a) => {
+    // TODO: clean up links?
+    delete s.cards[a.payload];
   },
 });
 

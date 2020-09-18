@@ -9,9 +9,11 @@ type State = {
   tabOrdr :: List[TabID],
 }
 
-TODO: unify Kanban with Zettelkasten
+type Zettel = {
+  content, id :: CardID, created, edited
+}
 
-type Card = {
+type Card : Zettel {
   -- core
   content :: String,
   id :: CardID,
