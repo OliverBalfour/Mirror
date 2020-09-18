@@ -10,6 +10,7 @@ import React from 'react';
 import { StyleSheet, Text, View, Platform } from 'react-native';
 import { Provider } from 'react-redux';
 import { useHashLocation } from './common/utils';
+// import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 
 import { Button, MenuBar } from './components';
 import Kanban from './kanban';
@@ -29,6 +30,12 @@ const getScreenName = n => {
   } else return screenNames[n];
 }
 
+// const theme = createMuiTheme({
+//   palette: {
+//     // primary: { main: '#1976d2', dark: '#1466b8' },
+//   },
+// });
+
 export default () => {
   const [loc, setLoc] = useHashLocation();
   const active = getScreen(loc);
@@ -39,20 +46,22 @@ export default () => {
 
   return (
     <Provider store={store}>
-      <View style={{ top: 0, left: 0, height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
+      {/*<ThemeProvider theme={theme}>*/}
+        <View style={{ top: 0, left: 0, height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
 
-        <View style={style}>
-          { active === 0 && (
-            <Kanban />
-          )}
-          { active === 1 && (
-            <Zettelkasten />
-          )}
+          <View style={style}>
+            { active === 0 && (
+              <Kanban />
+            )}
+            { active === 1 && (
+              <Zettelkasten />
+            )}
+          </View>
+
+          <MenuBar active={active} setActive={setActive} />
+
         </View>
-
-        <MenuBar active={active} setActive={setActive} />
-
-      </View>
+      {/*</ThemeProvider>*/}
     </Provider>
   );
 }

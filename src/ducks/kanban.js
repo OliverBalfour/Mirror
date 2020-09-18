@@ -209,7 +209,7 @@ const reducer = createReducer(initialState, {
   },
   [addZettel]: (s, a) => {
     const { zettel } = a.payload;
-    const id = generateID();
+    const id = zettel.id || generateID();
     const epochms = new Date().getTime();
     s.cards[id] = { id, created: epochms,  edited: epochms, moved: epochms,
       ...zettel };

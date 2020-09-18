@@ -187,6 +187,7 @@ export const useHashLocation = () => {
 };
 
 const linkName = card => {
+  if (!card) return 'unknown';
   if (card.name) return card.name;
   const firstLine = card.content.split('\n')[0];
   if (firstLine.length > 40) return firstLine.substring(0,37) + '...';
