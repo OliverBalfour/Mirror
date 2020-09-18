@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { useHashLocation } from '../common/utils';
+import { useHashLocation, parseWikilinks } from '../common/utils';
 import { selectors } from '../store';
 import { useSelector } from 'react-redux';
 import ReactMarkdown from 'react-markdown';
@@ -15,11 +15,11 @@ export default () => {
 
   return (
     <div>
-      <Zettel card={cards[currentCardID]} />
+      <Zettel card={cards[currentCardID]} cards={cards} />
     </div>
   );
 };
 
-const Zettel = ({ card }) => {
-  return <ReactMarkdown source={card.content} />;
+const Zettel = ({ card, cards }) => {
+  return <ReactMarkdown source={parseWikilinks(card.content, cards)} />;
 };

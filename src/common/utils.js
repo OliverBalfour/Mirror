@@ -184,3 +184,26 @@ export const useHashLocation = () => {
   const navigate = React.useCallback(to => window.location.hash = to, []);
   return [loc, navigate];
 };
+
+const linkName = card => {
+  if (card.name) return card.name;
+  const firstLine = card.content.split('\n')[0];
+  if (firstLine.length > 20) return firstLine.substring(0,17) + '...';
+  return firstLine;
+};
+export const parseWikilinks = (source, cards, prefix = '#/notes/') => {
+  const regex = /(\[\[[A-Za-z0-9_-]+\]\])/gm;
+  let m;
+  while ((m = regex.exec(source)) !== null) {
+    if (m.index === regex.lastIndex) regex.lastIndex++;
+    // m.index is the index in 'source'
+    const parseable = (source.substring(0, m.index).match(/`/gm) || []).length % 2 === 0;
+    if (!parseable) continue;
+    // m[1] is the actual match
+    let cardID = m[1].substring(2, m[1].length - 2);
+    console.log(cardID);
+    console.log(cards);
+    source = source.substring(0, m.index) + '[' + linkName(cards[cardID]) + '](' + prefix + cardID + ')';
+  }
+  return source;
+};
