@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { useHashLocation, parseWikilinks, generateID } from '../common/utils';
+import { useHashLocation, parseWikilinks, generateID, ReloadProtect } from '../common/utils';
 import { selectors } from '../store';
 import { useSelector, useDispatch } from 'react-redux';
 import { Markdown } from '../components';
@@ -92,6 +92,7 @@ export default () => {
 
   return (
     <React.Fragment>
+      <ReloadProtect shouldProtect={card.content !== content || card.description !== description} />
       <div className={styles.container}>
         {editing && (
           <div className={styles.zettel}>

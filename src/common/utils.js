@@ -290,3 +290,15 @@ export const searchCards = (term, cards, limit=10) => {
   }
   return matches;
 }
+
+// Note: ReloadProtect does not prevent hash changes. Be warned!
+export const ReloadProtect = ({ shouldProtect = true }) => {
+  React.useEffect(() => {
+    // componentDidMount
+    if (shouldProtect)
+      window.onbeforeunload = e => "Are you sure you want to quit?";
+    // componentWillUnmount
+    return () => window.onbeforeunload = null;
+  });
+  return null;
+}

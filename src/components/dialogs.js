@@ -7,6 +7,7 @@ import * as duck from '../ducks/kanban';
 import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { Description, DateTime, EBS } from '../kanban/attributes';
+import { ReloadProtect } from '../common/utils';
 
 export const ConfirmDialog = ({ open, respond, title, subtitle, labels = ["Cancel", "OK"] }) => {
   return (
@@ -61,15 +62,6 @@ export const PromptDialog = ({
 }
 
 export const CardEditDialog = ({ respond, card }) => {
-  // create confirm dialog if closing the tab while editing a card
-  React.useEffect(() => {
-    // componentDidMount
-    if (JSON.stringify(newCard) !== JSON.stringify(card))
-      window.onbeforeunload = e => "Are you sure you want to quit?";
-    // componentWillUnmount
-    return () => window.onbeforeunload = null;
-  });
-
   const dispatch = useDispatch();
 
   const currentColID = useSelector(state => Object.values(sel.boards(state).columns)
@@ -92,6 +84,7 @@ export const CardEditDialog = ({ respond, card }) => {
   return (
     <Dialog open onClose={() => done(null)} fullWidth maxWidth='md'
       disableBackdropClick={JSON.stringify(newCard) !== JSON.stringify(card)}>
+      <ReloadProtect shouldProtect={JSON.stringify(newCard) !== JSON.stringify(card)} />
       <DialogTitle>Edit card</DialogTitle>
       <DialogContent>
         <InputLabel id="kanban/card-column" className="custom-label">Column</InputLabel>
