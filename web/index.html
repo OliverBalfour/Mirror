@@ -61,6 +61,26 @@
       #zettel-buttons-container .MuiButton-root {
         padding: 7px 8px;
       }
+      .textcomplete-dropdown {
+        border: 1px solid #DDD;
+        background-color: white;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        z-index: 99999 !important; /* appear over MUI dialog */
+      }
+      .textcomplete-dropdown li {
+        margin: 0;
+        font-size: 14px;
+      }
+      .textcomplete-item {
+        padding: 2px 5px;
+        cursor: pointer;
+      }
+      .textcomplete-item:hover,
+      .textcomplete-item.active {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
     </style>
   </head>
   <body>

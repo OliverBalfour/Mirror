@@ -222,9 +222,8 @@ export const useHashLocation = () => {
   return [loc, navigate];
 };
 
-const linkName = card => {
+export const linkName = card => {
   if (!card) return 'unknown';
-  if (card.name) return card.name;
   const firstLine = card.content.split('\n')[0];
   if (firstLine.length > 40) return firstLine.substring(0,37) + '...';
   return firstLine;
@@ -267,7 +266,7 @@ export const mergeRefs = (...refs) => {
   };
 };
 
-// Simple card search; searches titles then descriptions for case insensitive exact matches
+// Simple card search; searches titles then descriptions then IDs for case insensitive exact matches
 export const searchCards = (term, cards, limit=10) => {
   let matches = [];
   let tl = term.toLowerCase();
@@ -278,7 +277,13 @@ export const searchCards = (term, cards, limit=10) => {
     }
   }
   for (const cardID in cards) {
-    if (cards[cardID].description.toLowerCase().includes(tl)) {
+    if (cards[cardID].description && cards[cardID].description.toLowerCase().includes(tl)) {
+      matches.push(cardID);
+      if (matches.length === limit) return matches;
+    }
+  }
+  for (const cardID in cards) {
+    if (cardID.toLowerCase().includes(tl)) {
       matches.push(cardID);
       if (matches.length === limit) return matches;
     }

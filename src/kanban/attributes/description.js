@@ -5,6 +5,7 @@ import { ClickAwayListener, TextField, InputLabel } from '@material-ui/core';
 import NotesIcon from '@material-ui/icons/Notes';
 import { IndicatorBuilder, AttributeHeader } from '.';
 import { selectors } from '../../store';
+import AutocompleteEditor from '../../components/autocomplete-editor';
 import { useSelector } from 'react-redux';
 
 export const Edit = ({ card, setCard }) => {
@@ -31,8 +32,9 @@ export const Edit = ({ card, setCard }) => {
     <React.Fragment>
       <InputLabel className="custom-label">Description</InputLabel>
       <ClickAwayListener onClickAway={() => setEditingDescription(false)}>
-        <TextField margin="dense" autoFocus fullWidth variant="outlined"
-          multiline rows={6} rowsMax={16} value={card.description} onChange={e => setDescription(e.target.value)} />
+        <div style={{width:'100%',height:'100%'}}>
+          <AutocompleteEditor value={card.description} setValue={setDescription} autoFocus />
+        </div>
       </ClickAwayListener>
     </React.Fragment>
   );

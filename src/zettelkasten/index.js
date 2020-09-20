@@ -12,6 +12,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import StarIcon from '@material-ui/icons/Star';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import * as duck from '../ducks/kanban.js';
+import AutocompleteEditor from '../components/autocomplete-editor';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -96,8 +97,7 @@ export default () => {
           <div className={styles.zettel}>
             <TextField margin="dense" autoFocus fullWidth
               multiline rowsMax={3} value={content} onChange={e => setContent(e.target.value)} />
-            <TextField margin="dense" fullWidth variant="outlined"
-              multiline rows={6} rowsMax={16} value={description} onChange={e => setDescription(e.target.value)} />
+            <AutocompleteEditor value={description} setValue={setDescription} />
             <div className={styles.editingButtons}>
               <Button onClick={cancel} color="primary">Cancel</Button>
               <Button onClick={save} color="primary" variant="contained">Save</Button>
