@@ -73,6 +73,9 @@ export const selectors = {
   archivedCards: state => Object.values(state.cards).filter(card => Object.keys(card).indexOf("archived") !== -1),
   activeCards:   state => Object.values(state.cards).filter(card => Object.keys(card).indexOf("archived") === -1),
   starredZettels: state => state.starredZettels ? state.starredZettels : [],
+  // gets { [tabID]: list_of_cardIDs }
+  cardsByTab: state => objectMap(state.tabs, tab =>
+    tab.columns.flatMap(colID => state.columns[colID].items)),
 };
 
 // Reducers

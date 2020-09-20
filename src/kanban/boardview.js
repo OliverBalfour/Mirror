@@ -119,7 +119,9 @@ export default ({ tabInfo }) => {
 
   const tabOrder = useSelector(selectors.boards.tabOrder);
   const columns = useSelector(selectors.boards.getColumnsInTabs)[tabOrder[tab]];
-  const colIDs = useSelector(selectors.boards.tabs)[tabOrder[tab]].columns;
+  const tabs = useSelector(selectors.boards.tabs);
+  const cards = useSelector(selectors.boards.cards);
+  const colIDs = tabs[tabOrder[tab]].columns;
 
   // dispatch move card action
   const onDragEnd = res => {
@@ -141,6 +143,14 @@ export default ({ tabInfo }) => {
     typeof name === "string" && name.length &&
       dispatch(duck.addColumn({ tabID: tabObj.id, name }));
 
+  const [loc, setLoc] = useHashLocation();
+  // editing card if URL is /board/CARD_ID/edit
+  const editingCard = loc.split("/")[4] === "edit" ? loc.split("/")[3] : null;
+
+  const cardsByTab = useSelector(selectors.boards.cardsByTab);
+  const tabIDfromCardID = id => Object.keys(cardsByTab).filter(tabID => cardsByTab[tabID].indexOf(id) !== -1);
+  const setEditingCard = id => id ? setLoc(`/boards/${tabs[tabIDfromCardID(id)].name}/${id}/edit`) : setLoc(`/boards/${loc.split("/")[2]}`);
+
   return (
     <View style={{ width: '100vw', overflowX: 'auto', height: '100%' }}>
       <DragDropContext onDragEnd={onDragEnd}>
@@ -148,7 +158,8 @@ export default ({ tabInfo }) => {
           {(provided, snapshot) => (
             <React.Fragment>
               <div className={styles.root} ref={provided.innerRef}>
-                {colIDs.map((colID, i) => <Column col={columns[i]} styles={styles} key={colID} index={i} />)}
+                {colIDs.map((colID, i) => <Column col={columns[i]} styles={styles} key={colID} index={i}
+                  setEditingCard={setEditingCard} />)}
                 <AddColumn styles={styles} add={() => setPromptOpen(true)} hide={snapshot.isDraggingOver || snapshot.draggingFromThisWith} />
               </div>
               {provided.placeholder}
@@ -160,11 +171,14 @@ export default ({ tabInfo }) => {
         <PromptDialog open respond={promptRespond}
           title="Add column" label="Name" />
       )}
+      {editingCard && (
+        <CardEditDialog respond={() => setEditingCard(null)} card={cards[editingCard]} />
+      )}
     </View>
   );
 }
 
-const Column = ({ styles, col, index }) => {
+const Column = ({ styles, col, index, setEditingCard }) => {
   const { id, items, name } = col;
 
   const [editingNew, setEditingNew] = React.useState(false);
@@ -208,7 +222,8 @@ const Column = ({ styles, col, index }) => {
               <EditingCard value={editingValue} setValue={setEditingValue}
                 add={addCard} cancel={() => { setEditingValue(""); setEditingNew(false) }} />
             )}
-            {items.map((card, index) => <Card card={card} styles={styles} index={index} key={card.id} />)}
+            {items.map((card, index) => <Card card={card} styles={styles} index={index} key={card.id}
+              setEditingCard={setEditingCard} />)}
           </div>
           {provided.placeholder}
         </React.Fragment>
@@ -313,20 +328,9 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
   );
 };
 
-const Card = ({ card, styles, index }) => {
+const Card = ({ card, styles, index, setEditingCard }) => {
   const { id, content } = card;
-  const dispatch = useDispatch();
-  // TODO: refactor this to board level
-  const [loc, setLoc] = useHashLocation();
-  // editing card if URL is /board/CARD_ID/edit
-  const promptOpen = loc.split("/")[3] === card.id && loc.split("/")[4] === "edit";
-  const tabName = useSelector(s => {
-    const state = sel.boards(s);
-    const colID = Object.values(state.columns).filter(col => col.items.indexOf(id) !== -1)[0].id;
-    return Object.values(state.tabs).filter(tab => tab.columns.indexOf(colID) !== -1)[0].name.toLowerCase();
-  });
   const cards = useSelector(selectors.boards.cards);
-  const setPromptOpen = yes => yes ? setLoc(`/boards/${tabName}/${id}/edit`) : setLoc(`/boards/${loc.split("/")[2]}`);
 
   return (
     <React.Fragment>
@@ -337,7 +341,7 @@ const Card = ({ card, styles, index }) => {
             {...provided.dragHandleProps}
             className={styles.card + (snapshot.isDragging ? " "+styles.draggingCard : "")}
             style={provided.draggableProps.style}
-            onClick={() => setPromptOpen(true)}>
+            onClick={() => setEditingCard(id)}>
             <Markdown source={content} cards={cards} />
             <Description.Indicator card={card} />
             <DateTime.Indicator    card={card} />
@@ -345,9 +349,6 @@ const Card = ({ card, styles, index }) => {
           </div>
         )}
       </Draggable>
-      {promptOpen && (
-        <CardEditDialog respond={() => setPromptOpen(false)} card={card} />
-      )}
     </React.Fragment>
   );
 }
