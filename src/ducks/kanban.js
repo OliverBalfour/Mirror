@@ -39,6 +39,7 @@ export const moveTab = createAction('kanban/MOVE_TAB'); // takes [srcIdx, dstIdx
 export const addZettel = createAction('zettelkasten/ADD_ZETTEL'); // takes { zettel: {...} }
 export const editZettel = createAction('zettelkasten/EDIT_ZETTEL'); // takes { zettel }
 export const deleteZettel = createAction('zettelkasten/DELETE_ZETTEL'); // takes zettelID
+export const toggleZettelStarred = createAction('zettelkasten/TOGGLE_STARRED'); // takes zettelID
 
 // Helpers
 
@@ -71,9 +72,14 @@ export const selectors = {
   cards: state => state.cards,
   archivedCards: state => Object.values(state.cards).filter(card => Object.keys(card).indexOf("archived") !== -1),
   activeCards:   state => Object.values(state.cards).filter(card => Object.keys(card).indexOf("archived") === -1),
+  starredZettels: state => state.starredZettels ? state.starredZettels : [],
 };
 
 // Reducers
+
+export const
+  KANBAN_CARD_TYPE = 0,
+  ZETTEL_NOTE_TYPE = 1;
 
 const initialState = loadState();
 
@@ -104,7 +110,7 @@ const reducer = createReducer(initialState, {
     const id = generateID();
     const epochms = new Date().getTime();
     // add to cards list
-    s.cards[id] = { id, content,
+    s.cards[id] = { id, content, type: KANBAN_CARD_TYPE,
       created: epochms,  edited: epochms, moved: epochms };
     s.columns[colID].items.unshift(id); // add to top of column
     s.columns[colID].edited = epochms;
@@ -211,7 +217,7 @@ const reducer = createReducer(initialState, {
     const { zettel } = a.payload;
     const id = zettel.id || generateID();
     const epochms = new Date().getTime();
-    s.cards[id] = { id, created: epochms,  edited: epochms, moved: epochms,
+    s.cards[id] = { id, type: ZETTEL_NOTE_TYPE, created: epochms,  edited: epochms, moved: epochms,
       ...zettel };
   },
   [editZettel]: (s, a) => {
@@ -223,6 +229,13 @@ const reducer = createReducer(initialState, {
   [deleteZettel]: (s, a) => {
     // TODO: clean up links?
     delete s.cards[a.payload];
+  },
+  [toggleZettelStarred]: (s, a) => {
+    if (!s.starredZettels) s.starredZettels = [];
+    if (s.starredZettels.indexOf(a.payload) === -1)
+      s.starredZettels.push(a.payload);
+    else
+      deleteInList(s.starredZettels, a.payload);
   },
 });
 

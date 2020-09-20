@@ -8,7 +8,49 @@ import { makeStyles, TextField, Button, ButtonGroup } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
+import SearchIcon from '@material-ui/icons/Search';
+import StarIcon from '@material-ui/icons/Star';
+import StarBorderIcon from '@material-ui/icons/StarBorder';
 import * as duck from '../ducks/kanban.js';
+
+const useStyles = makeStyles(theme => ({
+  container: {
+    background: '#DFEEEE',
+    position: 'absolute',
+    top: 0, left: 0, bottom: 0, right: 0,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    padding: 10,
+  },
+  zettel: {
+    background: 'white',
+    borderRadius: 5,
+    width: 650,
+    margin: 10,
+    marginTop: 70,
+    boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)',
+    padding: 16,
+    paddingTop: 8, paddingBottom: 12,
+    '&>p': {marginTop: 0},
+    '&>p:last-child': {marginBottom: 0},
+  },
+  zettelTitle: {
+    marginBottom: 8,
+    marginTop: 8,
+    fontSize: 24,
+    fontWeight: 600,
+    textAlign: 'center',
+  },
+  editingButtons: {
+    float: 'right',
+  },
+  buttons: {
+    position: 'absolute',
+    top: 15, left: 0, right: 0,
+    display: 'flex', justifyContent: 'center',
+  },
+}));
 
 export default () => {
   const [loc, setLoc] = useHashLocation();
@@ -35,6 +77,8 @@ export default () => {
     setTimeout(() => (setContent("New note"), setDescription("..."), setLoc(`/notes/${id}/edit`)), 500);
   };
 
+  const starZettel = () => dispatch(duck.toggleZettelStarred(currentCardID));
+
   const card = cards[currentCardID];
   const [content, setContent] = React.useState(card ? card.content : '');
   const [description, setDescription] = React.useState(card ? card.description : '');
@@ -46,52 +90,16 @@ export default () => {
       <Zettel card={card} cards={cards} editing={editing}
         setEditing={setEditing} deleteZettel={deleteZettel} saveZettel={saveZettel}
         addZettel={addZettel} content={content} setContent={setContent}
-        description={description} setDescription={setDescription} />
+        description={description} setDescription={setDescription} starZettel={starZettel} />
     </div>
   );
 };
 
-const useStyles = makeStyles(theme => ({
-  container: {
-    background: '#DFEEEE',
-    position: 'absolute',
-    top: 0, left: 0, bottom: 0, right: 0,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    padding: 10,
-  },
-  zettel: {
-    background: 'white',
-    borderRadius: 5,
-    width: 650,
-    margin: 10,
-    marginTop: 70,
-    boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)',
-    padding: 16,
-    paddingTop: 8, paddingBottom: 12,
-    '&>p': {margin: 0},
-  },
-  zettelTitle: {
-    marginBottom: 8,
-    marginTop: 8,
-    fontSize: 24,
-    fontWeight: 600,
-    textAlign: 'center',
-  },
-  editingButtons: {
-    float: 'right',
-  },
-  buttons: {
-    position: 'absolute',
-    top: 15, left: 0, right: 0,
-    display: 'flex', justifyContent: 'center',
-  },
-}));
-
 const Zettel = ({ card, cards, editing, setEditing, deleteZettel, saveZettel, addZettel,
-  content, setContent, description, setDescription }) => {
+  content, setContent, description, setDescription, starZettel }) => {
   const styles = useStyles();
+
+  const starred = useSelector(selectors.boards.starredZettels);
 
   const cancel = () => setEditing(false);
   const save = () => (saveZettel({ ...card, content, description }), cancel());
@@ -121,18 +129,30 @@ const Zettel = ({ card, cards, editing, setEditing, deleteZettel, saveZettel, ad
       <div className={styles.buttons} id='zettel-buttons-container'>
         <ButtonGroup variant='contained' color='primary'>
           {!editing && (
-            <Button onClick={() => setEditing(true)}>
+            <Button onClick={() => setEditing(true)} title="Edit note">
               <EditIcon />
             </Button>
           )}
           {card.id !== 'main' && (
-            <Button onClick={deleteZettel}>
+            <Button onClick={deleteZettel} title="Delete note">
               <DeleteIcon />
             </Button>
           )}
-          <Button onClick={addZettel}>
+          <Button onClick={addZettel} title="Add note">
             <AddIcon />
           </Button>
+          <Button onClick={() => alert('TODO')} title="Search notes">
+            <SearchIcon />
+          </Button>
+          {starred.indexOf(card.id) === -1 ? (
+            <Button onClick={starZettel} title="Star this note">
+              <StarBorderIcon />
+            </Button>
+          ) : (
+            <Button onClick={starZettel} title="Unstar this note">
+              <StarIcon />
+            </Button>
+          )}
         </ButtonGroup>
       </div>
     </React.Fragment>

@@ -47,7 +47,7 @@ export const dummyCols = (colnums, colnames) => {
   const epochms = new Date().getTime();
   for (let i = 0; i < numcards; i++) {
     let id = generateID();
-    cards[id] = { id, content: sampleCards[Math.floor(Math.random()*sampleCards.length)],
+    cards[id] = { id, type: 0, content: sampleCards[Math.floor(Math.random()*sampleCards.length)],
       created: epochms, edited: epochms, moved: epochms };
   }
   let columns = {};
@@ -75,7 +75,7 @@ export const dummyState = () => {
   initial.tabs[ids[0]].columns = [colIDs[0], colIDs[1], colIDs[2]];
   initial.tabs[ids[1]].columns = [colIDs[3], colIDs[4]];
   initial.tabOrder = ids;
-  initial.cards['main'] = { id:'main', content: 'Welcome', description: 'Welcome to your Zettelkasten! You can edit this and use `[[wikilink]]` syntax to link to other nodes.',
+  initial.cards['main'] = { id:'main', content: 'Welcome', type: 1, description: 'Welcome to your Zettelkasten! You can edit this and use `[[wikilink]]` syntax to link to other nodes.',
     created: epochms, edited: epochms }
   return initial;
 }
@@ -90,7 +90,7 @@ const modifyVersion = (oldSemver, newSemver, mutation) => {
 };
 
 // load persisted state
-const currentVersion = "0.2.0"; // IMPORTANT
+const currentVersion = "0.2.1"; // IMPORTANT
 export const loadState = () => {
   try {
 
@@ -102,6 +102,14 @@ export const loadState = () => {
       const epochms = new Date().getTime();
       state.cards['main'] = { id:'main', content: 'Welcome', description: 'Welcome to your Zettelkasten! You can edit this and use `[[wikilink]]` syntax to link to other nodes.',
       created: epochms, edited: epochms }
+      return state;
+    });
+    modifyVersion("0.2.0", "0.2.1", state => {
+      for (const cardID in state.cards) {
+        const numCols = Object.values(state.columns).filter(col => col.items.indexOf(cardID) !== -1).length;
+        state.cards[cardID].type = numCols ? 0 : 1;
+      }
+      state.cards['main'].type = 1;
       return state;
     });
 
@@ -134,7 +142,7 @@ export const objectMap = (object, mapFn) =>
  * Returns a heavily abbreviated pretty printed date using date-fns
  * - Only includes time if within a week and not midnight
  * - Only includes minutes if nonzero
- * - Replaces date with "Tomorrow" or "Next Fri" for days within a fortnight
+ * - Replaces date with "Tomorrow", "Next Fri" or "Last Wed", etc.
  */
 export const prettyPrintDate = epochMilliseconds => {
   const date = new Date(epochMilliseconds);
@@ -142,18 +150,47 @@ export const prettyPrintDate = epochMilliseconds => {
 
   const getDate = date => {
     const diff = fn.differenceInCalendarDays(date, now);
-    if (diff === 0) return "Today";
-    else if (diff === -1) return "Yesterday";
-    else if (diff === 1) return "Tomorrow";
-    else if (diff > 0 && diff < 7) return fn.format(date, "EEE"); // ex: Wed
-    else if (diff > 0 && diff < 14) return fn.format(date, "EEE") + " Week"; // ex: Fri Week
-    else if (diff > -7 && diff < 0) return "Last " + fn.format(date, "EEE"); // ex: Last Fri
-    return fn.format(date, "MMM do"); // ex: Sep 17th
+    const weekDiff = fn.differenceInCalendarWeeks(date, now, { weekStartsOn: 1 });
+    const yearDiff = fn.differenceInCalendarYears(date, now);
+
+    // Relative dates are quite ambiguous in English
+    // If today is Wednesday 23 September 2020, then the following mappings are adhered to:
+
+    // 15/9/19: 15 Sep 2019
+    // 15/9/20: 15 Sep
+    // 16/9/20: Last Wed
+    // 21/9/20: Last Mon
+    // 22/9/20: Yesterday
+    // 23/9/20: Today
+    // 24/9/20: Tomorrow
+    // 25/9/20: Fri
+    // 27/9/20: Sun
+    // 28/9/20: Next Mon
+    // 7/10/20: Wed Week
+
+    if (diff ===  0) return "Today";
+    if (diff === -1) return "Yesterday";
+    if (diff ===  1) return "Tomorrow";
+
+    const day = fn.format(date, "EEE"); // eg Mon, Thu
+
+    if (weekDiff === 0 && diff >= 0) return day;
+
+    if (diff >= -7 && diff <   0) return `Last ${day}`;
+    if (diff >   0 && diff <=  7) return `Next ${day}`;
+    if (diff >   7 && diff <= 14) return `${day} Week`;
+
+    if (yearDiff === 0)
+      return fn.format(date, "MMM do"); // eg: Sep 17th
+    else
+      return fn.format(date, "MMM do yyyy"); // eg: Sep 17th 2021 if it's 2020
   }
 
   const getTime = date => {
-    if (date.getHours() === 0 && date.getMinutes() === 0) return null; // ignore time if midnight
-    if (date.getMinutes() === 0) return fn.format(date, "haaa"); // ex: 4PM
+    // ignore time if midnight
+    if (date.getHours() === 0 && date.getMinutes() === 0) return null;
+    // No minutes; eg 4PM
+    if (date.getMinutes() === 0) return fn.format(date, "haaa");
     return fn.format(date, "h:mmaaa");
   }
 
@@ -161,7 +198,7 @@ export const prettyPrintDate = epochMilliseconds => {
   return getDate(date) + (time ? " " + time : "");
 };
 
-// Download content as filename with specificed MIME type
+// Web: Download content as filename with specificed MIME type
 export const downloadData = (content, filename, type) => {
     if(!type) type = 'application/octet-stream';
     const a = document.createElement('a');
@@ -171,9 +208,8 @@ export const downloadData = (content, filename, type) => {
     a.click();
 }
 
-// Web only
-// returns the current hash location (excluding the '#' symbol)
-// Based on Wouter: https://codesandbox.io/s/wouter-hash-based-hook-5fp9g?file=/index.js
+// Web: returns the current hash location (excluding the '#' symbol)
+// Based on https://codesandbox.io/s/wouter-hash-based-hook-5fp9g
 const currentLoc = () => window.location.hash.replace("#", "") || "/";
 export const useHashLocation = () => {
   const [loc, setLoc] = React.useState(currentLoc());
@@ -194,16 +230,39 @@ const linkName = card => {
   return firstLine;
 };
 export const parseWikilinks = (source, cards, prefix = '#/notes/') => {
-  const regex = /(\[\[[A-Za-z0-9_-]+\]\])/gm;
+  const regex = /(\[\[[A-Za-z0-9_-]+\]\])/gm; // assumes card IDs are alphanumeric + dash + underscore
   let m;
   while ((m = regex.exec(source)) !== null) {
     if (m.index === regex.lastIndex) regex.lastIndex++;
     // m.index is the index in 'source'
     const parseable = (source.substring(0, m.index).match(/`/gm) || []).length % 2 === 0;
     if (!parseable) continue;
+
     // m[1] is the actual match
     let cardID = m[1].substring(2, m[1].length - 2);
-    source = source.substring(0, m.index) + '[' + linkName(cards[cardID]) + '](' + prefix + cardID + ')' + source.substring(m.index + m[1].length, source.length);
+
+    // replace [[CARD_ID]] with [CARD_NAME](#/notes/CARD_ID)
+    let before = source.substring(0, m.index),
+        name = linkName(cards[cardID]),
+        link = prefix + cardID,
+        after = source.substring(m.index + m[1].length, source.length);
+    source = before + `[${name}](${link})` + after;
   }
   return source;
+};
+
+// Source: https://www.davedrinks.coffee/how-do-i-use-two-react-refs/
+export const mergeRefs = (...refs) => {
+  const filteredRefs = refs.filter(Boolean);
+  if (!filteredRefs.length) return null;
+  if (filteredRefs.length === 0) return filteredRefs[0];
+  return inst => {
+    for (const ref of filteredRefs) {
+      if (typeof ref === 'function') {
+        ref(inst);
+      } else if (ref) {
+        ref.current = inst;
+      }
+    }
+  };
 };

@@ -20,7 +20,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { PopoverMenu, ConfirmDialog, PromptDialog, CardEditDialog, Markdown } from '../components';
 import { Description, DateTime, EBS } from './attributes';
-import { useHashLocation } from '../common/utils';
+import { useHashLocation, mergeRefs } from '../common/utils';
 
 const grid = 8;
 const cardWidth = 300;
@@ -182,12 +182,15 @@ const Column = ({ styles, col, index }) => {
   const addButton = () => {
     if (editingNew)
       setEditingValue("");
+    else
+      // scroll so that the add card section at the top is visible
+      scrollContainerRef.current.scrollTop = 0;
     setEditingNew(!editingNew);
   };
+  const scrollContainerRef = React.useRef(null);
   const menuButton = () => {
     console.log('pressed menu button');
   };
-
   const internals = (
     <Droppable droppableId={id} style={{ flexGrow: 1, height: "100%" }} type="card" ignoreContainerClipping>
       {(provided, snapshot) => (
@@ -200,7 +203,7 @@ const Column = ({ styles, col, index }) => {
               // cards to the bottom
               height: snapshot.isDraggingOver ? "calc(100% - 120px)" : "calc(100% - 20px)",
               paddingBottom: snapshot.isDraggingOver ? 100 : 0
-            }} ref={provided.innerRef}>
+            }} ref={mergeRefs(provided.innerRef, scrollContainerRef)}>
             {editingNew && (
               <EditingCard value={editingValue} setValue={setEditingValue}
                 add={addCard} cancel={() => { setEditingValue(""); setEditingNew(false) }} />
@@ -238,6 +241,7 @@ const EditingCard = ({ value, setValue, add, cancel }) => {
       <TextField
         label="New Card"
         multiline
+        autoFocus
         rowsMax={6}
         value={value}
         onChange={e => setValue(e.target.value)}

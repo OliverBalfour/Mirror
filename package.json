@@ -1,6 +1,6 @@
 {
   "main": "index.js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://oliverbalfour.github.io/Mirror",
   "scripts": {
     "android": "react-native run-android",

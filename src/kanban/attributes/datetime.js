@@ -4,9 +4,12 @@ import { Button, InputLabel } from '@material-ui/core';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import { MuiPickersUtilsProvider, DateTimePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import { format } from 'date-fns';
+import { format, startOfToday } from 'date-fns';
+import { enAU } from 'date-fns/locale';
 import { prettyPrintDate } from '../../common/utils';
 import { IndicatorBuilder, AttributeHeader } from '.';
+
+enAU.weekStart = 1;
 
 export const Edit = ({ card, setCard }) => {
   const setDateTime = time => setCard({...card, time});
@@ -14,7 +17,7 @@ export const Edit = ({ card, setCard }) => {
   return card.time ? (
     <div style={{marginTop: 10}}>
       <InputLabel className="custom-label">Date &amp; time</InputLabel>
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      <MuiPickersUtilsProvider utils={DateFnsUtils} locale={enAU}>
         <DateTimePicker
           value={new Date(card.time)}
           onChange={newDate => setDateTime(newDate.getTime())}
@@ -25,7 +28,7 @@ export const Edit = ({ card, setCard }) => {
         onClick={() => setDateTime(null)}>Reset date</Button>
     </div>
   ) : (
-    <AttributeHeader onClick={() => setDateTime(new Date().getTime())}>
+    <AttributeHeader onClick={() => setDateTime(startOfToday())}>
       Add date &amp; time
     </AttributeHeader>
   );
