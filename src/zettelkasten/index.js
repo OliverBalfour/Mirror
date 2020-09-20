@@ -82,24 +82,9 @@ export default () => {
   const card = cards[currentCardID];
   const [content, setContent] = React.useState(card ? card.content : '');
   const [description, setDescription] = React.useState(card ? card.description : '');
-  if (!card) return null;
-
-  // TODO: <Zettel> is the wrong abstraction; merge it back into this component to avoid passing down every prop ever made
-  return (
-    <div>
-      <Zettel card={card} cards={cards} editing={editing}
-        setEditing={setEditing} deleteZettel={deleteZettel} saveZettel={saveZettel}
-        addZettel={addZettel} content={content} setContent={setContent}
-        description={description} setDescription={setDescription} starZettel={starZettel} />
-    </div>
-  );
-};
-
-const Zettel = ({ card, cards, editing, setEditing, deleteZettel, saveZettel, addZettel,
-  content, setContent, description, setDescription, starZettel }) => {
   const styles = useStyles();
-
   const starred = useSelector(selectors.boards.starredZettels);
+  if (!card) return null;
 
   const cancel = () => setEditing(false);
   const save = () => (saveZettel({ ...card, content, description }), cancel());
