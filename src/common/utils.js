@@ -266,3 +266,22 @@ export const mergeRefs = (...refs) => {
     }
   };
 };
+
+// Simple card search; searches titles then descriptions for case insensitive exact matches
+export const searchCards = (term, cards, limit=10) => {
+  let matches = [];
+  let tl = term.toLowerCase();
+  for (const cardID in cards) {
+    if (cards[cardID].content.toLowerCase().includes(tl)) {
+      matches.push(cardID);
+      if (matches.length === limit) return matches;
+    }
+  }
+  for (const cardID in cards) {
+    if (cards[cardID].description.toLowerCase().includes(tl)) {
+      matches.push(cardID);
+      if (matches.length === limit) return matches;
+    }
+  }
+  return matches;
+}
