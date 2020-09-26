@@ -226,6 +226,8 @@ const reducer = createReducer(initialState, {
   [editZettel]: (s, a) => {
     const { zettel } = a.payload;
     const epochms = new Date().getTime();
+    // editZettel does not add new zettels
+    if (Object.keys(s.cards).indexOf(zettel.id) === -1) return;
     s.cards[zettel.id] = zettel;
     s.cards[zettel.id].edited = epochms;
   },

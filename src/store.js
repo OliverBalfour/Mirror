@@ -1,11 +1,15 @@
 
 import { combineReducers } from 'redux';
 import { configureStore } from '@reduxjs/toolkit';
+import thunk from 'redux-thunk';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
 import boards, { selectors as boardSelectors } from './ducks/kanban';
 import { saveState, objectMap } from './common/utils';
 
-const store = configureStore({ reducer: boards });
+const store = configureStore({
+  reducer: boards,
+  middleware: getDefault => getDefault().concat(thunk),
+});
 
 // Undo/redo keyboard shortcuts if supported
 try {

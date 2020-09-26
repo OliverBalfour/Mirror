@@ -149,7 +149,7 @@ export default ({ tabInfo }) => {
 
   const cardsByTab = useSelector(selectors.boards.cardsByTab);
   const tabIDfromCardID = id => Object.keys(cardsByTab).filter(tabID => cardsByTab[tabID].indexOf(id) !== -1);
-  const setEditingCard = id => id ? setLoc(`/boards/${tabs[tabIDfromCardID(id)].name}/${id}/edit`) : setLoc(`/boards/${loc.split("/")[2]}`);
+  const setEditingCard = id => id ? setLoc(`/boards/${tabs[tabIDfromCardID(id)].name.toLowerCase()}/${id}/edit`) : setLoc(`/boards/${loc.split("/")[2]}`);
 
   return (
     <View style={{ width: '100vw', overflowX: 'auto', height: '100%' }}>
@@ -171,7 +171,7 @@ export default ({ tabInfo }) => {
         <PromptDialog open respond={promptRespond}
           title="Add column" label="Name" />
       )}
-      {editingCard && (
+      {editingCard && cards.hasOwnProperty(editingCard) && (
         <CardEditDialog respond={() => setEditingCard(null)} card={cards[editingCard]} />
       )}
     </View>
@@ -222,8 +222,8 @@ const Column = ({ styles, col, index, setEditingCard }) => {
               <EditingCard value={editingValue} setValue={setEditingValue}
                 add={addCard} cancel={() => { setEditingValue(""); setEditingNew(false) }} />
             )}
-            {items.map((card, index) => <Card card={card} styles={styles} index={index} key={card.id}
-              setEditingCard={setEditingCard} />)}
+            {items.map((card, index) => card ? <Card card={card} styles={styles} index={index} key={card.id}
+              setEditingCard={setEditingCard} /> : null)}
           </div>
           {provided.placeholder}
         </React.Fragment>
@@ -329,8 +329,9 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
 };
 
 const Card = ({ card, styles, index, setEditingCard }) => {
-  const { id, content } = card;
   const cards = useSelector(selectors.boards.cards);
+  if (!card) return null;
+  const { id, content } = card;
 
   return (
     <React.Fragment>

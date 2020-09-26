@@ -219,7 +219,8 @@ export const useHashLocation = () => {
     return () => window.removeEventListener("hashchange", handler);
   }, []);
   const navigate = React.useCallback(to => window.location.hash = to, []);
-  return [loc, navigate];
+  const navigateNoHistory = React.useCallback(to => history.replaceState(undefined, undefined, to));
+  return [loc, navigate, navigateNoHistory];
 };
 
 export const linkName = card => {
