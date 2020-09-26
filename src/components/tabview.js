@@ -26,6 +26,7 @@ export default ({
   addTab, renameTab, deleteTab, moveTab
 }) => {
   const handleChange = (event, newValue) => newValue >= 0 && newValue < tabs.length && setIndex(newValue);
+  const Grow = () => <div style={{ flexGrow: 1 }} />;
 
   return (
     <div style={{ flex: 1 }}>
@@ -38,7 +39,7 @@ export default ({
           {tabs.map(tab => (
             <Tab label={tab} key={tab} />
           ))}
-          <div style={{flexGrow: 1}}></div>
+          <Grow />
           <PopoverMenu map={{
             "Add tab": () => addTab(),
             "Rename tab": () => renameTab(index),
