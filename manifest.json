@@ -1,15 +1,25 @@
 {
-  "display": "standalone",
-  "lang": "en",
-  "name": "mirror",
-  "short_name": "mirror",
-  "start_url": "/?utm_source=web_app_manifest",
-  "related_applications": [
+  "short_name": "Mirror",
+  "name": "Mirror Project",
+  "icons": [
     {
-      "platform": "play",
-      "url": "http://play.google.com/store/apps/details?id=com.oliverbalfour.mirror",
-      "id": "com.oliverbalfour.mirror"
+      "src": "favicon.ico",
+      "sizes": "16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ],
-  "prefer_related_applications": true
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }
