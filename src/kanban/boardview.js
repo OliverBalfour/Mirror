@@ -1,13 +1,4 @@
 
-/**
- * Boarddiv component
- *
- * <Boarddiv
- *   tab={tabIndex}
- * />
- *
- */
-
 import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import * as duck from '../ducks/kanban';
@@ -179,7 +170,7 @@ export default ({ tabInfo }) => {
   );
 }
 
-const Column = ({ styles, col, index, setEditingCard }) => {
+const Column = React.memo(({ styles, col, index, setEditingCard }) => {
   const { id, items, name } = col;
 
   const [editingNew, setEditingNew] = React.useState(false);
@@ -249,7 +240,7 @@ const Column = ({ styles, col, index, setEditingCard }) => {
       )}
     </Draggable>
   );
-}
+});
 
 const EditingCard = ({ value, setValue, add, cancel }) => {
   return (
@@ -329,7 +320,7 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
   );
 };
 
-const Card = ({ card, styles, index, setEditingCard }) => {
+const Card = React.memo(({ card, styles, index, setEditingCard }) => {
   const cards = useSelector(selectors.boards.cards);
   if (!card) return null;
   const { id, content } = card;
@@ -353,7 +344,7 @@ const Card = ({ card, styles, index, setEditingCard }) => {
       </Draggable>
     </React.Fragment>
   );
-}
+});
 
 const AddColumn = ({ styles, add, hide }) => {
   return (
