@@ -17,16 +17,16 @@ import Kanban from './kanban';
 import Zettelkasten from './zettelkasten';
 import store, { globalSelectors as sel } from './store';
 
-const screenNames = ["/board", "/notes"];
+const screenNames = ["/boards", "/notes"];
 const getScreen = loc => {
-  const name = "/" + loc.split("/")[1]; // strip to / or /board, etc
+  const name = "/" + loc.split("/")[1]; // strip to / or /boards, etc
   return Math.max(screenNames.indexOf(name), 0);
 };
 const getScreenName = n => {
   if (n === 0) {
-    // boards get special treatment of /board/FIRST_TAB
+    // boards get special treatment of /boards/FIRST_TAB
     const state = sel.boards(store.getState());
-    return "/board/" + state.tabs[state.tabOrder[0]].name.toLowerCase();;
+    return "/boards/" + state.tabs[state.tabOrder[0]].name.toLowerCase();;
   } else return screenNames[n];
 }
 

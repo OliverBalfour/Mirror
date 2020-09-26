@@ -219,7 +219,10 @@ export const useHashLocation = () => {
     return () => window.removeEventListener("hashchange", handler);
   }, []);
   const navigate = React.useCallback(to => window.location.hash = to, []);
-  const navigateNoHistory = React.useCallback(to => history.replaceState(undefined, undefined, to));
+  const navigateNoHistory = React.useCallback(to => {
+    history.replaceState(undefined, undefined, "#"+to);
+    setLoc(to); // because handler does not detect replaceState
+  }, []);
   return [loc, navigate, navigateNoHistory];
 };
 

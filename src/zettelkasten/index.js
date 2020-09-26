@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default () => {
-  const [loc, setLoc] = useHashLocation();
+  const [loc, setLoc, setLocNoHist] = useHashLocation();
   const dispatch = useDispatch();
   const cards = useSelector(selectors.boards.cards);
   const starred = useSelector(selectors.boards.starredZettels);
@@ -70,11 +70,11 @@ export default () => {
 
   const editing = loc.split('/')[3] === 'edit'; //#/notes/ID/edit
   const setEditing = yes => yes
-    ? setLoc(`/notes/${currentCardID}/edit`)
-    : setLoc(`/notes/${currentCardID}`);
+    ? setLocNoHist(`/notes/${currentCardID}/edit`)
+    : setLocNoHist(`/notes/${currentCardID}`);
   const cancelEditing = () => (setEditing(false), setNewCard({...card}));
 
-  const deleteZettel = () => (dispatch(duck.deleteCard(currentCardID)), setLoc('/notes/main'));
+  const deleteZettel = () => (dispatch(duck.deleteCard(currentCardID)), setLocNoHist('/notes/main'));
   const saveZettel = zettel => (dispatch(duck.editZettel({ zettel })), setEditing(false));
   const starZettel = () => dispatch(duck.toggleZettelStarred(currentCardID));
 

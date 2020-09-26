@@ -143,13 +143,15 @@ export default ({ tabInfo }) => {
     typeof name === "string" && name.length &&
       dispatch(duck.addColumn({ tabID: tabObj.id, name }));
 
-  const [loc, setLoc] = useHashLocation();
+  const [loc, setLoc, setLocNoHist] = useHashLocation();
   // editing card if URL is /board/CARD_ID/edit
   const editingCard = loc.split("/")[4] === "edit" ? loc.split("/")[3] : null;
 
   const cardsByTab = useSelector(selectors.boards.cardsByTab);
   const tabIDfromCardID = id => Object.keys(cardsByTab).filter(tabID => cardsByTab[tabID].indexOf(id) !== -1);
-  const setEditingCard = id => id ? setLoc(`/boards/${tabs[tabIDfromCardID(id)].name.toLowerCase()}/${id}/edit`) : setLoc(`/boards/${loc.split("/")[2]}`);
+  const setEditingCard = id => id
+    ? setLoc(`/boards/${tabs[tabIDfromCardID(id)].name.toLowerCase()}/${id}/edit`)
+    : setLoc(`/boards/${loc.split("/")[2]}`);
 
   return (
     <View style={{ width: '100vw', overflowX: 'auto', height: '100%' }}>
