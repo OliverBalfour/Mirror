@@ -7,7 +7,6 @@
  */
 
 import React from 'react';
-import { StyleSheet, Text, View, Platform } from 'react-native';
 import { Provider } from 'react-redux';
 import { useHashLocation } from './common/utils';
 // import { createMuiTheme, ThemeProvider } from '@material-ui/core';
@@ -40,27 +39,25 @@ export default () => {
   const [loc, setLoc] = useHashLocation();
   const active = getScreen(loc);
   const setActive = n => setLoc(getScreenName(n));
-  const style = Platform.OS === "web"
-    ? { height: "calc(100% - 48px)" }
-    : { flexGrow: 1 };
+  const style = { height: "calc(100% - 48px)" };
 
   return (
     <Provider store={store}>
       {/*<ThemeProvider theme={theme}>*/}
-        <View style={{ top: 0, left: 0, height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
+        <div style={{ top: 0, left: 0, height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
 
-          <View style={style}>
+          <div style={style}>
             { active === 0 && (
               <Kanban />
             )}
             { active === 1 && (
               <Zettelkasten />
             )}
-          </View>
+          </div>
 
           <MenuBar active={active} setActive={setActive} />
 
-        </View>
+        </div>
       {/*</ThemeProvider>*/}
     </Provider>
   );

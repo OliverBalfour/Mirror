@@ -10,7 +10,6 @@
  */
 
 import * as React from 'react';
-import { View } from 'react-native';
 import { AppBar, Tabs, Tab, IconButton } from '@material-ui/core';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import PopoverMenu from './popovermenu';
@@ -39,7 +38,7 @@ export default ({
           {tabs.map(tab => (
             <Tab label={tab} key={tab} />
           ))}
-          <View style={{flexGrow: 1}}></View>
+          <div style={{flexGrow: 1}}></div>
           <PopoverMenu map={{
             "Add tab": () => addTab(),
             "Rename tab": () => renameTab(index),

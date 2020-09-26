@@ -1,8 +1,8 @@
 
 /**
- * BoardView component
+ * Boarddiv component
  *
- * <BoardView
+ * <Boarddiv
  *   tab={tabIndex}
  * />
  *
@@ -12,7 +12,6 @@ import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import * as duck from '../ducks/kanban';
 import { selectors, globalSelectors as sel } from '../store';
-import { View, Text } from 'react-native';
 import { makeStyles, Button, IconButton, ButtonGroup, TextField, Chip } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
@@ -154,7 +153,7 @@ export default ({ tabInfo }) => {
     : setLoc(`/boards/${loc.split("/")[2]}`);
 
   return (
-    <View style={{ width: '100vw', overflowX: 'auto', height: '100%' }}>
+    <div style={{ width: '100vw', overflowX: 'auto', height: '100%' }}>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="default" style={{ flexGrow: 1, height: "100%" }} direction="horizontal" type="column">
           {(provided, snapshot) => (
@@ -176,7 +175,7 @@ export default ({ tabInfo }) => {
       {editingCard && cards.hasOwnProperty(editingCard) && (
         <CardEditDialog respond={() => setEditingCard(null)} card={cards[editingCard]} />
       )}
-    </View>
+    </div>
   );
 }
 
