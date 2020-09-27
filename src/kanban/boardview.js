@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import * as duck from '../ducks/kanban';
-import { selectors, globalSelectors as sel } from '../store';
-import { makeStyles, Button, IconButton, ButtonGroup, TextField, Chip } from '@material-ui/core';
+import { selectors } from '../store';
+import { makeStyles, Button, IconButton, ButtonGroup, TextField } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -80,7 +80,7 @@ const useStyles = makeStyles(theme => ({
     margin: `0 0 ${grid}px 0`,
     background: 'white',
     borderRadius: 5,
-    transition: "opacity 0.3s",
+    transition: "opacity 0.2s, box-shadow 0.2s",
     overflow: 'hidden',
     "&:hover, &:focus": {
       boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)',
@@ -129,11 +129,13 @@ export default ({ tabInfo }) => {
   };
 
   const [promptOpen, setPromptOpen] = React.useState(false);
-  const promptRespond = name => setPromptOpen(false) ||
-    typeof name === "string" && name.length &&
+  const promptRespond = name => {
+    setPromptOpen(false);
+    if (typeof name === "string" && name.length)
       dispatch(duck.addColumn({ tabID: tabObj.id, name }));
+  }
 
-  const [loc, setLoc, setLocNoHist] = useHashLocation();
+  const [loc, setLoc] = useHashLocation();
   // editing card if URL is /board/CARD_ID/edit
   const editingCard = loc.split("/")[4] === "edit" ? loc.split("/")[3] : null;
 
@@ -171,7 +173,7 @@ export default ({ tabInfo }) => {
 }
 
 const Column = React.memo(({ styles, col, index, setEditingCard }) => {
-  const { id, items, name } = col;
+  const { id, items } = col;
 
   const [editingNew, setEditingNew] = React.useState(false);
   const [editingValue, setEditingValue] = React.useState("");
@@ -270,13 +272,17 @@ const ColumnHeader = ({ styles, col, add, menu }) => {
   const dispatch = useDispatch();
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
-  const confirmRespond = res => setConfirmOpen(false) ||
-    res && dispatch(duck.deleteColumn(col.id));
+  const confirmRespond = res => {
+    setConfirmOpen(false);
+    if (res) dispatch(duck.deleteColumn(col.id))
+  }
 
   const [promptOpen, setPromptOpen] = React.useState(false);
-  const promptRespond = res => setPromptOpen(false) ||
-    typeof res === "string" && res.length &&
+  const promptRespond = res => {
+    setPromptOpen(false);
+    if (typeof res === "string" && res.length)
       dispatch(duck.renameColumn({ colID: col.id, name: res }));
+  }
 
   const archiveAll = () => dispatch(duck.archiveCardsInColumn(col.id));
 
