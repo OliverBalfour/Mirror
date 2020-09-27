@@ -7,7 +7,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { PromptDialog, CardEditDialog } from '../components';
 import { useHashLocation } from '../common/utils';
 import Column, { AddColumn } from './column';
-import './index.css';
+import './index.scss';
 
 export default ({ tabInfo }) => {
   const tab = tabInfo.index;
@@ -53,9 +53,9 @@ export default ({ tabInfo }) => {
     : setLoc(`/boards/${loc.split("/")[2]}`);
 
   return (
-    <div style={{ width: '100vw', overflowX: 'auto', height: '100%' }}>
+    <div className='boardview-root'>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="default" style={{ flexGrow: 1, height: "100%" }} direction="horizontal" type="column">
+        <Droppable droppableId="default" className='column-droppable' direction="horizontal" type="column">
           {(provided, snapshot) => (
             <React.Fragment>
               <div className='root' ref={provided.innerRef}>

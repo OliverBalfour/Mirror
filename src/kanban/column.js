@@ -10,10 +10,6 @@ import { mergeRefs } from '../common/utils';
 import ColumnHeader from './column-header';
 import Card from './card';
 
-// TODO: extract to a CSS file with all other styles as a CSS variable
-const grid = 8;
-const cardWidth = 300;
-
 export default React.memo(({ col, index, setEditingCard }) => {
   const { id, items } = col;
 
@@ -42,18 +38,13 @@ export default React.memo(({ col, index, setEditingCard }) => {
     console.log('pressed menu button');
   };
   const internals = (
-    <Droppable droppableId={id} style={{ flexGrow: 1, height: "100%" }} type="card" ignoreContainerClipping>
+    <Droppable droppableId={id} className='card-droppable' type="card" ignoreContainerClipping>
       {(provided, snapshot) => (
         <React.Fragment>
-          <div style={{
-              width: cardWidth, overflowY: 'auto', overflowX: 'hidden',
-              // 1) height is -20px to avoid bottom being clipped off
-              // 2) 100px padding and -100px height while dragging to give a 100px buffer of
-              // droppable space to avoid glitching due to dynamic resizing while moving
-              // cards to the bottom
-              height: snapshot.isDraggingOver ? "calc(100% - 120px)" : "calc(100% - 20px)",
-              paddingBottom: snapshot.isDraggingOver ? 100 : 0
-            }} ref={mergeRefs(provided.innerRef, scrollContainerRef)}>
+          <div
+            className={'column-internals' + (snapshot.isDraggingOver ? ' dragging-over' : '')}
+            ref={mergeRefs(provided.innerRef, scrollContainerRef)}
+          >
             {editingNew && (
               <EditingCard value={editingValue} setValue={setEditingValue}
                 add={addCard} cancel={() => { setEditingValue(""); setEditingNew(false) }} />
@@ -98,8 +89,7 @@ const EditingCard = ({ value, setValue, add, cancel }) => {
         onChange={e => setValue(e.target.value)}
         variant="filled"
         style={{ width: "100%" }} />
-      <ButtonGroup variant="contained" size='small'
-        style={{marginBottom: 8, boxShadow: "0px 4px 2px -2px rgba(0,0,0,0.15)", width: "100%"}}>
+      <ButtonGroup variant="contained" size='small' className='editingCardButtons'>
         <Button style={{flexGrow: 1}} variant='contained' onClick={add}>
           Done
         </Button>
@@ -109,11 +99,9 @@ const EditingCard = ({ value, setValue, add, cancel }) => {
   );
 };
 
-
 export const AddColumn = ({ add, hide }) => {
   return (
-    <div className='addColumnContainer' style={{
-      marginLeft: hide ? cardWidth + 4*grid + 2 : 0 }}>
+    <div className={'addColumnContainer' + (hide ? ' hidden' : '')}>
       <div className='addColumn'>
         <IconButton onClick={add}>
           <AddIcon />
