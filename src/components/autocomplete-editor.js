@@ -10,7 +10,7 @@ import { searchCards, linkName, generateID } from '../common/utils';
 // If addNote is a function an 'Add note' option will appear
 // It inserts a link to a note with a generated ID, and invokes
 // addNote on the generated ID.
-export default ({ value, setValue, autoFocus = false, addNote, rowsMax = 24 }) => {
+export default ({ value, setValue, autoFocus = false, addNote, rows, rowsMax }) => {
 
   const inputRef = React.useRef(null);
   const cards = useSelector(selectors.boards.cards);
@@ -45,12 +45,15 @@ export default ({ value, setValue, autoFocus = false, addNote, rowsMax = 24 }) =
     };
     const textcomplete = new Textcomplete(editor, [strategy], options);
     // cleanup
-    return () => (textcomplete.destroy(), delete window['__addNote']);
-  }, [inputRef.current]);
+    return () => {
+      textcomplete.destroy();
+      delete window['__addNote']
+    }
+  });
 
   return (
     <TextField margin="dense" fullWidth variant="outlined" autoFocus={autoFocus}
-      multiline rows={6} rowsMax={rowsMax} value={value} onChange={e => setValue(e.target.value)}
+      multiline rows={rows} rowsMax={rowsMax} value={value} onChange={e => setValue(e.target.value)}
       inputProps={{ ref: inputRef }} />
   );
 };

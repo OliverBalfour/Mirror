@@ -1,0 +1,63 @@
+
+@import "../common/variables";
+
+.zettelContainer {
+  background: #DFEEEE;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 10px;
+}
+.zettel {
+  background: white;
+  border-radius: 5px;
+  width: 650px;
+  margin: 10px;
+  margin-top: 70px;
+  box-shadow: 0 1px 3px rgba(100, 100, 100, 0.3);
+  padding: 16px;
+  padding-top: 8px;
+  padding-bottom: 12px;
+  max-height: calc(100% - 160px);
+  overflow-y: auto;
+  & > p {
+    margin-top: 0
+  };
+  & > p:last-child {
+    margin-bottom: 0
+  };
+}
+.zettelTitle {
+  margin-bottom: 8px;
+  margin-top: 8px;
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+}
+.zettelEditingButtons {
+  float: right;
+}
+.zettelButtons {
+  position: absolute;
+  top: 15px;
+  left: 0; // left: $drawerWidth;
+  right: 0;
+  display: flex;
+  justify-content: center;
+}
+.zettelDrawer {
+  width: $drawerWidth;
+  flex-shrink: 0;
+}
+.zettelDrawerPaper {
+  width: $drawerWidth;
+  zIndex: 0;
+}
+.zettelDrawerContainer {
+  overflow: auto;
+}

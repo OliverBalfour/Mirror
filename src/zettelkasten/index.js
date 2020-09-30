@@ -4,7 +4,10 @@ import { useHashLocation, generateID, ReloadProtect } from '../common/utils';
 import { selectors } from '../store';
 import { useSelector, useDispatch } from 'react-redux';
 import { Markdown, AutocompleteEditor } from '../components';
-import { makeStyles, TextField, Button, ButtonGroup, Drawer, List, Divider, ListItem, ListItemText } from '@material-ui/core';
+import {
+  TextField, Button, ButtonGroup,
+  // Drawer, List, Divider, ListItem, ListItemText
+} from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
@@ -12,64 +15,13 @@ import SearchIcon from '@material-ui/icons/Search';
 import StarIcon from '@material-ui/icons/Star';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import * as duck from '../ducks/kanban.js';
-
-const drawerWidth = 240;
-const useStyles = makeStyles(theme => ({
-  container: {
-    background: '#DFEEEE',
-    position: 'absolute',
-    top: 0, left: 0, bottom: 0, right: 0,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    padding: 10,
-  },
-  zettel: {
-    background: 'white',
-    borderRadius: 5,
-    width: 650,
-    margin: 10,
-    marginTop: 70,
-    boxShadow: '0 1px 3px rgba(100, 100, 100, 0.3)',
-    padding: 16,
-    paddingTop: 8, paddingBottom: 12,
-    '&>p': {marginTop: 0},
-    '&>p:last-child': {marginBottom: 0},
-  },
-  zettelTitle: {
-    marginBottom: 8,
-    marginTop: 8,
-    fontSize: 24,
-    fontWeight: 600,
-    textAlign: 'center',
-  },
-  editingButtons: {
-    float: 'right',
-  },
-  buttons: {
-    position: 'absolute',
-    top: 15, left: drawerWidth, right: 0,
-    display: 'flex', justifyContent: 'center',
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth,
-    zIndex: 0,
-  },
-  drawerContainer: {
-    overflow: 'auto',
-  },
-}));
+import './index.scss';
 
 export default () => {
   const [loc, setLoc, setLocNoHist] = useHashLocation();
   const dispatch = useDispatch();
   const cards = useSelector(selectors.boards.cards);
   const starred = useSelector(selectors.boards.starredZettels);
-  const styles = useStyles();
 
   const currentCardID = loc.split('/')[2] || 'main'; //#/notes/ID
   // const setCurrentCardID = id => setLoc(`/notes/${id}`);
@@ -120,17 +72,23 @@ export default () => {
   }
 
   return (
+    // TODO: drawer
+    // Responsive: https://material-ui.com/components/drawers/#responsive-drawer
+    // Search bar: https://material-ui.com/components/text-fields/#icons
+    //   or https://material-ui.com/components/app-bar/#app-bar-with-a-primary-search-field
+    // Starred cards
+    // All notes button (navigate to #/notes/all and show a list of notes without contents)
     <React.Fragment>
       <ReloadProtect shouldProtect={JSON.stringify(newCard) !== JSON.stringify(card)} />
-      <div className={styles.container}>
-        <Drawer
-          className={styles.drawer}
+      <div className='zettelContainer'>
+        {/*<Drawer
+          className='zettelDrawer'
           variant="permanent"
           classes={{
-            paper: styles.drawerPaper,
+            paper: 'zettelDrawerPaper',
           }}
         >
-          <div className={styles.drawerContainer}>
+          <div className='zettelDrawerContainer'>
             <List>
               {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
                 <ListItem button key={text}>
@@ -147,27 +105,27 @@ export default () => {
               ))}
             </List>
           </div>
-        </Drawer>
+        </Drawer>*/}
         {editing && (
-          <div className={styles.zettel}>
+          <div className='zettel'>
             <TextField margin="dense" autoFocus fullWidth
               multiline rowsMax={3} value={newCard.content || ''} onChange={e => setCard({ content: e.target.value })} />
             <AutocompleteEditor value={newCard.description || ''} setValue={description => setCard({ description })}
-              addNote={addNewNote} rowsMax={30} />
-            <div className={styles.editingButtons}>
+              addNote={addNewNote} />
+            <div className='zettelEditingButtons'>
               <Button onClick={cancelEditing} color="primary">Cancel</Button>
               <Button onClick={() => saveZettel(newCard)} color="primary" variant="contained">Save</Button>
             </div>
           </div>
         )}
-        <div className={styles.zettel + (editing ? ' notes-editing' : '')}>
-          <div className={styles.zettelTitle}>
+        <div className={'zettel' + (editing ? ' notes-editing' : '')}>
+          <div className='zettelTitle'>
             {(editing ? newCard.content : card.content) || ''}
           </div>
           <Markdown source={(editing ? newCard.description : card.description) || ''} cards={cards} />
         </div>
       </div>
-      <div className={styles.buttons} id='zettel-buttons-container'>
+      <div className='zettelButtons' id='zettel-buttons-container'>
         <ButtonGroup variant='contained' color='primary'>
           {!editing && (
             <Button onClick={() => setEditing(true)} title="Edit note">
