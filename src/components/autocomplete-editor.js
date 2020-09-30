@@ -49,7 +49,8 @@ export default ({ value, setValue, autoFocus = false, addNote, rows, rowsMax }) 
       textcomplete.destroy();
       delete window['__addNote']
     }
-  });
+    // eslint-disable-next-line
+  }, []); // passing dependencies breaks it
 
   return (
     <TextField margin="dense" fullWidth variant="outlined" autoFocus={autoFocus}
