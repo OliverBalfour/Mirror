@@ -78,6 +78,12 @@ export default React.memo(({ col, index, setEditingCard }) => {
 });
 
 const EditingCard = ({ value, setValue, add, cancel }) => {
+  React.useEffect(() => {
+    // Pressing ESC cancels editing a card
+    const cb = e => e.which === 27 && cancel();
+    document.addEventListener('keydown', cb);
+    return () => document.removeEventListener('keydown', cb);
+  });
   return (
     <div>
       <TextField
