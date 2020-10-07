@@ -6,7 +6,7 @@ import { Button, IconButton, ButtonGroup, TextField } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
-import { mergeRefs } from '../common/utils';
+import { mergeRefs } from '../common';
 import ColumnHeader from './column-header';
 import Card from './card';
 

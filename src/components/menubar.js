@@ -10,12 +10,11 @@
 import React from 'react';
 import { AppBar, Toolbar, IconButton, Tabs, Tab } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import SearchIcon from '@material-ui/icons/Search';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import NotesIcon from '@material-ui/icons/Notes';
 import PopoverMenu from './popovermenu';
-import { downloadData } from '../common/utils';
+import { downloadData } from '../common';
 import { AboutDialog } from './dialogs';
 
 export default ({ active, setActive }) => {
@@ -36,6 +35,7 @@ export default ({ active, setActive }) => {
           </Tabs>
           <div style={{ flexGrow: 1 }} />
           <PopoverMenu map={{
+            // eslint-disable-next-line
             "Submit feedback": () => window.open('mailto'+':oliver.'+'leo.balfour+mirrorsupport'+'@googlemail'+'.com', '_blank'),
             "About": () => setAboutOpen(true),
             "Clear saved state": () => window.prompt("Delete all saved state? Pressing undo will fix this. Type YES to confirm", "NO") === "YES" && localStorage.clear(),

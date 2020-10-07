@@ -6,7 +6,7 @@ import { MuiPickersUtilsProvider, DateTimePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { format, startOfToday } from 'date-fns';
 import { enAU } from 'date-fns/locale';
-import { prettyPrintDate } from '../../common/utils';
+import { prettyPrintDate } from '../../common';
 import { IndicatorBuilder, AttributeHeader } from '.';
 
 enAU.weekStart = 1;

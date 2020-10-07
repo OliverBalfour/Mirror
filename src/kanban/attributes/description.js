@@ -7,6 +7,7 @@ import { IndicatorBuilder, AttributeHeader } from '.';
 import { selectors } from '../../store';
 import AutocompleteEditor from '../../components/autocomplete-editor';
 import { useSelector } from 'react-redux';
+import { abbreviatedDescription } from '../../common';
 
 export const Edit = ({ card, setCard }) => {
   const [editingDescription, setEditingDescription] = React.useState(false);
@@ -43,10 +44,7 @@ export const Edit = ({ card, setCard }) => {
 
 export const Indicator = ({ card }) => {
   if (card.description) {
-    const limit = 500; // crop after this with ellisis
-    const title = card.description.split("\n\n").join("\n").substring(0, limit)
-      + (card.description.length > limit ? "..." : "");
-
+    const title = abbreviatedDescription(card);
     return <IndicatorBuilder label={null} title={title} icon={<NotesIcon />} />;
   } else return null;
 };

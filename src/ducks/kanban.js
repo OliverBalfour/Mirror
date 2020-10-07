@@ -7,9 +7,9 @@
  *  each has a unique ID as a key in the respective object
  */
 
-import { createReducer, createAction, createSelector } from '@reduxjs/toolkit';
+import { createReducer, createAction } from '@reduxjs/toolkit';
 import undoable from 'redux-undo';
-import { loadState, generateID, objectMap } from '../common/utils';
+import { loadState, generateID, objectMap } from '../common';
 
 // Action creators
 

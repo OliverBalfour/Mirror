@@ -7,7 +7,7 @@ import * as duck from '../ducks/kanban';
 import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { Description, DateTime, EBS } from '../kanban/attributes';
-import { ReloadProtect } from '../common/utils';
+import { ReloadProtect } from '../common';
 
 export const ConfirmDialog = ({ open, respond, title, subtitle, labels = ["Cancel", "OK"] }) => {
   return (
@@ -73,13 +73,21 @@ export const CardEditDialog = ({ respond, card }) => {
 
   const columns = useSelector(selectors.boards.columns);
   const tabs = useSelector(selectors.boards.tabs);
-  const getTabIdxByColID = colID => Object.values(tabs).map(tab => tab.columns.indexOf(colID) !== -1).indexOf(true);
-  const getColIdxByID = colID => Object.values(columns).map(col => col.id === colID).indexOf(true);
 
-  const done = () => (respond(), setContent(card.content));
+  const done = () => {
+    respond();
+    setContent(card.content);
+  }
   // save and then delete so you can undo the delete without losing your unsaved draft of a card
-  const deleteCard = () => (dispatch(duck.editCard({ card: newCard, colID })), dispatch(duck.deleteCard(card.id)), done());
-  const editCard = () => (dispatch(duck.editCard({ card: newCard, colID })), done());
+  const deleteCard = () => {
+    dispatch(duck.editCard({ card: newCard, colID }));
+    dispatch(duck.deleteCard(card.id));
+    done();
+  }
+  const editCard = () => {
+    dispatch(duck.editCard({ card: newCard, colID }));
+    done();
+  }
 
   return (
     <Dialog open onClose={() => done(null)} fullWidth maxWidth='md'

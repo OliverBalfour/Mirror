@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { useHashLocation, generateID, ReloadProtect } from '../common/utils';
+import { useHashLocation, generateID, ReloadProtect } from '../common';
 import { selectors } from '../store';
 import { useSelector, useDispatch } from 'react-redux';
 import { Markdown, AutocompleteEditor } from '../components';

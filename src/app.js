@@ -8,10 +8,10 @@
 
 import React from 'react';
 import { Provider } from 'react-redux';
-import { useHashLocation } from './common/utils';
+import { useHashLocation } from './common';
 // import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 
-import { Button, MenuBar } from './components';
+import { MenuBar } from './components';
 import Kanban from './kanban';
 import Zettelkasten from './zettelkasten';
 import store, { globalSelectors as sel } from './store';

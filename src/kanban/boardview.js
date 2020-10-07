@@ -5,7 +5,7 @@ import * as duck from '../ducks/kanban';
 import { selectors } from '../store';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { PromptDialog, CardEditDialog } from '../components';
-import { useHashLocation } from '../common/utils';
+import { useHashLocation } from '../common';
 import Column, { AddColumn } from './column';
 import './index.scss';
 

@@ -5,7 +5,7 @@ import { Textcomplete } from '@textcomplete/core';
 import { TextareaEditor } from '@textcomplete/textarea';
 import { selectors } from '../store';
 import { useSelector } from 'react-redux';
-import { searchCards, linkName, generateID } from '../common/utils';
+import { searchCards, linkName, generateID } from '../common';
 
 // If addNote is a function an 'Add note' option will appear
 // It inserts a link to a note with a generated ID, and invokes

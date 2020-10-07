@@ -5,8 +5,8 @@ import { TabView, UndoRedo } from '../components';
 import BoardView from './boardview';
 import * as duck from '../ducks/kanban';
 import { selectors } from '../store';
-import { PopoverMenu, ConfirmDialog, PromptDialog } from '../components';
-import { useHashLocation } from '../common/utils';
+import { ConfirmDialog, PromptDialog } from '../components';
+import { useHashLocation } from '../common';
 
 export default () => {
   const dispatch = useDispatch();
@@ -19,18 +19,27 @@ export default () => {
   if (currentTab < 0) currentTab = 0;
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
-  const confirmRespond = res => setConfirmOpen(false) ||
-    res && (dispatch(duck.deleteTab(currentTab)), setCurrentTab(Math.max(0,currentTab-1)));
+  const confirmRespond = res => {
+    setConfirmOpen(false);
+    if (res) {
+      dispatch(duck.deleteTab(currentTab));
+      setCurrentTab(Math.max(0,currentTab-1));
+    }
+  }
 
   const [addPromptOpen, setAddPromptOpen] = React.useState(false);
-  const addPromptRespond = res => setAddPromptOpen(false) ||
-    typeof res === "string" && res.length &&
+  const addPromptRespond = res => {
+    setAddPromptOpen(false);
+    if (typeof res === "string" && res.length)
       dispatch(duck.addTab(res));
+  }
 
   const [renamePromptOpen, setRenamePromptOpen] = React.useState(false);
-  const renamePromptRespond = res => setRenamePromptOpen(false) ||
-    typeof res === "string" && res.length &&
+  const renamePromptRespond = res => {
+    setRenamePromptOpen(false);
+    if (typeof res === "string" && res.length)
       dispatch(duck.renameTab({ tabID: tabOrder[currentTab], name: res }));
+  }
 
   return (
     <React.Fragment>
