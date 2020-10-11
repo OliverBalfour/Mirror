@@ -31,6 +31,10 @@ export const prettyPrintDate = epochMilliseconds => {
     const diff = fn.differenceInCalendarDays(date, now);
     const weekDiff = fn.differenceInCalendarWeeks(date, now, { weekStartsOn: 1 });
     const yearDiff = fn.differenceInCalendarYears(date, now);
+    // 0 is Monday
+    let dayOfWeek = now.getDay() - 1;
+    // JavaScript's modulo is broken for negatives, so we must use an if statement
+    if (dayOfWeek < 0) dayOfWeek += 7;
 
     // Relative dates are quite ambiguous in English
     // If today is Wednesday 23 September 2020, then the following mappings are adhered to:
@@ -53,7 +57,10 @@ export const prettyPrintDate = epochMilliseconds => {
 
     const day = fn.format(date, "EEE"); // eg Mon, Thu
 
-    if (weekDiff === 0 && diff >= 0) return day;
+    // If it's this calendar week,
+    // or during the weekend it is a weekday the next week
+    if ((weekDiff === 0 && diff >= 0)
+     || (dayOfWeek >= 5 && diff >= 0 && diff < 5)) return day;
 
     if (diff >= -7 && diff <   0) return `Last ${day}`;
     if (diff >   0 && diff <=  7) return `Next ${day}`;
