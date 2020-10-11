@@ -10,10 +10,14 @@ export default () => {
   const dispatch = useDispatch();
   return (
     <React.Fragment>
-      <IconButton onClick={() => dispatch(ActionCreators.undo())}>
+      <IconButton
+        onClick={() => dispatch(ActionCreators.undo())}
+        color="inherit" edge="end">
         <UndoIcon />
       </IconButton>
-      <IconButton onClick={() => dispatch(ActionCreators.redo())}>
+      <IconButton
+        onClick={() => dispatch(ActionCreators.redo())}
+        color="inherit" edge="end">
         <RedoIcon />
       </IconButton>
     </React.Fragment>

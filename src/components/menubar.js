@@ -15,6 +15,7 @@ import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import NotesIcon from '@material-ui/icons/Notes';
 import PopoverMenu from './popovermenu';
 import { downloadData } from '../common';
+import { UndoRedo } from '../components';
 import { AboutDialog } from './dialogs';
 
 export default ({ active, setActive }) => {
@@ -34,6 +35,7 @@ export default ({ active, setActive }) => {
             <Tab label={<div><NotesIcon style={{verticalAlign: 'middle'}} /> Notes</div>}  />
           </Tabs>
           <div style={{ flexGrow: 1 }} />
+          <UndoRedo />
           <PopoverMenu map={{
             // eslint-disable-next-line
             "Submit feedback": () => window.open('mailto'+':oliver.'+'leo.balfour+mirrorsupport'+'@googlemail'+'.com', '_blank'),

@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { TabView, UndoRedo } from '../components';
+import { TabView } from '../components';
 import BoardView from './boardview';
 import * as duck from '../ducks/kanban';
 import { selectors } from '../store';
@@ -50,7 +50,6 @@ export default () => {
         renameTab={() => setRenamePromptOpen(true)}
         deleteTab={() => Object.values(tabs).length > 1 ? setConfirmOpen(true) : alert("Cannot delete only tab")}
         moveTab={data => dispatch(duck.moveTab(data))}
-        children={<UndoRedo />}
         index={currentTab} setIndex={setCurrentTab}
       />
       {confirmOpen && (
