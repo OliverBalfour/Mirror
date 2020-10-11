@@ -28,11 +28,12 @@ export const useHashLocation = () => {
     return () => window.removeEventListener("hashchange", handler);
   }, []);
   const navigate = React.useCallback(to => window.location.hash = to, []);
-  const navigateNoHistory = React.useCallback(to => {
-    window.history.replaceState(undefined, undefined, "#"+to);
-    setLoc(to); // because handler does not detect replaceState
-  }, []);
-  return [loc, navigate, navigateNoHistory];
+  // const navigateNoHistory = React.useCallback(to => {
+  //   window.history.replaceState(undefined, undefined, "#"+to);
+  //   setLoc(to); // because handler does not detect replaceState
+  // }, []);
+  // Disable no history navigation
+  return [loc, navigate, navigate/*NoHistory*/];
 };
 
 // Note: ReloadProtect does not prevent hash changes. Be warned!
@@ -46,3 +47,9 @@ export const ReloadProtect = ({ shouldProtect = true }) => {
   });
   return null;
 }
+
+// Assumes display: block (CSS's display: revert property has poor support)
+export const Hidden = ({ children, show }) =>
+  <div style={{ display: show ? "block" : "none" }}>
+    {children}
+  </div>;

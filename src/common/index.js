@@ -1,6 +1,6 @@
 
 export { linkName, abbreviatedDescription, parseWikilinks } from './string';
-export { mergeRefs, useHashLocation, ReloadProtect } from './react';
+export { mergeRefs, useHashLocation, ReloadProtect, Hidden } from './react';
 export { prettyPrintDate, generateID } from './time';
 export { saveState, loadState } from '../backends';
 

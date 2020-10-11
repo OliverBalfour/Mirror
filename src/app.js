@@ -8,7 +8,7 @@
 
 import React from 'react';
 import { Provider } from 'react-redux';
-import { useHashLocation } from './common';
+import { useHashLocation, Hidden } from './common';
 // import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 
 import { MenuBar } from './components';
@@ -16,49 +16,57 @@ import Kanban from './kanban';
 import Zettelkasten from './zettelkasten';
 import store, { globalSelectors as sel } from './store';
 
-const screenNames = ["/boards", "/notes"];
-const getScreen = loc => {
-  const name = "/" + loc.split("/")[1]; // strip to / or /boards, etc
-  return Math.max(screenNames.indexOf(name), 0);
-};
-const getScreenName = n => {
-  if (n === 0) {
-    // boards get special treatment of /boards/FIRST_TAB
-    const state = sel.boards(store.getState());
-    return "/boards/" + state.tabs[state.tabOrder[0]].name.toLowerCase();;
-  } else return screenNames[n];
+const baseTabNames = ["boards", "notes"];
+// Get the nth segment of a slash separated list
+const getURLPart = (str, n) =>
+  str.split("/").filter(s=>s.length)[n < 0 ? str.length + n : n];
+const getScreen = loc =>
+  Math.max(baseTabNames.indexOf(getURLPart(loc, 0)), 0);
+const getScreenNames = () => {
+  let screenNames = ["/boards/", "/notes/main"];
+  // boards get special treatment of /boards/FIRST_TAB
+  const state = sel.boards(store.getState());
+  screenNames[0] += state.tabs[state.tabOrder[0]].name.toLowerCase();
+  return screenNames;
 }
-
-// const theme = createMuiTheme({
-//   palette: {
-//     // primary: { main: '#1976d2', dark: '#1466b8' },
-//   },
-// });
 
 export default () => {
   const [loc, setLoc] = useHashLocation();
+  const [tabURLs, setTabURLs] = React.useState(getScreenNames());
+  const setTabURL = (newURL, i, move) => {
+    let newTabURLs = tabURLs.slice(0);
+    newTabURLs[i] = newURL;
+    setTabURLs(newTabURLs);
+    if (move) setLoc(newURL);
+  };
   const active = getScreen(loc);
-  const setActive = n => setLoc(getScreenName(n));
+  const setActive = n => {
+    if (n === active) {
+      // Return to the base page of this tab
+      setTabURL("/" + baseTabNames[active], active, true);
+    } else {
+      // Save the current URL as the return URL for this tab
+      setTabURL(loc, active);
+      // Set the location to the saved URL for the new tab
+      setLoc(tabURLs[n]);
+    }
+  }
+
   const style = { height: "calc(100% - 48px)" };
 
   return (
     <Provider store={store}>
-      {/*<ThemeProvider theme={theme}>*/}
-        <div style={{ top: 0, left: 0, height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
-
-          <div style={style}>
-            { active === 0 && (
-              <Kanban />
-            )}
-            { active === 1 && (
-              <Zettelkasten />
-            )}
-          </div>
-
-          <MenuBar active={active} setActive={setActive} />
-
+      <div id="jsx-root">
+        <div style={style}>
+          <Hidden show={active === 0}>
+            <Kanban />
+          </Hidden>
+          <Hidden show={active === 1}>
+            <Zettelkasten />
+          </Hidden>
         </div>
-      {/*</ThemeProvider>*/}
+        <MenuBar active={active} setActive={setActive} />
+      </div>
     </Provider>
   );
 }
