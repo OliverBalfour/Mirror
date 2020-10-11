@@ -1,5 +1,5 @@
 
-import { dummyState } from '../common/initial-state.js';
+import { generateInitialState } from '../common/initial-state.js';
 
 const modifyVersion = (oldSemver, newSemver, mutation) => {
   if (localStorage.version === oldSemver) {
@@ -33,10 +33,10 @@ export const loadState = () => {
     });
 
     if (localStorage.hasOwnProperty('kanban'))
-      return JSON.parse(localStorage.kanban) || dummyState();
+      return JSON.parse(localStorage.kanban) || generateInitialState();
 
   } catch (e) {}
-  return dummyState();
+  return generateInitialState();
 }
 
 export const saveState = state => {

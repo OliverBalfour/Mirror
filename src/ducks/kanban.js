@@ -50,12 +50,6 @@ const deleteInList = (list, elem) => {
   if (index !== -1) list.splice(index, 1); // undesired behaviour when splicing at (-1, 1)
   return index !== -1;
 };
-// const _deleteColumn = (s, id) => {
-//   const colIdx = indexFromID(s.columns, id);
-//   s.columns[colIdx].items.forEach(cardID => deleteByID(s.cards, cardID));
-//   s.tabs.forEach(tab => deleteInList(tab.columns, id));
-//   deleteByID(s.columns, id);
-// };
 
 // Selectors
 
