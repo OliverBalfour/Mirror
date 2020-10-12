@@ -1,5 +1,5 @@
 
-export { linkName, abbreviatedDescription, parseWikilinks } from './string';
+export { linkName, abbreviatedDescription, parseWikilinks, parseLaTeX } from './string';
 export { mergeRefs, useHashLocation, ReloadProtect, Hidden } from './react';
 export { prettyPrintDate, generateID } from './time';
 export { saveState, loadState } from '../backends';

@@ -1,34 +1,31 @@
 
 import * as React from 'react';
-import ReactMarkdown from 'react-markdown/with-html';
 import { parseWikilinks } from '../common';
-const htmlParser = require('react-markdown/plugins/html-parser')
+import { MarkdownBase } from './markdown-base';
 
-// Markdown renderer component
-// Allows a subset of HTML to be embedded
-
-// XSS protection:
-// 1. <script>, <style>, <iframe> are disallowed
-// 2. javascript links are overwritten with javascript:void(0) by default
-
-// See https://github.com/aknuds1/html-to-react#with-custom-processing-instructions
-// for more info on the processing instructions
-const parseHtml = htmlParser({
-  isValidNode: node => ['script', 'style', 'iframe'].indexOf(node.type) === -1,
-  // Note that react-markdown is quite flaky; processing should be done externally
-  processingInstructions: [/* ... */],
-});
+// Dynamic import via webpack code splitting and React.lazy
+const KaTeXMarkdown = React.lazy(() => import('./markdown-katex'));
 
 // Takes either a cards prop or a source prop
 // Parses wikilinks if the cards prop is present
+// Note: to have predictable styling of math, make sure the container for this component has className="markdown"
 export default props => {
+  // Parse wikilinks if available
   let source = props.cards ? parseWikilinks(props.source, props.cards) : props.source;
 
-  return (
-    <ReactMarkdown
-      source={source}
-      escapeHtml={false}
-      astPlugins={[parseHtml]}
-    />
-  );
+  // Parse LaTeX formulae if present
+  // As KaTeX is 250kB minified we dynamically import it only if we need to
+  if (source.indexOf("$$") === -1) {
+    return (
+      <div className="markdown">
+        <MarkdownBase source={source} />
+      </div>
+    );
+  } else {
+    return (
+      <React.Suspense fallback={<span>Loading...</span>}>
+        <KaTeXMarkdown source={source} />
+      </React.Suspense>
+    );
+  }
 };

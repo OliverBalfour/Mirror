@@ -18,7 +18,7 @@ export default React.memo(({ card, index, setEditingCard }) => {
           <div ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            className={'card' + (snapshot.isDragging ? " draggingCard" : "")}
+            className={'card ' + (snapshot.isDragging ? " draggingCard" : "")}
             style={provided.draggableProps.style}
             onClick={() => setEditingCard(id)}>
             <Markdown source={content} cards={cards} />
