@@ -1,31 +1,16 @@
 
 import * as React from 'react';
-import ReactMarkdown from 'react-markdown/with-html';
-const htmlParser = require('react-markdown/plugins/html-parser');
+import marked from 'marked';
+import { RawHTMLString } from '../common';
 
-// Markdown renderer component
-// Allows a subset of HTML to be embedded
+// TODO: pygmentize.js (via example here: https://marked.js.org/using_advanced#highlight)
 
-// XSS protection:
-// 1. <script>, <style>, <iframe> are disallowed
-// 2. javascript links are overwritten with javascript:void(0) by default
+// The RawHTMLString component internally uses DOMPurify to reduce the risk of XSS
 
-// See https://github.com/aknuds1/html-to-react#with-custom-processing-instructions
-// for more info on the processing instructions
-const parseHtml = htmlParser({
-  isValidNode: node => ['script', 'style', 'iframe'].indexOf(node.type) === -1,
-  // Note that react-markdown is quite flaky; processing should be done externally
-  processingInstructions: [/* ... */],
-});
-
-export const MarkdownBase = ({ source }) => {
+export const MarkdownBase = ({ source, postprocess = x => x }) => {
   try {
     return (
-      <ReactMarkdown
-        source={source}
-        escapeHtml={false}
-        astPlugins={[parseHtml]}
-      />
+      <RawHTMLString source={postprocess(marked(source, { gfm: true }))} className='markdown' />
     );
   } catch (e) {
     return (

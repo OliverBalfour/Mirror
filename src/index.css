@@ -83,13 +83,9 @@ code {
 .textcomplete-item.active {
   background-color: rgba(0, 0, 0, 0.05);
 }
-/* .markdown > p {
-  display: inline-block;
+.markdown p:first-child {
+  margin-top: 0;
 }
-.markdown > p + p {
-  display: block;
+.markdown p:last-child {
+  margin-bottom: 0;
 }
-.markdown .inline-math {
-  display: inline-block;
-  margin: 0 8px;
-} */

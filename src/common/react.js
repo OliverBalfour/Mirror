@@ -1,5 +1,6 @@
 
 import * as React from 'react';
+import DOMPurify from 'dompurify';
 
 // Source: https://www.davedrinks.coffee/how-do-i-use-two-react-refs/
 export const mergeRefs = (...refs) => {
@@ -48,8 +49,19 @@ export const ReloadProtect = ({ shouldProtect = true }) => {
   return null;
 }
 
-// Assumes display: block (CSS's display: revert property has poor support)
 export const Hidden = ({ children, show }) =>
-  <div style={{ display: show ? "block" : "none" }}>
+  <div style={show ? {} : { display: "none" }}>
     {children}
   </div>;
+
+export const RawHTMLElement = ({ source, ...props }) => {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    ref.current.appendChild(source);
+  });
+  return <span ref={ref} {...props} />
+}
+
+// DOMPurify reduces XSS risk
+export const RawHTMLString = ({ source, purify = true, ...props }) =>
+  <span dangerouslySetInnerHTML={{ __html: purify ? DOMPurify.sanitize(source) : source }} {...props} />;

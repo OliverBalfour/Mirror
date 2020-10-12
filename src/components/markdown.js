@@ -17,9 +17,7 @@ export default props => {
   // As KaTeX is 250kB minified we dynamically import it only if we need to
   if (source.indexOf("$$") === -1) {
     return (
-      <div className="markdown">
-        <MarkdownBase source={source} />
-      </div>
+      <MarkdownBase source={source} />
     );
   } else {
     return (
