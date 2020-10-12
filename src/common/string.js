@@ -44,6 +44,7 @@ const countRegexOccurrences = (str, re) =>
 
 // Parse LaTeX math formulae using KaTeX
 export const parseLaTeX = (string, katex) => {
+  console.log(string);
   if (string.indexOf("$$") === -1) return string;
 
   const blockRegex = /<p>\$\$([^\n]+)\$\$<\/p>/m;
@@ -60,7 +61,7 @@ export const parseLaTeX = (string, katex) => {
     // Limit to 100 equations
     for (let i = 0; i < 100 && lastIndex < str.length && m; i++) {
       // Skip <code> or <pre> blocks
-      const proceed = countRegexOccurrences(str.substring(0, lastIndex + m.index), /<(code|pre)>/g)
+      const proceed = countRegexOccurrences(str.substring(0, lastIndex + m.index), /<(code|pre)[^>]*>/g)
                   === countRegexOccurrences(str.substring(0, lastIndex + m.index), /<\/(code|pre)>/g);
 
       if (proceed) {

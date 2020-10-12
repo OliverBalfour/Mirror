@@ -8,7 +8,7 @@ const KaTeXMarkdown = React.lazy(() => import('./markdown-katex'));
 
 // Takes either a cards prop or a source prop
 // Parses wikilinks if the cards prop is present
-// Note: to have predictable styling of math, make sure the container for this component has className="markdown"
+// Parses $$math$$ and syntax highlights ```js\ncode\n``` if present, lazy loading the relevant libraries
 export default props => {
   // Parse wikilinks if available
   let source = props.cards ? parseWikilinks(props.source, props.cards) : props.source;
