@@ -30,6 +30,7 @@ export const deleteColumn = createAction('kanban/DELETE_COLUMN'); // takes strin
 export const renameColumn = createAction('kanban/RENAME_COLUMN'); // takes { colID, name }
 export const moveColumn = createAction('kanban/MOVE_COLUMN'); // takes [srcIdx, dstIdx, tabIdx]
 export const archiveCardsInColumn = createAction('kanban/ARCHIVE_ALL_COLUMN'); // takes colID
+export const sortColByTime = createAction('kanban/SORT_COLUMN_BY_CARD_TIME_ATTRIBUTE');
 
 export const addTab = createAction('kanban/ADD_TAB'); // takes name
 export const deleteTab = createAction('kanban/DELETE_TAB'); // takes tabIdx
@@ -235,6 +236,19 @@ const reducer = createReducer(initialState, {
       s.starredZettels.push(a.payload);
     else
       deleteInList(s.starredZettels, a.payload);
+  },
+  [sortColByTime]: (s, a) => {
+    // This sorts by epoch millisecond time; anything without a time is at the end in the same order
+    // As a bug meant card.time is sometimes a string, we must wrap in new Date(x).getTime() instead of just x
+    s.columns[a.payload].items.sort(
+      (a, b) => {
+        let aMS = new Date(s.cards[b].time || null).getTime();
+        let bMS = new Date(s.cards[a].time || null).getTime();
+        if (bMS === 0 && aMS === 0) return 0;
+        if (bMS === 0) return 1;
+        if (aMS === 0) return -1;
+        return bMS - aMS;
+    });
   },
 });
 

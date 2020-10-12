@@ -27,6 +27,9 @@ export default ({ col, add, menu }) => {
 
   const archiveAll = () => dispatch(duck.archiveCardsInColumn(col.id));
 
+  const dateTimeAttributeUsed = col.items.filter(card => ['string','number'].indexOf(typeof card.time) !== -1).length > 0;
+  const sortByDue = () => dispatch(duck.sortColByTime(col.id));
+
   return (
     <div>
       <div className='columnHeaderContainer'>
@@ -44,6 +47,9 @@ export default ({ col, add, menu }) => {
           </IconButton>
           <PopoverMenu map={{
             "Archive all": () => archiveAll(),
+            ...(dateTimeAttributeUsed ? {
+              "Sort by due": () => sortByDue(),
+            } : {}),
             "Rename": () => setPromptOpen(true),
             "Delete": () => setConfirmOpen(true),
           }}>

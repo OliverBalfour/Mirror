@@ -28,7 +28,7 @@ export const Edit = ({ card, setCard }) => {
         onClick={() => setDateTime(null)}>Reset date</Button>
     </div>
   ) : (
-    <AttributeHeader onClick={() => setDateTime(startOfToday())}>
+    <AttributeHeader onClick={() => setDateTime(startOfToday().getTime())}>
       Add date &amp; time
     </AttributeHeader>
   );
