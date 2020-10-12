@@ -9,7 +9,6 @@
 
 import React from 'react';
 import { AppBar, Toolbar, IconButton, Tabs, Tab } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import NotesIcon from '@material-ui/icons/Notes';
@@ -24,9 +23,6 @@ export default ({ active, setActive }) => {
     <React.Fragment>
       <AppBar color="primary" style={{ top: 'auto', bottom: 0 }}>
         <Toolbar style={{ minHeight: 0 }}>
-          <IconButton edge="start" color="inherit" onClick={() => console.log("open menu")}>
-            <MenuIcon />
-          </IconButton>
           <Tabs
             value={active} onChange={(e, val) => setActive(val)}
             TabIndicatorProps={{ style: { backgroundColor: 'white' } }}
