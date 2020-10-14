@@ -83,3 +83,13 @@ export const prettyPrintDate = epochMilliseconds => {
   const time = getTime(date);
   return getDate(date) + (time ? " " + time : "");
 };
+
+export const timeUrgencyColour = ms => {
+  const diff = ms - new Date().getTime();
+  // Some nice colours: chartreuse, gold, peachpuff, wheat, coral, lightcoral, tomato, orangered
+  if (diff < 0) return '#e0816f';
+  if (diff < 3600) return 'tomato';
+  if (diff < 86400) return 'lightcoral';
+  if (diff < 86400*7) return 'wheat';
+  return null;
+}

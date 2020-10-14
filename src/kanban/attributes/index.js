@@ -7,12 +7,13 @@ import * as DateTime from './datetime';
 import * as EBS from './ebs';
 export { Description, DateTime, EBS };
 
-export const IndicatorBuilder = ({ icon, label, title }) =>
+export const IndicatorBuilder = ({ icon, label, title, background }) =>
   <Chip size='small' icon={icon}
     label={label}
     title={title}
     classes={label && label.length ? null : { label: 'attribute-label' }}
-    style={{ borderRadius: 3, background: 'white', marginRight: 2 }}
+    className='attribute-indicator'
+    style={{ background, borderColor: background }}
     variant='outlined' />;
 
 export const AttributeHeader = props =>

@@ -6,7 +6,7 @@ import { MuiPickersUtilsProvider, DateTimePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { format, startOfToday } from 'date-fns';
 import { enAU } from 'date-fns/locale';
-import { prettyPrintDate } from '../../common';
+import { prettyPrintDate, timeUrgencyColour } from '../../common';
 import { IndicatorBuilder, AttributeHeader } from '.';
 
 enAU.weekStart = 1;
@@ -39,6 +39,8 @@ export const Indicator = ({ card }) => {
     return <IndicatorBuilder
       icon={<AccessTimeIcon />}
       label={prettyPrintDate(card.time)}
-      title={format(new Date(card.time), "dd/MM/yyyy hh:mmaaa")} />
+      title={format(new Date(card.time), "dd/MM/yyyy hh:mmaaa")}
+      background={timeUrgencyColour(new Date(card.time).getTime())}
+    />
   } else return null;
 };

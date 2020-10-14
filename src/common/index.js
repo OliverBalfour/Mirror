@@ -1,7 +1,7 @@
 
 export { linkName, abbreviatedDescription, parseWikilinks, parseLaTeX } from './string';
 export { mergeRefs, useHashLocation, useTitle, ReloadProtect, Hidden, RawHTMLElement, RawHTMLString } from './react';
-export { prettyPrintDate, generateID } from './time';
+export { prettyPrintDate, generateID, timeUrgencyColour } from './time';
 export { saveState, loadState } from '../backends';
 
 // Source: https://stackoverflow.com/a/14810722/4642943

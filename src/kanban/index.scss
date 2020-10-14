@@ -125,10 +125,15 @@
   width: 100%;
 }
 
-.attribute-label {
+.MuiChip-labelSmall.attribute-label {
   padding: 3px;
 }
 .attribute-header {
   margin-bottom: 6px;
   margin-top: 6px;
+}
+.MuiChip-root.attribute-indicator {
+  background: white;
+  margin-right: 4px;
+  margin-top: 4px;
 }
