@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { useHashLocation, generateID, ReloadProtect } from '../common';
+import { useHashLocation, useTitle, generateID, ReloadProtect } from '../common';
 import { selectors } from '../store';
 import { useSelector, useDispatch } from 'react-redux';
 import { Markdown, AutocompleteEditor } from '../components';
@@ -17,7 +17,7 @@ import StarBorderIcon from '@material-ui/icons/StarBorder';
 import * as duck from '../ducks/kanban.js';
 import './index.scss';
 
-export default () => {
+export default ({ active }) => {
   const [loc, setLoc, setLocNoHist] = useHashLocation();
   const dispatch = useDispatch();
   const cards = useSelector(selectors.boards.cards);
@@ -28,6 +28,7 @@ export default () => {
 
   const card = cards[currentCardID];
   const [newCard, setNewCard] = React.useState({ ...card }); // assuming no deep nesting
+  useTitle(() => active && newCard.content + " | Mirror");
   const setCard = part => setNewCard({ ...newCard, ...part });
 
   if (typeof card !== 'object') return null;

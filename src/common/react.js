@@ -33,9 +33,27 @@ export const useHashLocation = () => {
   //   window.history.replaceState(undefined, undefined, "#"+to);
   //   setLoc(to); // because handler does not detect replaceState
   // }, []);
-  // Disable no history navigation
+  // Disable no history navigation as it breaks currentLoc
   return [loc, navigate, navigate/*NoHistory*/];
 };
+
+// You can supply a title, a function that produces a title each render, or null
+// In every case the title is reset to its original value afterwards
+let __useTitleInUse = 0;
+export const useTitle = title => {
+  if (typeof title === "function") {
+    const result = title();
+    if (result)
+      document.title = result;
+  }
+  React.useEffect(() => {
+    const original = document.title;
+    __useTitleInUse++;
+    if (typeof title === "string")
+      document.title = title;
+    return () => !(__useTitleInUse--) && (document.title = original);
+  });
+}
 
 // Note: ReloadProtect does not prevent hash changes. Be warned!
 export const ReloadProtect = ({ shouldProtect = true }) => {

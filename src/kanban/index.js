@@ -6,9 +6,9 @@ import BoardView from './boardview';
 import * as duck from '../ducks/kanban';
 import { selectors } from '../store';
 import { ConfirmDialog, PromptDialog } from '../components';
-import { useHashLocation } from '../common';
+import { useHashLocation, useTitle } from '../common';
 
-export default () => {
+export default ({ active }) => {
   const dispatch = useDispatch();
   const [loc, setLoc] = useHashLocation();
   // {id:{name, id, columns (ids)},...}
@@ -16,6 +16,7 @@ export default () => {
   const tabOrder = useSelector(selectors.boards.tabOrder);
   let currentTab = tabOrder.map(tabID => tabs[tabID].name.toLowerCase() === loc.split("/")[2]).indexOf(true);
   const setCurrentTab = num => setLoc("/boards/"+tabs[tabOrder[num]].name.toLowerCase());
+  useTitle(() => active && currentTab >= 0 && tabs[tabOrder[currentTab]].name + " | Mirror");
   if (currentTab < 0) currentTab = 0;
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);

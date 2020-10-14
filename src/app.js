@@ -59,10 +59,10 @@ export default () => {
       <div id="jsx-root">
         <div style={style}>
           <Hidden show={active === 0}>
-            <Kanban />
+            <Kanban active={active === 0} />
           </Hidden>
           <Hidden show={active === 1}>
-            <Zettelkasten />
+            <Zettelkasten active={active === 1} />
           </Hidden>
         </div>
         <MenuBar active={active} setActive={setActive} />
