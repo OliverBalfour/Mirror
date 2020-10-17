@@ -1,24 +1,30 @@
 {
-    "env": {
-        "browser": true,
-        "node": true,
-        "es6": true
+  "parser": "@babel/eslint-parser",
+  "extends": ["eslint:recommended", "plugin:react/recommended"],
+  "rules": {
+    "react/display-name": "off",
+    "react/prop-types": "off"
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "allowImportExportEverywhere": true,
+    "babelOptions": {
+      configFile: "./src/babel.js"
     },
-
-    "globals": {
-        "React": true
-    },
-
-    "parserOptions": {
-        "ecmaVersion": 2018,
-        "sourceType": "module",
-        "ecmaFeatures": {
-            "jsx": true,
-            "modules": true
-        }
-    },
-
-    "plugins": [
-        "react"
-    ]
+    "ecmaFeatures": {
+      "jsx": true,
+      "modules": true
+    }
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "globals": {
+    "React": true
+  },
+  "plugins": [
+      "react"
+  ]
 }

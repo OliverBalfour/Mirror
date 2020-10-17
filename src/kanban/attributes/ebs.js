@@ -8,7 +8,7 @@ import * as React from 'react';
 import { useSelector } from 'react-redux';
 import { Button, TextField, FormControlLabel, Checkbox, InputLabel } from '@material-ui/core';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
-import HourglassFullIcon from '@material-ui/icons/HourglassFull';
+// import HourglassFullIcon from '@material-ui/icons/HourglassFull';
 import { globalSelectors as sel } from '../../store';
 import { IndicatorBuilder, AttributeHeader } from '.';
 
@@ -36,7 +36,11 @@ export const Edit = ({ card, setCard }) => {
     if (typeof elapsed === "number")
       setEBS({elapsed});
   }
-  const resetEBS = () => (setEstStr(""), setElapStr(""), setCard({...card, ebs: null}));
+  const resetEBS = () => {
+    setEstStr("");
+    setElapStr("");
+    setCard({...card, ebs: null});
+  }
 
   if (!card.ebs)
     return (

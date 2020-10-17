@@ -22,7 +22,7 @@ export default ({ value, setValue, autoFocus = false, addNote, rows, rowsMax }) 
       context: beforeCursor => beforeCursor.indexOf('[[') >= 0,
       match: /\[\[([A-Za-z0-9_ -]+)$/, // captures the X in "abc [[X"
       // term is captured substring; can use async (t, cb) => cb(await something(term));
-      search: (term, callback, match) => callback([...searchCards(term, cards), 0]),
+      search: (term, callback /*, match*/) => callback([...searchCards(term, cards), 0]),
       cache: true,
       // these take the input to the search callback
       template: cardID => cardID === 0 ? (addNote ? `<em>Add note</em>` : '') : linkName(cards[cardID]),
@@ -30,7 +30,7 @@ export default ({ value, setValue, autoFocus = false, addNote, rows, rowsMax }) 
         if (cardID === 0 && addNote) {
           const id = generateID();
           // run addNote after replacing text
-          setTimeout(() => addNote(id), 0);
+          window.setTimeout(() => addNote(id), 0);
           return `[[${id}]]`;
         } else {
           return `[[${cardID}]]`;
