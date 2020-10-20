@@ -15,10 +15,11 @@ import NotesIcon from '@material-ui/icons/Notes';
 import PopoverMenu from './popovermenu';
 import { downloadData } from '../common';
 import { UndoRedo } from '../components';
-import { AboutDialog } from './dialogs';
+import { AboutDialog, GitHubLoginDialog } from './dialogs';
 
 export default ({ active, setActive }) => {
   const [aboutOpen, setAboutOpen] = React.useState(false);
+  const [GHOpen, setGHOpen] = React.useState(false);
   return (
     <React.Fragment>
       <AppBar color="primary" style={{ top: 'auto', bottom: 0 }}>
@@ -36,6 +37,7 @@ export default ({ active, setActive }) => {
             // eslint-disable-next-line
             "Submit feedback": () => window.open('mailto'+':oliver.'+'leo.balfour+mirrorsupport'+'@googlemail'+'.com', '_blank'),
             "About": () => setAboutOpen(true),
+            "Login via GitHub": () => setGHOpen(true),
             "Clear saved state": () => window.prompt("Delete all saved state? Pressing undo will fix this. Type YES to confirm", "NO") === "YES" && localStorage.clear(),
             "Import state": () => { localStorage.kanban = window.prompt("Paste your exported state here. Press cancel (or the undo button after pressing OK) to revert. Refresh the page to confirm and reload state.") },
             "Export state": () => downloadData(localStorage.kanban, "mirror-backup.json", "application/json"),
@@ -47,6 +49,17 @@ export default ({ active, setActive }) => {
         </Toolbar>
       </AppBar>
       <AboutDialog open={aboutOpen} respond={() => setAboutOpen(false)} />
+      <GitHubLoginDialog open={GHOpen} respond={(token, gistID) => {
+        setGHOpen(false);
+        if (token !== false) {
+          // This is fairly insecure, especially given there are possible XSS vulnerabilities
+          // See https://stackoverflow.com/a/58467408/4642943 for alternatives
+          // once security becomes a bigger concern.
+          localStorage["__GITHUB_TOKEN"] = token;
+          localStorage["__GITHUB_GIST_ID"] = gistID;
+          if (window.__GHLoggedIn) window.__GHLoggedIn();
+        }
+      }} />
     </React.Fragment>
   );
 }

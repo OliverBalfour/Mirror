@@ -1,7 +1,7 @@
 
 # Mirror Project
 
-> *Mirror is a cross-platform app for task management and time management. Your everyday tasks are a reflection of who you are, and you deserve high quality tools to stay on top.*
+> *Mirror is a web-based app for task management and note taking. Your everyday tasks are a reflection of who you are, and you deserve high quality tools to stay on top of your workload.*
 
 The app is available for free at [this link](https://oliverbalfour.github.io/Mirror/).
 
@@ -10,14 +10,14 @@ The app is available for free at [this link](https://oliverbalfour.github.io/Mir
 - Mobile friendly web app
 - Personal [Kanban](https://www.atlassian.com/agile/kanban/boards) boards
 - [Zettelkasten](https://writingcooperative.com/zettelkasten-how-one-german-scholar-was-so-freakishly-productive-997e4e0ca125) knowledge management / note taking tool
-- Google Drive synchronisation (single source of truth)
+- GitHub Gist synchronisation (single source of truth)
 - [Free and open source](https://github.com/OliverBalfour/Mirror)
 - Minimal, non-skeuomorphic design
 - [Evidence Based Scheduling](https://www.joelonsoftware.com/2007/10/26/evidence-based-scheduling/)
 
 **Implementation**
 
-Built with React, Redux, Material UI and [react-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd). The project was bootstrapped with Create React App. Synchronisation makes use of Redux state serialisation and the Google Drive API.
+Built with React, Redux, Material UI and [react-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd). The project was bootstrapped with Create React App. Synchronisation makes use of Redux state serialisation and the GitHub Gist API.
 
 **Possible future features**
 
@@ -31,14 +31,16 @@ Built with React, Redux, Material UI and [react-beautiful-dnd](https://github.co
   - Link to another board, with embedded progress bar (eg have board Main and board Mirror Project; you can have a card in Main that references Mirror Project to manage subprojects at a high level of abstraction)
   - Stow for period of time (like a reminder); useful to keep a record of something in the future without causing clutter (eg holidays todo list).
 
-- Swimlanes in Kanban board (show side-by-side in mobile?)
-
 **Roadmap**
 
 1. [x] Kanban boards
 1. [x] Zettelkasten
 1. [ ] Synchronisation
 1. [ ] Mobile friendly
+
+**Logging in**
+
+To log in via GitHub for synchronisation, [create a new token](https://github.com/settings/tokens/new) with the `gist` permission and save it somewhere safe. Then, go to [gist.github.com](https://gist.github.com) and create a new Gist with any title and add one file, `main.md`, with any contents. Then click "Create secret gist". Copy the ID from the URL. In the main popup menu (three dots in bottom right) select "Login via GitHub" and enter your token and the gist ID. You will need these two pieces of information on every new computer, so consider putting them in an encrypted text file in cloud storage.
 
 ## Setup
 

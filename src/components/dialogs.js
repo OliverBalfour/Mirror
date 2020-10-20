@@ -8,6 +8,7 @@ import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { Description, DateTime, EBS } from '../kanban/attributes';
 import { ReloadProtect } from '../common';
+import { MarkdownBase } from './markdown-base';
 
 export const ConfirmDialog = ({ open, respond, title, subtitle, labels = ["Cancel", "OK"] }) => {
   return (
@@ -139,6 +140,42 @@ export const AboutDialog = ({ open, respond }) => {
       <DialogActions>
         <Button onClick={respond} color="primary" variant="contained" autoFocus>
           OK
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+export const GitHubLoginDialog = ({ open, respond }) => {
+  const [token, setToken] = React.useState("");
+  const [gistID, setGistID] = React.useState("");
+  return (
+    <Dialog open={open} onClose={respond} fullWidth>
+      <DialogTitle>Log in via GitHub</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          <MarkdownBase source={`To log in via GitHub for synchronisation,
+            [create a new token](https://github.com/settings/tokens/new) with
+            the \`gist\` permission and save it somewhere safe. Then, go to
+            [gist.github.com](https://gist.github.com) and create a new Gist
+            with any title and add one file, \`main.md\`, with any contents.
+            Then click "Create secret gist". Copy the ID from the URL. In the
+            main popup menu (three dots in bottom right) select "Login via
+            GitHub" and enter your token and the gist ID.`} />
+        </DialogContentText>
+        <InputLabel className="custom-label">GitHub access token</InputLabel>
+        <TextField margin="dense" autoFocus fullWidth
+          value={token} onChange={e => setToken(e.target.value)} />
+        <InputLabel className="custom-label">Gist ID</InputLabel>
+        <TextField margin="dense" fullWidth
+          value={gistID} onChange={e => setGistID(e.target.value)} />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => respond(false)} color="primary">
+          Cancel
+        </Button>
+        <Button onClick={() => respond(token, gistID)} color="primary" variant="contained">
+          Log in
         </Button>
       </DialogActions>
     </Dialog>
