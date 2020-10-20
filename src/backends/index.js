@@ -4,5 +4,9 @@
 // If neither is initialised then it will generate an initial state
 // The load and save functions will be async
 
+// The interface must support loading cards not in memory (first from IndexedDB then the remote)
+// It must support synchronising all edited notes to the IndexedDB cache in the background
+// It must support rectifying divergent branches (via interactive merge dialog?)
+
 import './github';
 export { loadState, saveState } from './localstorage';

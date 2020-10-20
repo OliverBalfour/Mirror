@@ -32,6 +32,7 @@ export const loadState = () => {
       return state;
     });
 
+    // eslint-disable-next-line
     if (localStorage.hasOwnProperty('kanban'))
       return JSON.parse(localStorage.kanban) || generateInitialState();
 

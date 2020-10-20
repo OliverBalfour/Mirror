@@ -72,7 +72,7 @@ export default ({ tabInfo }) => {
         <PromptDialog open respond={promptRespond}
           title="Add column" label="Name" />
       )}
-      {editingCard && cards.hasOwnProperty(editingCard) && (
+      {editingCard && Object.prototype.hasOwnProperty.call(cards, editingCard) && (
         <CardEditDialog respond={() => setEditingCard(null)} card={cards[editingCard]} />
       )}
     </div>
