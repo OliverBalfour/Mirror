@@ -7,6 +7,15 @@ const getOctokit = () => import("@octokit/rest").then(({ Octokit }) =>
   })
 );
 
+// TODO: does this need to be a class, or can it be a couple exported functions?
+// There's minimal state it needs to keep track of
+
+// TODO: keep track of the latest SHA revision, perhaps in localStorage
+// TODO: write code to load all revisions since last known revision and transmit
+// them to IndexedDB
+
+// TODO: how do we access an individual file in the Gist?
+
 export class BackendGitHub extends BackendBase {
   compileEditSet (editSet) {
     // Produces the file modifications object

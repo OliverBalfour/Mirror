@@ -1,9 +1,4 @@
 
-// IndexedDB wrapper with a simple async key-value storage API
-import { get, set, keys } from 'idb-keyval';
-
-import { generateInitialState } from '../common/initial-state.js';
-
 /**
  * IndexedDB backend for offline use and caching (98% browser support via caniuse)
  *
@@ -11,14 +6,24 @@ import { generateInitialState } from '../common/initial-state.js';
  * eg you could get card ID 12345 via get("cards.12345").then(card => doStuff())
  */
 
-// TODO: the code does not work with an async loadState
-export const loadState = async () => {
+// IndexedDB wrapper with a simple async key-value storage API
+import { get, set, keys } from 'idb-keyval';
+import { generateInitialState } from './base';
+
+// TODO: support async loadState and saveState functions
+
+export async function loadState () {
   const idbKeys = await keys();
-  if (!idbKeys.length) return generateInitialState();
+  if (!idbKeys.length) {
+    let state = loadLegacyLocalStorageState();
+    if (state) return state;
+    return await generateInitialState();
+  }
   try {
     return await loadIDBState(idbKeys);
   } catch (e) {
-    return generateInitialState();
+    console.error(e);
+    return await generateInitialState();
   }
 }
 
@@ -30,22 +35,44 @@ async function loadIDBState (idbKeys) {
     tabs: {},
   };
   let namespaces = ['cards', 'columns', 'tabs'];
+  let promises = [];
   for (let key of idbKeys) {
     let chunks = key.split('.');
     let namespaceIndex = namespaces.indexOf(chunks[1]);
     if (namespaceIndex !== -1) {
       let id = chunks[2];
-      state[namespaces[namespaceIndex]][id] = await get(key);
+      promises.push(
+        get(key).then(key => state[namespaces[namespaceIndex]][id] = key)
+      );
     }
   }
-  return state;
+  return await Promise.all(promises).then(() => state);
 }
 
-export const saveState = state => {
+function loadLegacyLocalStorageState () {
   try {
-    if (localStorage) {
-      const serialised = JSON.stringify(state);
-      localStorage.setItem("kanban", serialised);
+    if (Object.prototype.hasOwnProperty.call(localStorage, 'kanban'))
+      return JSON.parse(localStorage.kanban);
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
+
+export async function saveState (state) {
+  try {
+    set('mirror.tabOrder', state.tabOrder);
+    let namespaces = ['cards', 'columns', 'tabs'];
+    let promises = [];
+    for (let namespace of namespaces) {
+      for (let id in state[namespace]) {
+        promises.push(
+          set(`mirror.${namespace}.${id}`, state[namespace][id])
+        );
+      }
     }
-  } catch (e) {}
+    return await Promise.all(promises);
+  } catch (e) {
+    console.error(e);
+  }
 }
