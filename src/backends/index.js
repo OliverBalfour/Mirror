@@ -9,4 +9,12 @@
 // It must support rectifying divergent branches (via interactive merge dialog?)
 
 import './github';
-export { loadState, saveState } from './localstorage';
+import * as idb from './indexeddb';
+
+export async function loadState () {
+  return await idb.loadState();
+}
+
+export async function saveState (state) {
+  return await Promise.all([idb.saveState(state)]);
+}

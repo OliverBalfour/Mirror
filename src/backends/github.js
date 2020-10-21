@@ -1,5 +1,5 @@
 
-import { BackendBase, EditSet } from './base';
+import { BackendBase /*, EditSet*/ } from './base';
 
 const getOctokit = () => import("@octokit/rest").then(({ Octokit }) =>
   new Octokit({

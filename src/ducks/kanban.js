@@ -9,9 +9,11 @@
 
 import { createReducer, createAction } from '@reduxjs/toolkit';
 import undoable from 'redux-undo';
-import { loadState, generateID, objectMap } from '../common';
+import { generateID, objectMap } from '../common';
 
 // Action creators
+
+export const unsafeSetState = createAction('mirror/SET_STATE');  // Used for async initial state
 
 export const transferCard = createAction('kanban/TRANSFER_CARD');
 export const reorderCard = createAction('kanban/REORDER_CARD');
@@ -79,9 +81,19 @@ export const
   KANBAN_CARD_TYPE = 0,
   ZETTEL_NOTE_TYPE = 1;
 
-const initialState = loadState();
+const loadingState = {
+  loading: true
+};
 
-const reducer = createReducer(initialState, {
+const reducer = createReducer(loadingState, {
+  [unsafeSetState]: (s, a) => {
+    for (let key in s) {
+      delete s[key];
+    }
+    for (let key in a.payload) {
+      s[key] = a.payload[key];
+    }
+  },
   [transferCard]: (s, a) => {
     const { srcColID, dstColID, srcIndex, dstIndex } = a.payload;
     let srcCol = s.columns[srcColID].items;
@@ -252,4 +264,5 @@ const reducer = createReducer(initialState, {
   },
 });
 
+// Undoable reducer
 export default undoable(reducer, {limit:20});

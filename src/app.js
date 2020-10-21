@@ -1,15 +1,12 @@
 
 /**
  * app.js
- * Main JSX source file for the app
- * Details like screen size and renderer are abstracted away by index.[platform].js
- * and ../index.js
+ * Main JSX source
  */
 
 import React from 'react';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { useHashLocation, Hidden } from './common';
-// import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 
 import { MenuBar } from './components';
 import Kanban from './kanban';
@@ -30,9 +27,29 @@ const getScreenNames = () => {
   return screenNames;
 }
 
-export default () => {
+const ComponentsContainer = ({ active, setActive }) => {
+  return (
+    <React.Fragment>
+      <Hidden show={active === 0}>
+        <Kanban active={active === 0} />
+      </Hidden>
+      <Hidden show={active === 1}>
+        <Zettelkasten active={active === 1} />
+      </Hidden>
+    </React.Fragment>
+  );
+};
+
+const Root = () => {
   const [loc, setLoc] = useHashLocation();
-  const [tabURLs, setTabURLs] = React.useState(getScreenNames());
+  const [tabURLs, setTabURLs] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const currentlyLoading = useSelector(state => sel.boards(state).loading);
+  if (loading && !currentlyLoading) {
+    setTabURLs(getScreenNames());
+    setLoading(false);
+  }
+  if (currentlyLoading) return <span>Loading...</span>;
   const setTabURL = (newURL, i, move) => {
     let newTabURLs = tabURLs.slice(0);
     newTabURLs[i] = newURL;
@@ -43,7 +60,7 @@ export default () => {
   const setActive = n => {
     if (n === active) {
       // Return to the base page of this tab
-      setTabURL("/" + baseTabNames[active], active, true);
+      setTabURL(getScreenNames()[active], active, true);
     } else {
       // Save the current URL as the return URL for this tab
       setTabURL(loc, active);
@@ -58,15 +75,15 @@ export default () => {
     <Provider store={store}>
       <div id="jsx-root">
         <div style={style}>
-          <Hidden show={active === 0}>
-            <Kanban active={active === 0} />
-          </Hidden>
-          <Hidden show={active === 1}>
-            <Zettelkasten active={active === 1} />
-          </Hidden>
+          <ComponentsContainer active={active} setActive={setActive} />
         </div>
         <MenuBar active={active} setActive={setActive} />
       </div>
     </Provider>
   );
 }
+
+export default () =>
+  <Provider store={store}>
+    <Root />
+  </Provider>

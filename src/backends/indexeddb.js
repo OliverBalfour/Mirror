@@ -11,6 +11,7 @@ import { get, set, keys } from 'idb-keyval';
 import { generateInitialState } from './base';
 
 // TODO: support async loadState and saveState functions
+// TODO: don't load archived cards in memory
 
 export async function loadState () {
   const idbKeys = await keys();
@@ -61,6 +62,7 @@ function loadLegacyLocalStorageState () {
 
 export async function saveState (state) {
   try {
+    if (state.loading) return;
     set('mirror.tabOrder', state.tabOrder);
     let namespaces = ['cards', 'columns', 'tabs'];
     let promises = [];

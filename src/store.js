@@ -2,12 +2,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 import thunk from 'redux-thunk';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
-import boards, { selectors as boardSelectors } from './ducks/kanban';
-import { saveState, objectMap } from './common';
+import * as kanban from './ducks/kanban';
+import { saveState, objectMap, loadState } from './common';
 
 const store = configureStore({
-  reducer: boards,
+  reducer: kanban.default,
   middleware: getDefault => getDefault().concat(thunk),
+});
+
+loadState().then(state => {
+  store.dispatch(kanban.unsafeSetState(state));
 });
 
 // Undo/redo keyboard shortcuts if supported
@@ -29,7 +33,7 @@ export const globalSelectors = {
   boards: state => state.present
 }
 export const selectors = {
-  boards: objectMap(boardSelectors, localSelector => state => localSelector(globalSelectors.boards(state)))
+  boards: objectMap(kanban.selectors, localSelector => state => localSelector(globalSelectors.boards(state)))
 };
 
 // Save board state (excluding history)
