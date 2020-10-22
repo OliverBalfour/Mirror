@@ -10,9 +10,6 @@
 import { get, set, keys } from 'idb-keyval';
 import { generateInitialState } from './base';
 
-// TODO: support async loadState and saveState functions
-// TODO: don't load archived cards in memory
-
 export async function loadState () {
   const idbKeys = await keys();
   if (!idbKeys.length) {
@@ -31,23 +28,46 @@ export async function loadState () {
 async function loadIDBState (idbKeys) {
   const state = {
     tabOrder: await get('mirror.tabOrder'),
+    starredZettels: await get('mirror.starredZettels') || [],
     cards: {},
     columns: {},
     tabs: {},
   };
   let namespaces = ['cards', 'columns', 'tabs'];
-  let promises = [];
-  for (let key of idbKeys) {
-    let chunks = key.split('.');
-    let namespaceIndex = namespaces.indexOf(chunks[1]);
-    if (namespaceIndex !== -1) {
-      let id = chunks[2];
-      promises.push(
-        get(key).then(key => state[namespaces[namespaceIndex]][id] = key)
-      );
+  const getAllInNamespace = (namespace, whitelist = null) => {
+    let promises = [];
+    for (let key of idbKeys) {
+      let chunks = key.split('.');
+      let namespaceIndex = namespaces.indexOf(chunks[1]);
+      if (namespaceIndex !== -1) {
+        let id = chunks[2];
+        if (whitelist && whitelist.indexOf(id) === -1) continue;
+        promises.push(
+          get(key).then(key => state[namespaces[namespaceIndex]][id] = key)
+        );
+      }
     }
+    return Promise.all(promises);
   }
-  return await Promise.all(promises).then(() => state);
+  let promises = [
+    getAllInNamespace('tabs'),
+    getAllInNamespace('columns').then(() => {
+      // Only load cards in the Kanban boards and the main Zettelkasten card
+      let whitelist = ['main'];
+      console.log(state.columns)
+      /*
+      TODO:
+      All of the cards are being loaded, whitelisted or otherwise
+      Ctrl+F, delete console.log's
+      */
+      for (let colID in state.columns) {
+        whitelist.push(...state.columns[colID].items);
+      }
+      console.log(whitelist);
+      return getAllInNamespace('cards', whitelist);
+    })
+  ];
+  return await Promise.all(promises).then(() => (console.log(state), state));
 }
 
 function loadLegacyLocalStorageState () {
@@ -64,6 +84,7 @@ export async function saveState (state) {
   try {
     if (state.loading) return;
     set('mirror.tabOrder', state.tabOrder);
+    set('mirror.starredZettels', state.starredZettels);
     let namespaces = ['cards', 'columns', 'tabs'];
     let promises = [];
     for (let namespace of namespaces) {
@@ -76,5 +97,20 @@ export async function saveState (state) {
     return await Promise.all(promises);
   } catch (e) {
     console.error(e);
+  }
+}
+
+/*
+TODO:
+- The IndexedDB API should operate using edit sets rather than rewriting everything every time
+- The main Zettelkasten card and all cards in columns should be loaded immediately, all other cards should load lazily from IndexedDB
+- Decouple zettelkasten view from controller
+*/
+
+export async function loadCard (cardID) {
+  try {
+    return await get('mirror.cards.'+cardID);
+  } catch (e) {
+    return null;
   }
 }

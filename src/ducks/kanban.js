@@ -7,9 +7,10 @@
  *  each has a unique ID as a key in the respective object
  */
 
-import { createReducer, createAction } from '@reduxjs/toolkit';
+import { createReducer, createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import undoable from 'redux-undo';
 import { generateID, objectMap } from '../common';
+import * as backend from '../backends';
 
 // Action creators
 
@@ -44,10 +45,22 @@ export const editZettel = createAction('zettelkasten/EDIT_ZETTEL'); // takes { z
 export const deleteZettel = createAction('zettelkasten/DELETE_ZETTEL'); // takes zettelID
 export const toggleZettelStarred = createAction('zettelkasten/TOGGLE_STARRED'); // takes zettelID
 
+// createAsyncThunk a normal action creator creator you dispatch as usual with .pending,
+// .fulfilled and .rejected action types for handling by a reducer
+export const loadZettel = createAsyncThunk(
+  'zettelkasten/LOAD_ZETTEL', async (cardID, thunkAPI) => {
+    const card = await backend.loadCard(cardID);
+    if (!card) {
+      // Reject if the card couldn't be loaded
+      return thunkAPI.rejectWithValue(cardID);
+    } else {
+      return card;
+    }
+  }
+);
+
 // Helpers
 
-// const indexFromID = (list, id) => list.map(item => item.id === id).indexOf(true);
-// const deleteByID = (list, id) => list.splice(indexFromID(list, id), 1);
 const deleteInList = (list, elem) => {
   let index = list.indexOf(elem);
   if (index !== -1) list.splice(index, 1); // undesired behaviour when splicing at (-1, 1)
@@ -73,6 +86,7 @@ export const selectors = {
   // gets { [tabID]: list_of_cardIDs }
   cardsByTab: state => objectMap(state.tabs, tab =>
     tab.columns.flatMap(colID => state.columns[colID].items)),
+  loadingZettel: state => state.loadingZettel,
 };
 
 // Reducers
@@ -132,6 +146,7 @@ const reducer = createReducer(loadingState, {
     s.columns[colID].items.forEach(cardID => delete s.cards[cardID]);
     Object.values(s.tabs).forEach(tab => deleteInList(tab.columns, colID));
     delete s.columns[colID];
+    backend.deleteColumn(a.payload);
   },
   [renameColumn]: (s, a) => {
     const { colID, name } = a.payload;
@@ -149,6 +164,7 @@ const reducer = createReducer(loadingState, {
         col.edited = new Date().getTime();
     });
     delete s.cards[a.payload];
+    backend.deleteCard(a.payload);
   },
   [addColumn]: (s, a) => {
     const { tabID, name } = a.payload;
@@ -182,6 +198,7 @@ const reducer = createReducer(loadingState, {
     }
     delete s.tabs[s.tabOrder[tabIdx]];
     s.tabOrder.splice(tabIdx, 1);
+    backend.deleteTab(a.payload);
   },
   [addTab]: (s, a) => {
     const id = generateID();
@@ -241,6 +258,7 @@ const reducer = createReducer(loadingState, {
   [deleteZettel]: (s, a) => {
     // TODO: clean up links?
     delete s.cards[a.payload];
+    backend.deleteZettel(a.payload);
   },
   [toggleZettelStarred]: (s, a) => {
     if (!s.starredZettels) s.starredZettels = [];
@@ -261,6 +279,16 @@ const reducer = createReducer(loadingState, {
         if (aMS === 0) return -1;
         return bMS - aMS;
     });
+  },
+  [loadZettel.pending]: (s, a) => {
+    s.loadingZettel = true;
+  },
+  [loadZettel.fulfilled]: (s, a) => {
+    s.cards[a.payload.id] = a.payload;
+    delete s.loadingZettel;
+  },
+  [loadZettel.rejected]: (s, a) => {
+    s.loadingZettel = a.payload;
   },
 });
 
