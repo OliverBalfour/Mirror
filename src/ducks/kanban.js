@@ -7,10 +7,11 @@
  *  each has a unique ID as a key in the respective object
  */
 
-import { createReducer, createAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import undoable from 'redux-undo';
-import { generateID, objectMap, deleteInList } from '../common';
-import { EditSet, commit, load } from '../backends';
+import produce from 'immer';
+import { generateID, objectMap, deleteInList, createReducer } from '../common';
+import { EditSet, load, namespaceNames as c } from '../backends';
 
 // Action creators
 
@@ -91,200 +92,363 @@ const loadingState = {
   loading: true
 };
 
+// Use our version of createReducer that does not enable Immer by default
+// Note that these reducers are not pure, they commit changes to IndexedDB
+// and the GitHub Gist API. As the app cannot function without these features,
+// these side effects have to happen somewhere, and none of the features
+// impure reducers break are relevant or would work anyway, the rule of pure
+// reducers is intentionally broken.
+// Note: ps is previous state, s is draft state, ns is next state, a is action
 const reducer = createReducer(loadingState, {
-  [unsafeSetState]: (s, a) => {
-    for (let key in s) {
-      delete s[key];
-    }
-    for (let key in a.payload) {
-      s[key] = a.payload[key];
-    }
-  },
-  [transferCard]: (s, a) => {
-    const { srcColID, dstColID, srcIndex, dstIndex } = a.payload;
-    let srcCol = s.columns[srcColID].items;
-    let dstCol = s.columns[dstColID].items;
-    const [removed] = srcCol.splice(srcIndex, 1);
+  // Only used for updating the initial state from the loading state
+  // Makes no changes to the remote (pure functional reducer)
+  [unsafeSetState]: (ps, a) =>
+    produce(ps, s => {
+      for (let key in s) {
+        delete s[key];
+      }
+      for (let key in a.payload) {
+        s[key] = a.payload[key];
+      }
+    }),
+  [transferCard]: (ps, a) => {
     const epochms = new Date().getTime();
-    s.cards[removed].moved = epochms;
-    s.columns[srcColID].edited = epochms;
-    s.columns[dstColID].edited = epochms;
-    dstCol.splice(dstIndex, 0, removed);
+    const { srcColID, dstColID, srcIndex, dstIndex } = a.payload;
+    const cardID = ps.columns[srcColID].items[srcIndex];
+    const ns = produce(ps, s => {
+      s.columns[srcColID].items.splice(srcIndex, 1);
+      s.cards[cardID].moved = epochms;
+      s.columns[srcColID].edited = epochms;
+      s.columns[dstColID].edited = epochms;
+      s.columns[dstColID].items.splice(dstIndex, 0, cardID);
+    });
+    new EditSet()
+      .edit(c.cards, ns.cards[cardID])
+      .edit(c.columns, ns.columns[srcColID])
+      .edit(c.columns, ns.columns[dstColID])
+      .commit();
+    return ns;
   },
-  [reorderCard]: (s, a) => {
+  [reorderCard]: (ps, a) => {
     const { colID, srcIndex, dstIndex } = a.payload;
     const epochms = new Date().getTime();
-    s.columns[colID].edited = epochms;
-    let newitems = s.columns[colID].items;
-    const [removed] = newitems.splice(srcIndex, 1);
-    s.cards[removed].moved = epochms;
-    newitems.splice(dstIndex, 0, removed);
-    s.columns[colID].items = newitems;
+    const cardID = ps.columns[colID].items[srcIndex];
+    const ns = produce(ps, s => {
+      s.columns[colID].edited = epochms;
+      s.columns[colID].items.splice(srcIndex, 1);
+      s.cards[cardID].moved = epochms;
+      s.columns[colID].items.splice(dstIndex, 0, cardID);
+    });
+    new EditSet()
+      .edit(c.columns, ns.columns[colID])
+      .edit(c.cards, ns.cards[cardID])
+      .commit();
+    return ns;
   },
-  [addCard]: (s, a) => {
+  [addCard]: (ps, a) => {
     const { content, colID } = a.payload;
     const id = generateID();
     const epochms = new Date().getTime();
-    // add to cards list
-    s.cards[id] = { id, content, type: KANBAN_CARD_TYPE,
+    const card = { id, content, type: KANBAN_CARD_TYPE,
       created: epochms,  edited: epochms, moved: epochms };
-    s.columns[colID].items.unshift(id); // add to top of column
-    s.columns[colID].edited = epochms;
+    const ns = produce(ps, s => {
+      s.cards[id] = card;
+      // Add to top of column
+      s.columns[colID].items.unshift(id);
+      s.columns[colID].edited = epochms;
+    });
+    new EditSet()
+      .add(c.cards, card)
+      .edit(c.columns, ns.columns[colID])
+      .commit();
+    return ns;
   },
-  [deleteColumn]: (s, a) => {
-    // TODO: edit set
+  [deleteColumn]: (ps, a) => {
     const colID = a.payload;
     const ms = new Date().getTime();
-    const tabIdx = Object.values(s.tabs).map(tab => tab.columns.indexOf(a.payload) !== -1).indexOf(true);
-    if (tabIdx >= 0) s.tabs[s.tabOrder[tabIdx]].edited = ms;
-    s.columns[colID].items.forEach(cardID => delete s.cards[cardID]);
-    Object.values(s.tabs).forEach(tab => deleteInList(tab.columns, colID));
-    delete s.columns[colID];
-  },
-  [renameColumn]: (s, a) => {
-    const { colID, name } = a.payload;
-    s.columns[colID].name = name;
-    s.columns[colID].edited = new Date().getTime();
-  },
-  [editCardContent]: (s, a) => {
-    const { cardID, content } = a.payload;
-    s.cards[cardID].content = content;
-    s.cards[cardID].edited = new Date().getTime();
-  },
-  [deleteCard]: (s, a) => {
-    // TODO: edit set
-    const ms = new Date().getTime();
-    Object.values(s.columns).forEach(col => {
-      if (deleteInList(col.items, a.payload))
-        col.edited = ms;
+    const tabIdx = Object.values(ps.tabs).map(tab => tab.columns.indexOf(a.payload) !== -1).indexOf(true);
+    const ns = produce(ps, s => {
+      if (tabIdx >= 0) s.tabs[s.tabOrder[tabIdx]].edited = ms;
+      s.columns[colID].items.forEach(cardID => delete s.cards[cardID]);
+      Object.values(s.tabs).forEach(tab => deleteInList(tab.columns, colID));
+      delete s.columns[colID];
     });
-    delete s.cards[a.payload];
+    new EditSet()
+      .editAll(c.tabs, ns.tabs)
+      .deleteAllByID(c.cards, ps.columns[colID].items)
+      .commit();
+    return ns;
   },
-  [addColumn]: (s, a) => {
+  [renameColumn]: (ps, a) => {
+    const { colID, name } = a.payload;
+    const ns = produce(ps, s => {
+      s.columns[colID].name = name;
+      s.columns[colID].edited = new Date().getTime();
+    });
+    new EditSet()
+      .edit(c.columns, ns.columns[colID])
+      .commit();
+    return ns;
+  },
+  [editCardContent]: (ps, a) => {
+    const { cardID, content } = a.payload;
+    const ns = produce(ps, s => {
+      s.cards[cardID].content = content;
+      s.cards[cardID].edited = new Date().getTime();
+    });
+    new EditSet()
+      .edit(c.cards, ns.cards[cardID])
+      .commit();
+    return ns;
+  },
+  [deleteCard]: (ps, a) => {
+    const cardID = a.payload;
+    const ms = new Date().getTime();
+    const colIDs = [];
+    const ns = produce(ps, s => {
+      Object.values(s.columns).forEach(col => {
+        if (deleteInList(col.items, cardID)) {
+          col.edited = ms;
+          colIDs.push(col.id);
+        }
+      });
+      delete s.cards[a.payload];
+    });
+    new EditSet()
+      .delete(c.cards, cardID)
+      .editAllByID(c.columns, ns.columns, colIDs)
+      .commit();
+    return ns;
+  },
+  [addColumn]: (ps, a) => {
     const { tabID, name } = a.payload;
     const id = generateID();
     const epochms = new Date().getTime();
-    s.columns[id] = { id, items: [], name, created: epochms, edited: epochms };
-    s.tabs[tabID].columns.push(id);
-    s.tabs[tabID].edited = epochms;
+    const column = { id, items: [], name, created: epochms, edited: epochms };
+    const ns = produce(ps, s => {
+      s.columns[id] = column;
+      s.tabs[tabID].columns.push(id);
+      s.tabs[tabID].edited = epochms;
+    });
+    new EditSet()
+      .add(c.columns, column)
+      .edit(c.tabs, ns.tabs[tabID])
+      .commit();
+    return ns;
   },
-  [editCard]: (s, a) => {
-    const { card, colID } = a.payload;
+  [editCard]: (ps, a) => {
+    const { card, colID: dstColID } = a.payload;
     const epochms = new Date().getTime();
-    s.cards[card.id] = a.payload.card;
-    s.cards[card.id].edited = epochms;
-    const srcColID = Object.keys(s.columns).filter(colID => s.columns[colID].items.indexOf(card.id) !== -1)[0];
-    const dstColID = colID;
-    if (srcColID !== dstColID) {
-      deleteInList(s.columns[srcColID].items, card.id);
-      s.columns[dstColID].items.unshift(card.id);
-      s.columns[srcColID].edited = s.columns[dstColID].edited = epochms;
-    }
+    const srcColID = Object.keys(ps.columns).filter(colID => ps.columns[colID].items.indexOf(card.id) !== -1)[0];
+    const ns = produce(ps, s => {
+      s.cards[card.id] = JSON.parse(JSON.stringify(a.payload.card));
+      s.cards[card.id].edited = epochms;
+      if (srcColID !== dstColID) {
+        deleteInList(s.columns[srcColID].items, card.id);
+        s.columns[dstColID].items.unshift(card.id);
+        s.columns[srcColID].edited = s.columns[dstColID].edited = epochms;
+      }
+    });
+    new EditSet()
+      .edit(c.cards, ns.cards[card.id])
+      .concat(() => {
+        // Update columns if changed
+        const set = new EditSet();
+        if (srcColID !== dstColID) {
+          set.edit(c.columns, ns.columns[srcColID]);
+          set.edit(c.columns, ns.columns[dstColID]);
+        }
+        return set;
+      })
+      .commit();
+    return ns;
   },
-  [deleteTab]: (s, a) => {
-    // TODO: edit set
+  [deleteTab]: (ps, a) => {
     const tabIdx = a.payload;
-    const tab = s.tabs[s.tabOrder[tabIdx]];
-    while (tab.columns.length) {
-      const colID = tab.columns[0];
-      s.columns[colID].items.forEach(cardID => delete s.cards[cardID]);
-      delete s.columns[colID];
-      tab.columns.shift();
-    }
-    delete s.tabs[s.tabOrder[tabIdx]];
-    s.tabOrder.splice(tabIdx, 1);
+    const cardIDs = [];
+    const tab = ps.tabs[ps.tabOrder[tabIdx]];
+    const ns = produce(ps, s => {
+      while (tab.columns.length) {
+        const colID = tab.columns[0];
+        cardIDs.push(...s.columns[colID].items);
+        s.columns[colID].items.forEach(cardID => delete s.cards[cardID]);
+        delete s.columns[colID];
+        tab.columns.shift();
+      }
+      delete s.tabs[tab.id];
+      s.tabOrder.splice(tabIdx, 1);
+    });
+    new EditSet()
+      .deleteAllByID(c.cards, cardIDs)
+      .deleteAllByID(c.columns, tab.columns)
+      .delete(c.tabs, tab.id)
+      .param(c.tabOrder, ns.tabOrder)
+      .commit();
+    return ns;
   },
-  [addTab]: (s, a) => {
+  [addTab]: (ps, a) => {
     const id = generateID();
     const name = a.payload;
-    s.tabs[id] = { name, id, columns: [], created: new Date().getTime() };
-    s.tabOrder.push(id);
+    const tab = { name, id, columns: [], created: new Date().getTime() };
+    const ns = produce(ps, s => {
+      s.tabs[id] = tab;
+      s.tabOrder.push(id);
+    });
+    new EditSet()
+      .add(c.tabs, tab)
+      .param(c.tabOrder, ns.tabOrder)
+      .commit();
+    return ns;
   },
-  [renameTab]: (s, a) => {
+  [renameTab]: (ps, a) => {
     const { tabID, name } = a.payload;
-    s.tabs[tabID].name = name;
-    s.tabs[tabID].edited = new Date().getTime();
+    const ns = produce(ps, s => {
+      s.tabs[tabID].name = name;
+      s.tabs[tabID].edited = new Date().getTime();
+    });
+    new EditSet()
+      .edit(c.tabs, ns.tabs[tabID])
+      .commit();
+    return ns;
   },
-  [moveColumn]: (s, a) => {
+  [moveColumn]: (ps, a) => {
     const [srcIdx, dstIdx, tabIdx] = a.payload;
-    const tabID = s.tabOrder[tabIdx];
-    let newitems = s.tabs[tabID].columns;
-    const [removed] = newitems.splice(srcIdx, 1);
-    newitems.splice(dstIdx, 0, removed);
-    s.tabs[tabID].columns = newitems;
-    s.tabs[tabID].edited = new Date().getTime();
+    if (srcIdx === dstIdx) return ps;
+    const tabID = ps.tabOrder[tabIdx];
+    const colID = ps.tabs[tabID].columns[srcIdx];
+    const ns = produce(ps, s => {
+      s.tabs[tabID].columns.splice(srcIdx, 1);
+      s.tabs[tabID].columns.splice(dstIdx, 0, colID);
+      s.tabs[tabID].edited = new Date().getTime();
+    });
+    new EditSet()
+      .edit(c.tabs, ns.tabs[tabID])
+      .commit();
+    return ns;
   },
-  [moveTab]: (s, a) => {
+  [moveTab]: (ps, a) => {
     const [srcIdx, dstIdx] = a.payload;
-    if (dstIdx < 0 || dstIdx >= s.tabs.length) return;
-    let newitems = s.tabOrder;
-    const [removed] = newitems.splice(srcIdx, 1);
-    newitems.splice(dstIdx, 0, removed);
-    s.tabOrder = newitems;
+    const tabID = ps.tabOrder[srcIdx];
+    if (dstIdx < 0 || dstIdx >= ps.tabs.length) return ps;
+    const ns = produce(ps, s => {
+      s.tabOrder.splice(srcIdx, 1);
+      s.tabOrder.splice(dstIdx, 0, tabID);
+    });
+    new EditSet()
+      .param(c.tabOrder, ns.tabOrder)
+      .commit();
+    return ns;
   },
-  [archiveCardsInColumn]: (s, a) => {
-    // archived cards still exist in memory but are not listed in a column's items
+  [archiveCardsInColumn]: (ps, a) => {
+    // Archived cards are deleted from memory but stored in IndexedDB and the Gist
     const colID = a.payload;
     const epochms = new Date().getTime();
-    s.columns[colID].items.forEach(cardID => {
-      let card = s.cards[cardID];
-      card.moved = card.edited = card.archived = epochms;
-      card.archivedFromColID = a.payload;
+    const ns = produce(ps, s => {
+      s.columns[colID].items.forEach(cardID => {
+        let card = s.cards[cardID];
+        card.moved = card.edited = card.archived = epochms;
+        card.archivedFromColID = a.payload;
+      });
+      s.columns[colID].items = [];
+      s.columns[colID].edited = epochms;
     });
-    s.columns[colID].items = [];
-    s.columns[colID].edited = epochms;
+    new EditSet()
+      .editAllByID(c.cards, ns.cards, ns.columns[colID].items)
+      .edit(c.columns, ns.columns[colID])
+      .commit();
+    const nns = produce(ns, s => {
+      s.columns[colID].items.forEach(cardID => delete s.cards[cardID]);
+    });
+    return nns;
   },
-  [addZettel]: (s, a) => {
+  [addZettel]: (ps, a) => {
     const { zettel } = a.payload;
     const id = zettel.id || generateID();
     const epochms = new Date().getTime();
-    s.cards[id] = { id, type: ZETTEL_NOTE_TYPE, created: epochms,  edited: epochms, moved: epochms,
-      ...zettel };
+    const fullZettel = {
+      id, type: ZETTEL_NOTE_TYPE,
+      created: epochms,  edited: epochms, moved: epochms,
+      ...zettel
+    };
+    const ns = produce(ps, s => {
+      s.cards[ns] = fullZettel;
+    });
+    new EditSet()
+      .add(c.cards, fullZettel)
+      .commit();
+    return ns;
   },
-  [editZettel]: (s, a) => {
+  [editZettel]: (ps, a) => {
     const { zettel } = a.payload;
     const epochms = new Date().getTime();
-    // editZettel does not add new zettels
-    if (Object.keys(s.cards).indexOf(zettel.id) === -1) return;
-    s.cards[zettel.id] = zettel;
-    s.cards[zettel.id].edited = epochms;
-  },
-  [deleteZettel]: (s, a) => {
-    // TODO: edit set
-    deleteInList(s.starredZettels, a.payload);
-    delete s.cards[a.payload];
-  },
-  [toggleZettelStarred]: (s, a) => {
-    if (!s.starredZettels) s.starredZettels = [];
-    if (s.starredZettels.indexOf(a.payload) === -1)
-      s.starredZettels.push(a.payload);
-    else
-      deleteInList(s.starredZettels, a.payload);
-  },
-  [sortColByTime]: (s, a) => {
-    // This sorts by epoch millisecond time; anything without a time is at the end in the same order
-    // As a bug meant card.time is sometimes a string, we must wrap in new Date(x).getTime() instead of just x
-    s.columns[a.payload].items.sort(
-      (a, b) => {
-        let aMS = new Date(s.cards[b].time || null).getTime();
-        let bMS = new Date(s.cards[a].time || null).getTime();
-        if (bMS === 0 && aMS === 0) return 0;
-        if (bMS === 0) return 1;
-        if (aMS === 0) return -1;
-        return bMS - aMS;
+    // editZettel will not add new zettels
+    if (Object.keys(ps.cards).indexOf(zettel.id) === -1) return ps;
+    const ns = produce(ps, s => {
+      s.cards[zettel.id] = zettel;
+      s.cards[zettel.id].edited = epochms;
     });
+    new EditSet()
+      .edit(c.cards, zettel)
+      .commit();
+    return ns;
   },
-  [loadZettel.pending]: (s, a) => {
-    s.loadingZettel = true;
+  [deleteZettel]: (ps, a) => {
+    const cardID = a.payload;
+    const ns = produce(ps, s => {
+      deleteInList(s.starredZettels, a.payload);
+      delete s.cards[cardID];
+    });
+    new EditSet
+      .param(c.starredZettels, ns.starredZettels)
+      .delete(c.cards, cardID)
+      .commit();
+    return ns;
   },
-  [loadZettel.fulfilled]: (s, a) => {
-    s.cards[a.payload.id] = a.payload;
-    delete s.loadingZettel;
+  [toggleZettelStarred]: (ps, a) => {
+    const cardID = a.payload;
+    const ns = produce(ps, s => {
+      if (!s.starredZettels) s.starredZettels = [];
+      if (s.starredZettels.indexOf(cardID) === -1)
+        s.starredZettels.push(cardID);
+      else
+        deleteInList(s.starredZettels, cardID);
+    });
+    new EditSet()
+      .param(c.starredZettels, ns.starredZettels)
+      .commit();
+    return ns;
   },
-  [loadZettel.rejected]: (s, a) => {
-    s.loadingZettel = a.payload;
+  [sortColByTime]: (ps, a) => {
+    const colID = a.payload;
+    const ns = produce(ps, s => {
+      // This sorts by epoch millisecond time; anything without a time is at the end in the same order
+      // As a bug meant card.time is sometimes a string, we must wrap in new Date(x).getTime() instead of just x
+      s.columns[colID].items.sort(
+        (a, b) => {
+          let aMS = new Date(s.cards[b].time || null).getTime();
+          let bMS = new Date(s.cards[a].time || null).getTime();
+          if (bMS === 0 && aMS === 0) return 0;
+          if (bMS === 0) return 1;
+          if (aMS === 0) return -1;
+          return bMS - aMS;
+        });
+    });
+    new EditSet()
+      .edit(c.columns, ns.columns[colID])
+      .commit();
+    return ns;
   },
+  [loadZettel.pending]: (ps, a) =>
+    produce(ps, s => s.loadingZettel = true),
+  [loadZettel.fulfilled]: (ps, a) =>
+    produce(ps, s => {
+      s.cards[a.payload.id] = a.payload;
+      delete s.loadingZettel;
+    }),
+  [loadZettel.rejected]: (ps, a) =>
+    produce(ps, s => s.loadingZettel = a.payload),
 });
 
 // Undoable reducer
+// TODO: does lazy loading break undo?
 export default undoable(reducer, {limit:20});

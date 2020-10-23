@@ -52,3 +52,18 @@ export const searchCards = (term, cards, limit=10) => {
   }
   return matches;
 }
+
+// @reduxjs/toolkit's createReducer uses Immer internally which is great
+// until you need to access the mutated piece of state directly to send it
+// to the backend, when Immer only supplies a Proxy instead of an Object
+// This variant has opt-in Immer support (you can call produce if desired)
+export function createReducer (initialState, actionMap) {
+  return (prevState, action) => {
+    if (Object.prototype.hasOwnProperty.call(actionMap, action.type)) {
+      const nextState = actionMap[action.type](prevState, action);
+      if (!nextState)
+        console.error(`Invalid state produced by createReducer for ${action.type}: ${nextState}`);
+      return nextState;
+    }
+  }
+}

@@ -5,13 +5,13 @@ const getOctokit = () => import("@octokit/rest").then(({ Octokit }) =>
   })
 );
 
-// TODO: does this need to be a class, or can it be a couple exported functions?
 // TODO: keep track of the latest SHA revision, perhaps in localStorage
 // TODO: write code to load all revisions since last known revision and transmit them to IndexedDB
 // TODO: support rectifying divergent branches (via fast forward or interactive merge dialog for conflicts)
 // TODO: initialisation of newly logged in client
 
 export async function commit (editSet) {
+  if (editSet.set.length === 0) return [];
   const update = async (gh, set) =>
     await gh.gists.update({
       gist_id: localStorage["__GITHUB_GIST_ID"],
@@ -46,6 +46,9 @@ function compileEditSet (editSet) {
         files[filename] = { filename, content };
         break;
       }
+      case 'param':
+        // TODO: how are params like tabOrder and starredZettels stored?
+        break;
       default:
     }
   }
@@ -54,9 +57,9 @@ function compileEditSet (editSet) {
 
 function getEditFilename (edit) {
   if (edit.namespace === 'cards')
-    return edit.id + '.md';
+    return edit.object.id + '.md';
   else
-    return edit.namespace + '.' + edit.id + '.md';
+    return edit.namespace + '.' + edit.object.id + '.md';
 }
 
 function serializeObject (object) {
@@ -75,12 +78,24 @@ function serializeObject (object) {
   return serialized;
 }
 
-// TODO: deserializeObject
+function deserializeObject (markdown) {
+  const object = {};
+  const [ , frontmatter, description] = markdown.split('---');
+  frontmatter.split('\n').filter(str => str.trim().length).forEach(str => {
+    const [key, leftPaddedValue] = str.split(':');
+    // Need to be careful with these objects; if someone edits a GitHub Gist
+    // file to include "hasOwnProperty: 0" it could cause a crash
+    object[key] = JSON.parse(leftPaddedValue.trimStart());
+  });
+  if (description.trim().length)
+    object.description = description.trim();
+  return object;
+}
 
 const initialiseGitHubClient = () => {
   // const set = new EditSet();
-  // set.edit('cards', "main", { description: "The EditSet and BackendGitHub::commit code works", id: 'main' });
-  // set.add('cards', "test", { description: "hi there", id: 'test' });
+  // set.edit('cards', { description: "The EditSet and BackendGitHub::commit code works", id: 'main' });
+  // set.add('cards', { description: "hi there", id: 'test' });
   // commit(set).then(async () => await backend.commit(new EditSet().delete('cards', "test"))).catch(console.error);
 }
 

@@ -138,6 +138,6 @@ export async function load (namespace, id = null) {
 // or is only loading restricted to one backend?
 
 export async function commit (editSet) {
-  // TODO
+  // TODO: IndexedDB::commit
   return null;
 }

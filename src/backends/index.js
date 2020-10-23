@@ -2,11 +2,37 @@
 import * as ghb from './github';
 import * as idb from './indexeddb';
 
+export const namespaceNames = {
+  cards: 'cards',
+  columns: 'columns',
+  tabs: 'tabs',
+  tabOrder: 'tabOrder',
+  starredZettels: 'starredZettels',
+}
+
 export class EditSet {
   constructor (other) { this.set = [] }
-  add    (namespace, id, object) { this.set.push({ type: 'add',    namespace, id, object }); return this }
-  edit   (namespace, id, object) { this.set.push({ type: 'edit',   namespace, id, object }); return this }
-  delete (namespace, id        ) { this.set.push({ type: 'delete', namespace, id         }); return this }
+  add    (namespace, object) { this.set.push({ type: 'add',    namespace, object }); return this }
+  edit   (namespace, object) { this.set.push({ type: 'edit',   namespace, object }); return this }
+  delete (namespace, id    ) { this.set.push({ type: 'delete', namespace, id     }); return this }
+  param  (namespace, value ) { this.set.push({ type: 'param',  namespace, value  }); return this }
+  concat (produceOther) { this.set.push(...produceOther().set) }
+  editAll (namespace, objectDict) {
+    for (let id in objectDict) {
+      this.edit(namespace, objectDict[id]);
+    }
+  }
+  editAllByID (namespace, objectDict, arrayOfIDs) {
+    for (let id of arrayOfIDs) {
+      this.edit(namespace, objectDict[id]);
+    }
+  }
+  deleteAllByID (namespace, arrayOfIDs) {
+    for (let id of arrayOfIDs) {
+      this.delete(namespace, id);
+    }
+  }
+  commit () { commit(this) }
 }
 
 export async function loadState () {
