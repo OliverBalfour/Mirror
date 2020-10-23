@@ -11,6 +11,13 @@ export const objectMap = (object, mapFn) =>
     return result
   }, {});
 
+
+export const deleteInList = (list, elem) => {
+  let index = list.indexOf(elem);
+  if (index !== -1) list.splice(index, 1); // undesired behaviour when splicing at (-1, 1)
+  return index !== -1;
+};
+
 // Web: Download content as filename with specificed MIME type
 export const downloadData = (content, filename, type) => {
   if(!type) type = 'application/octet-stream';

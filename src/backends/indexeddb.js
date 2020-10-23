@@ -2,30 +2,58 @@
 /**
  * IndexedDB backend for offline use and caching (98% browser support via caniuse)
  *
- * Cards, columns and tabs are stored individually indexed with "namespace.id"
- * eg you could get card ID 12345 via get("cards.12345").then(card => doStuff())
+ * Cards, columns and tabs are stored individually indexed with "mirror.namespace.id"
+ * eg you could get card ID 12345 via get("mirror.cards.12345").then(card => doStuff())
  */
 
+
+/*
+TODO:
+- The IndexedDB API should operate using edit sets rather than rewriting everything every time
+- The main Zettelkasten card and all cards in columns should be loaded immediately, all other cards should load lazily from IndexedDB
+- Decouple zettelkasten view from controller
+*/
+
+
 // IndexedDB wrapper with a simple async key-value storage API
-import { get, set, keys } from 'idb-keyval';
-import { generateInitialState } from './base';
+import { get, set, keys, del } from 'idb-keyval';
+import { generateInitialState } from './index';
+
+let idbKeys = [];
 
 export async function loadState () {
-  const idbKeys = await keys();
+  idbKeys = await keys();
   if (!idbKeys.length) {
     let state = loadLegacyLocalStorageState();
     if (state) return state;
     return await generateInitialState();
   }
   try {
-    return await loadIDBState(idbKeys);
+    return await loadIDBState();
   } catch (e) {
     console.error(e);
     return await generateInitialState();
   }
 }
 
-async function loadIDBState (idbKeys) {
+const getAllInNamespace = (state, namespace, whitelist = null) => {
+  let promises = [];
+  let namespaces = ['cards', 'columns', 'tabs'];
+  for (let key of idbKeys) {
+    let chunks = key.split('.');
+    let namespaceIndex = namespaces.indexOf(chunks[1]);
+    if (namespaceIndex !== -1) {
+      let id = chunks[2];
+      if (whitelist && whitelist.indexOf(id) === -1) continue;
+      promises.push(
+        get(key).then(key => state[namespaces[namespaceIndex]][id] = key)
+      );
+    }
+  }
+  return Promise.all(promises).then(() => state);
+}
+
+async function loadIDBState () {
   const state = {
     tabOrder: await get('mirror.tabOrder'),
     starredZettels: await get('mirror.starredZettels') || [],
@@ -33,41 +61,19 @@ async function loadIDBState (idbKeys) {
     columns: {},
     tabs: {},
   };
-  let namespaces = ['cards', 'columns', 'tabs'];
-  const getAllInNamespace = (namespace, whitelist = null) => {
-    let promises = [];
-    for (let key of idbKeys) {
-      let chunks = key.split('.');
-      let namespaceIndex = namespaces.indexOf(chunks[1]);
-      if (namespaceIndex !== -1) {
-        let id = chunks[2];
-        if (whitelist && whitelist.indexOf(id) === -1) continue;
-        promises.push(
-          get(key).then(key => state[namespaces[namespaceIndex]][id] = key)
-        );
-      }
-    }
-    return Promise.all(promises);
-  }
   let promises = [
-    getAllInNamespace('tabs'),
+    getAllInNamespace(state, 'tabs'),
     getAllInNamespace('columns').then(() => {
-      // Only load cards in the Kanban boards and the main Zettelkasten card
+      // Only load cards in the Kanban boards and the main Zettelkasten note
       let whitelist = ['main'];
-      console.log(state.columns)
-      /*
-      TODO:
-      All of the cards are being loaded, whitelisted or otherwise
-      Ctrl+F, delete console.log's
-      */
       for (let colID in state.columns) {
         whitelist.push(...state.columns[colID].items);
       }
-      console.log(whitelist);
-      return getAllInNamespace('cards', whitelist);
+      return getAllInNamespace(state, 'cards', whitelist);
     })
   ];
-  return await Promise.all(promises).then(() => (console.log(state), state));
+  await Promise.all(promises);
+  return state;
 }
 
 function loadLegacyLocalStorageState () {
@@ -100,17 +106,38 @@ export async function saveState (state) {
   }
 }
 
-/*
-TODO:
-- The IndexedDB API should operate using edit sets rather than rewriting everything every time
-- The main Zettelkasten card and all cards in columns should be loaded immediately, all other cards should load lazily from IndexedDB
-- Decouple zettelkasten view from controller
-*/
+// Combinators
 
-export async function loadCard (cardID) {
+// Delete a specific object in a namespace without removing
+// references to it in other objects
+export async function deleteAtomically (namespace, id) {
+  return await del('mirror.'+namespace+'.'+id);
+}
+
+export async function load (namespace, id = null) {
   try {
-    return await get('mirror.cards.'+cardID);
+    if (!id) { // eg tabOrder
+      return await get('mirror.'+namespace);
+    } else { // eg cards
+      return await get('mirror.'+namespace+'.'+id);
+    }
   } catch (e) {
     return null;
   }
+}
+
+// TODO: deletion functions (apply to all remotes)
+// Better approach: atomic operations provided by each backend which the Redux
+// code applies (stuff like update/delete specific value)
+
+// ie write an edit set commit function and create edit sets in the Redux code
+// which all backends use
+
+// but then: if backend/index controls the backends, where is the code
+// to decide which edit sets apply to which backend?
+// or is only loading restricted to one backend?
+
+export async function commit (editSet) {
+  // TODO
+  return null;
 }

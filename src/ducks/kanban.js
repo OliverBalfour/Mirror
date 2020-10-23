@@ -9,8 +9,8 @@
 
 import { createReducer, createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import undoable from 'redux-undo';
-import { generateID, objectMap } from '../common';
-import * as backend from '../backends';
+import { generateID, objectMap, deleteInList } from '../common';
+import { EditSet, commit, load } from '../backends';
 
 // Action creators
 
@@ -49,7 +49,7 @@ export const toggleZettelStarred = createAction('zettelkasten/TOGGLE_STARRED'); 
 // .fulfilled and .rejected action types for handling by a reducer
 export const loadZettel = createAsyncThunk(
   'zettelkasten/LOAD_ZETTEL', async (cardID, thunkAPI) => {
-    const card = await backend.loadCard(cardID);
+    const card = await load('cards', cardID);
     if (!card) {
       // Reject if the card couldn't be loaded
       return thunkAPI.rejectWithValue(cardID);
@@ -58,14 +58,6 @@ export const loadZettel = createAsyncThunk(
     }
   }
 );
-
-// Helpers
-
-const deleteInList = (list, elem) => {
-  let index = list.indexOf(elem);
-  if (index !== -1) list.splice(index, 1); // undesired behaviour when splicing at (-1, 1)
-  return index !== -1;
-};
 
 // Selectors
 
@@ -140,13 +132,14 @@ const reducer = createReducer(loadingState, {
     s.columns[colID].edited = epochms;
   },
   [deleteColumn]: (s, a) => {
+    // TODO: edit set
     const colID = a.payload;
+    const ms = new Date().getTime();
     const tabIdx = Object.values(s.tabs).map(tab => tab.columns.indexOf(a.payload) !== -1).indexOf(true);
-    if (tabIdx >= 0) s.tabs[s.tabOrder[tabIdx]].edited = new Date().getTime();
+    if (tabIdx >= 0) s.tabs[s.tabOrder[tabIdx]].edited = ms;
     s.columns[colID].items.forEach(cardID => delete s.cards[cardID]);
     Object.values(s.tabs).forEach(tab => deleteInList(tab.columns, colID));
     delete s.columns[colID];
-    backend.deleteColumn(a.payload);
   },
   [renameColumn]: (s, a) => {
     const { colID, name } = a.payload;
@@ -159,12 +152,13 @@ const reducer = createReducer(loadingState, {
     s.cards[cardID].edited = new Date().getTime();
   },
   [deleteCard]: (s, a) => {
+    // TODO: edit set
+    const ms = new Date().getTime();
     Object.values(s.columns).forEach(col => {
       if (deleteInList(col.items, a.payload))
-        col.edited = new Date().getTime();
+        col.edited = ms;
     });
     delete s.cards[a.payload];
-    backend.deleteCard(a.payload);
   },
   [addColumn]: (s, a) => {
     const { tabID, name } = a.payload;
@@ -188,6 +182,7 @@ const reducer = createReducer(loadingState, {
     }
   },
   [deleteTab]: (s, a) => {
+    // TODO: edit set
     const tabIdx = a.payload;
     const tab = s.tabs[s.tabOrder[tabIdx]];
     while (tab.columns.length) {
@@ -198,7 +193,6 @@ const reducer = createReducer(loadingState, {
     }
     delete s.tabs[s.tabOrder[tabIdx]];
     s.tabOrder.splice(tabIdx, 1);
-    backend.deleteTab(a.payload);
   },
   [addTab]: (s, a) => {
     const id = generateID();
@@ -256,9 +250,9 @@ const reducer = createReducer(loadingState, {
     s.cards[zettel.id].edited = epochms;
   },
   [deleteZettel]: (s, a) => {
-    // TODO: clean up links?
+    // TODO: edit set
+    deleteInList(s.starredZettels, a.payload);
     delete s.cards[a.payload];
-    backend.deleteZettel(a.payload);
   },
   [toggleZettelStarred]: (s, a) => {
     if (!s.starredZettels) s.starredZettels = [];

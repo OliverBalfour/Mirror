@@ -1,10 +1,13 @@
 
-// TODO
-// It must support synchronising all edited notes to the IndexedDB cache in the background
-// It must support rectifying divergent branches (via interactive merge dialog?)
-
-import './github';
+import * as ghb from './github';
 import * as idb from './indexeddb';
+
+export class EditSet {
+  constructor (other) { this.set = [] }
+  add    (namespace, id, object) { this.set.push({ type: 'add',    namespace, id, object }); return this }
+  edit   (namespace, id, object) { this.set.push({ type: 'edit',   namespace, id, object }); return this }
+  delete (namespace, id        ) { this.set.push({ type: 'delete', namespace, id         }); return this }
+}
 
 export async function loadState () {
   return await idb.loadState();
@@ -15,18 +18,21 @@ export async function saveState (state) {
   return await Promise.all([idb.saveState(state)]);
 }
 
-export async function loadCard (cardID) {
+// Load tabOrder: await load('tabOrder')
+// Load card: await load('cards', cardID)
+export async function load (namespace, id = null) {
   // Assumes the cache is up-to-date with the remote
-  return await idb.loadCard(cardID);
+  return await idb.load(namespace, id);
 }
 
-// TODO: deletion functions (apply to all remotes)
+export async function commit (editSet) {
+  return await Promise.all([
+    ghb.commit(editSet),
+    idb.commit(editSet),
+  ])
+}
 
-// remove from cards, column items
-export async function deleteCard (cardID) {}
-// delete contained cards, column, tab column entries
-export async function deleteColumn (colID) {}
-// delete everything contained, update tabOrder
-export async function deleteTab (tabIdx) {}
-// needs to remove from starredZettels and cards
-export async function deleteZettel (cardID) {}
+export const generateInitialState = () =>
+  fetch("./initial-state.json")
+    .then(res => res.json())
+    .catch(e => alert("Could not load initial state. Error: " + e));
