@@ -89,3 +89,7 @@ code {
 .markdown p:last-child {
   margin-bottom: 0;
 }
+.markdown input[type="checkbox"] {
+  margin: 0;
+  margin-left: -4px;
+}

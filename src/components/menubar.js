@@ -27,7 +27,7 @@ export default ({ active, setActive }) => {
             value={active} onChange={(e, val) => setActive(val)}
             TabIndicatorProps={{ style: { backgroundColor: 'white' } }}
           >
-            <Tab label={<div><DeveloperBoardIcon style={{verticalAlign: 'middle'}} /> Board</div>}  />
+            <Tab label={<div><DeveloperBoardIcon style={{verticalAlign: 'middle'}} /> Boards</div>}  />
             <Tab label={<div><NotesIcon style={{verticalAlign: 'middle'}} /> Notes</div>}  />
           </Tabs>
           <div style={{ flexGrow: 1 }} />

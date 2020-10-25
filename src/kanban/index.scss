@@ -41,15 +41,16 @@
   flex-shrink: 0;
 }
 .column {
-  background: #DFEEEE;
+  background: $columnBackground;
   padding: $gridSpacing;
   padding-bottom: 24px;
   width: $cardWidth;
   border: 1px solid #CCDCDC;
   border-radius: 4px;
   margin: $gridSpacing;
+  margin-top: $gridSpacing + 4px;
   transition: border 0.2s;
-  height: calc(100vh - 160px);
+  height: calc(100vh - 156px);
   overflow: hidden;
 }
 .addColumnContainer {
@@ -65,13 +66,14 @@
   justify-content: center;
   align-items: center;
   height: 100px;
-  background: #DFEEEE;
+  background: $columnBackground;
   padding: $gridSpacing;
   padding-bottom: 24px;
   width: $cardWidth;
   border: 1px solid #CCDCDC;
   border-radius: 5px;
   margin: $gridSpacing;
+  margin-top: $gridSpacing + 4px;
 }
 .columnHeaderContainer {
   padding: 0;
