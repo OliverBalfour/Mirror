@@ -44,6 +44,7 @@ const Root = () => {
   const [loc, setLoc] = useHashLocation();
   const [tabURLs, setTabURLs] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  useSelector(console.log);
   const currentlyLoading = useSelector(state => sel.boards(state).loading);
   if (loading && !currentlyLoading) {
     setTabURLs(getScreenNames());

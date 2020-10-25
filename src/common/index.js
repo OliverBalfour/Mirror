@@ -58,9 +58,19 @@ export const searchCards = (term, cards, limit=10) => {
 // to the backend, when Immer only supplies a Proxy instead of an Object
 // This variant has opt-in Immer support (you can call produce if desired)
 export function createReducer (initialState, actionMap) {
-  return (prevState, action) => {
+  return (prevState = initialState, action) => {
     if (Object.prototype.hasOwnProperty.call(actionMap, action.type)) {
       const nextState = actionMap[action.type](prevState, action);
+
+      // BUG: prevState is the undo state { present, past, future }
+      // Whereas nextState is what we would expect
+      // Why does the initial state not work as expected either?
+      // Also, another bug: when IndexedDB is corrupted we get JSON parse unexpected token "<" errors
+      // we should handle the case where data is corrupted by deleting it and loading asynchronously
+
+
+      console.log(prevState);
+      console.log(nextState);
       if (!nextState)
         console.error(`Invalid state produced by createReducer for ${action.type}: ${nextState}`);
       return nextState;
