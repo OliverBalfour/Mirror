@@ -20,15 +20,16 @@ export const Edit = ({ card, setCard }) => {
 
   // list of EBS objects for all cards
   const historical = useSelector(s => Object.values(sel.boards(s).cards)
-    .filter(card => card.hasOwnProperty('ebs') && card.ebs !== null)
+    .filter(card => Object.prototype.hasOwnProperty.call(card, 'ebs') && card.ebs !== null)
     .filter(card => card.ebs.elapsed && card.ebs.estimate)
     .map(card => card.ebs));
 
-  const setEBSEstimate = str => {
+  const setEBSEstimate = (str, exact = null) => {
     setEstStr(str);
     const estimate = unprettySeconds(str);
+    const optExact = exact !== null ? { exact } : {};
     if (typeof estimate === "number")
-      setEBS({estimate, computed: computeEstimate(estimate, historical)});
+      setEBS({estimate, computed: computeEstimate(estimate, historical), ...optExact});
   }
   const setEBSElapsed = str => {
     setElapStr(str);
@@ -44,7 +45,7 @@ export const Edit = ({ card, setCard }) => {
 
   if (!card.ebs)
     return (
-      <AttributeHeader onClick={() => setEBSEstimate('1h')}>
+      <AttributeHeader onClick={() => setEBSEstimate('1h', true)}>
         Add time estimate
       </AttributeHeader>
     );
