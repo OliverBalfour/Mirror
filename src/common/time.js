@@ -39,8 +39,8 @@ export const prettyPrintDate = epochMilliseconds => {
     // Relative dates are quite ambiguous in English
     // If today is Wednesday 23 September 2020, then the following mappings are adhered to:
 
-    // 15/9/19: 15 Sep 2019
-    // 15/9/20: 15 Sep
+    // 15/9/19: Sun 15 Sep 2019
+    // 15/9/20: Tue 15 Sep
     // 16/9/20: Last Wed
     // 21/9/20: Last Mon
     // 22/9/20: Yesterday
@@ -67,9 +67,9 @@ export const prettyPrintDate = epochMilliseconds => {
     if (diff >   7 && diff <= 14) return `${day} Week`;
 
     if (yearDiff === 0)
-      return fn.format(date, "MMM do"); // eg: Sep 17th
+      return fn.format(date, "EEE MMM do"); // eg: Thu Sep 17th
     else
-      return fn.format(date, "MMM do yyyy"); // eg: Sep 17th 2021 if it's 2020
+      return fn.format(date, "EEE MMM do yyyy"); // eg: Fri Sep 17th 2021 if it's not 2021
   }
 
   const getTime = date => {
@@ -84,12 +84,12 @@ export const prettyPrintDate = epochMilliseconds => {
   return getDate(date) + (time ? " " + time : "");
 };
 
-export const timeUrgencyColour = ms => {
-  const diff = ms - new Date().getTime();
-  // Some nice colours: chartreuse, gold, peachpuff, wheat, coral, lightcoral, tomato, orangered
-  if (diff < 0) return '#e0816f';
-  if (diff < 3600) return 'tomato';
-  if (diff < 86400) return 'lightcoral';
-  if (diff < 86400*7) return 'wheat';
+export const timeUrgencyClassName = ms => {
+  const remaining = (ms - new Date().getTime()) / 1000;
+  if (remaining < 0) return 'urgency-overdue';
+  if (remaining < 7200) return 'urgency-two-hours';
+  if (remaining < 86400) return 'urgency-day';
+  if (remaining < 86400*7) return 'urgency-week';
+  if (remaining < 86400*7*2) return 'urgency-fortnight';
   return null;
 }

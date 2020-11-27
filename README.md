@@ -46,7 +46,7 @@ Built with React, Redux, Material UI and [react-beautiful-dnd](https://github.co
 
 1. `git clone https://github.com/OliverBalfour/Mirror`
 2. `cd Mirror`
-3. `npm install`
+3. `npm install` (you may need to run `npm rebuild node-sass` for later node versions)
 
 ### Development
 

@@ -66,6 +66,7 @@ export const Edit = ({ card, setCard }) => {
       <InputLabel className="custom-label">Time estimate</InputLabel>
       <div style={{width: '30%',float:'left',marginRight:16}}>
         <TextField label={`Estimate (predicted ${getPrettyPredicted()})`}
+          autoFocus
           margin="dense" fullWidth
           value={estStr}
           error={invalid(estStr)}

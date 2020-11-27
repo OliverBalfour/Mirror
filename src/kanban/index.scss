@@ -139,3 +139,23 @@
   margin-right: 4px;
   margin-top: 4px;
 }
+
+@mixin chip-urgency($colour) {
+  background-color: $colour !important;
+  border-color: darken($colour, 13%) !important;
+}
+.urgency-overdue {
+  @include chip-urgency($colourOverdue);
+}
+.urgency-two-hours {
+  @include chip-urgency($colourDue);
+}
+.urgency-day {
+  @include chip-urgency(mix($colourDue, $colourNotDueSoon, 75%));
+}
+.urgency-week {
+  @include chip-urgency(mix($colourDue, $colourNotDueSoon, 33%));
+}
+.urgency-fortnight {
+  @include chip-urgency($colourNotDueSoon);
+}
