@@ -67,9 +67,9 @@ export const prettyPrintDate = epochMilliseconds => {
     if (diff >   7 && diff <= 14) return `${day} Week`;
 
     if (yearDiff === 0)
-      return fn.format(date, "EEE MMM do"); // eg: Thu Sep 17th
+      return fn.format(date, "EEE do MMM"); // eg: Thu 17th Sep
     else
-      return fn.format(date, "EEE MMM do yyyy"); // eg: Fri Sep 17th 2021 if it's not 2021
+      return fn.format(date, "EEE do MMM yyyy"); // eg: Fri 17th Sep 2021 if it's not 2021
   }
 
   const getTime = date => {
