@@ -102,15 +102,7 @@ const loadingState = {
 const reducer = createReducer(loadingState, {
   // Only used for updating the initial state from the loading state
   // Makes no changes to the remote (pure functional reducer)
-  [unsafeSetState]: (ps, a) =>
-    produce(ps, s => {
-      for (let key in s) {
-        delete s[key];
-      }
-      for (let key in a.payload) {
-        s[key] = a.payload[key];
-      }
-    }),
+  [unsafeSetState]: (ps, a) => a.payload,
   [transferCard]: (ps, a) => {
     const epochms = new Date().getTime();
     const { srcColID, dstColID, srcIndex, dstIndex } = a.payload;

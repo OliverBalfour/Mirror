@@ -65,12 +65,10 @@ export function createReducer (initialState, actionMap) {
       // BUG: prevState is the undo state { present, past, future }
       // Whereas nextState is what we would expect
       // Why does the initial state not work as expected either?
-      // Also, another bug: when IndexedDB is corrupted we get JSON parse unexpected token "<" errors
-      // we should handle the case where data is corrupted by deleting it and loading asynchronously
+      // console.log(initialState);
+      // console.log(prevState);
+      // console.log(nextState);
 
-
-      console.log(prevState);
-      console.log(nextState);
       if (!nextState)
         console.error(`Invalid state produced by createReducer for ${action.type}: ${nextState}`);
       return nextState;

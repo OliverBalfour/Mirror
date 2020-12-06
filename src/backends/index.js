@@ -16,7 +16,7 @@ export class EditSet {
   edit   (namespace, object) { this.set.push({ type: 'edit',   namespace, object }); return this }
   delete (namespace, id    ) { this.set.push({ type: 'delete', namespace, id     }); return this }
   param  (namespace, value ) { this.set.push({ type: 'param',  namespace, value  }); return this }
-  concat (produceOther) { this.set.push(...produceOther().set) }
+  concat (produceOther) { this.set.push(...produceOther().set); return this }
   editAll (namespace, objectDict) {
     for (let id in objectDict) {
       this.edit(namespace, objectDict[id]);
@@ -52,13 +52,16 @@ export async function load (namespace, id = null) {
 }
 
 export async function commit (editSet) {
-  return await Promise.all([
-    ghb.commit(editSet),
-    idb.commit(editSet),
-  ])
+  const promises = [
+    idb.commit(editSet)
+  ];
+  if (localStorage["__GITHUB_TOKEN"]) {
+    promises.push(ghb.commit(editSet));
+  }
+  return await Promise.all(promises);
 }
 
 export const generateInitialState = () =>
   fetch("./initial-state.json")
     .then(res => res.json())
-    .catch(e => alert("Could not load initial state. Error: " + e));
+    .catch(e => alert("Could not load initial state. Perhaps you forgot a trailing slash in the URL? Error: " + e));

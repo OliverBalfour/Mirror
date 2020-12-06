@@ -63,7 +63,7 @@ async function loadIDBState () {
   };
   let promises = [
     getAllInNamespace(state, 'tabs'),
-    getAllInNamespace('columns').then(() => {
+    getAllInNamespace(state, 'columns').then(() => {
       // Only load cards in the Kanban boards and the main Zettelkasten note
       let whitelist = ['main'];
       for (let colID in state.columns) {
@@ -88,7 +88,7 @@ function loadLegacyLocalStorageState () {
 
 export async function saveState (state) {
   try {
-    if (state.loading) return;
+    if (!state || state.loading) return;
     set('mirror.tabOrder', state.tabOrder);
     set('mirror.starredZettels', state.starredZettels);
     let namespaces = ['cards', 'columns', 'tabs'];
@@ -126,18 +126,15 @@ export async function load (namespace, id = null) {
   }
 }
 
-// TODO: deletion functions (apply to all remotes)
-// Better approach: atomic operations provided by each backend which the Redux
-// code applies (stuff like update/delete specific value)
-
-// ie write an edit set commit function and create edit sets in the Redux code
-// which all backends use
-
-// but then: if backend/index controls the backends, where is the code
-// to decide which edit sets apply to which backend?
-// or is only loading restricted to one backend?
-
 export async function commit (editSet) {
   // TODO: IndexedDB::commit
+  // needs to update idbKeys
   return null;
 }
+
+// For manual intervention of corrupted state
+window.deleteAllState = async () => {
+  let res = await Promise.all(idbKeys.map(key => del(key)));
+  idbKeys = [];
+  return res;
+};

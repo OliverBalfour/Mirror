@@ -68,7 +68,7 @@ function serializeObject (object) {
   // Columns and tabs contain just the frontmatter component
   const specialKeys = ['description'];
   let frontmatter = [];
-  for (let key of object) {
+  for (let key in object) {
     if (specialKeys.indexOf(key) === -1) {
       frontmatter.push(`${key}: ${JSON.stringify(object[key])}`);
     }

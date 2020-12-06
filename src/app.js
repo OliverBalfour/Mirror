@@ -44,8 +44,11 @@ const Root = () => {
   const [loc, setLoc] = useHashLocation();
   const [tabURLs, setTabURLs] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
-  useSelector(console.log);
-  const currentlyLoading = useSelector(state => sel.boards(state).loading);
+  // BUG: for some reason the intial state is not the loading state
+  // in our createReducer shim and the prevState at first is the empty undoable state
+  // The below `state.present === undefined` is a temporary workaround
+  // useSelector(console.log);
+  const currentlyLoading = useSelector(state => state.present === undefined || sel.boards(state).loading);
   if (loading && !currentlyLoading) {
     setTabURLs(getScreenNames());
     setLoading(false);

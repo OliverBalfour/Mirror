@@ -37,9 +37,7 @@ export const selectors = {
   boards: objectMap(kanban.selectors, localSelector => state => localSelector(globalSelectors.boards(state)))
 };
 
-// Save board state (excluding history)
-// to save history efficiently we would need to store a state 50 states ago, the 50 actions since,
-// and the current state; this would require a rewrite of redux-undo
-const localStorageSubscriber = () => saveState(globalSelectors.boards(store.getState()));
-store.subscribe(localStorageSubscriber);
-localStorageSubscriber(); // save data generated on first run
+// Save board state excluding history
+const indexedDBSubscriber = () => saveState(globalSelectors.boards(store.getState()));
+store.subscribe(indexedDBSubscriber);
+indexedDBSubscriber(); // save data generated on first run
