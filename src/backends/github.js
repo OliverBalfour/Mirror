@@ -27,7 +27,7 @@ export async function commit (editSet) {
         return await Promise.all(editSet.set.map(edit => update(gh, { set: [edit] })))
           .catch(console.error)
       })
-    );
+    ).catch(console.error);  // Authentication issue
 }
 
 function compileEditSet (editSet) {
@@ -41,13 +41,14 @@ function compileEditSet (editSet) {
         files[filename] = null;
         break;
       case 'add':
-      case 'edit': {
+      case 'edit':
+      {
         const content = serializeObject(edit.object);
         files[filename] = { filename, content };
         break;
       }
       case 'param':
-        // TODO: how are params like tabOrder and starredZettels stored?
+        files[filename] = { filename, content: JSON.stringify(edit.value) }
         break;
       default:
     }
@@ -58,6 +59,8 @@ function compileEditSet (editSet) {
 function getEditFilename (edit) {
   if (edit.namespace === 'cards')
     return edit.object.id + '.md';
+  else if (edit.type === 'param')
+    return edit.namespace + '.md';
   else
     return edit.namespace + '.' + edit.object.id + '.md';
 }
@@ -93,14 +96,13 @@ function deserializeObject (markdown) {
 }
 
 const initialiseGitHubClient = () => {
-  // const set = new EditSet();
-  // set.edit('cards', { description: "The EditSet and BackendGitHub::commit code works", id: 'main' });
-  // set.add('cards', { description: "hi there", id: 'test' });
-  // commit(set).then(async () => await backend.commit(new EditSet().delete('cards', "test"))).catch(console.error);
+  // TODO
+  // Should ask whether we want to use the local version or pull the remote
+  // This function should only be called once, not each reload
 }
 
+// TODO: remove
 window.__GHLoggedIn = initialiseGitHubClient;
-
 if (localStorage["__GITHUB_TOKEN"]) {
   window.__GHLoggedIn();
 }
