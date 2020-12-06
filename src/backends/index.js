@@ -15,6 +15,7 @@ export class EditSet {
   add    (namespace, object) { this.set.push({ type: 'add',    namespace, object }); return this }
   edit   (namespace, object) { this.set.push({ type: 'edit',   namespace, object }); return this }
   delete (namespace, id    ) { this.set.push({ type: 'delete', namespace, id     }); return this }
+  // params are always present, this edit updates a param
   param  (namespace, value ) { this.set.push({ type: 'param',  namespace, value  }); return this }
   concat (produceOther) { this.set.push(...produceOther().set); return this }
   editAll (namespace, objectDict) {

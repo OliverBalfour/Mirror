@@ -6,15 +6,6 @@
  * eg you could get card ID 12345 via get("mirror.cards.12345").then(card => doStuff())
  */
 
-
-/*
-TODO:
-- The IndexedDB API should operate using edit sets rather than rewriting everything every time
-- The main Zettelkasten card and all cards in columns should be loaded immediately, all other cards should load lazily from IndexedDB
-- Decouple zettelkasten view from controller
-*/
-
-
 // IndexedDB wrapper with a simple async key-value storage API
 import { get, set, keys, del } from 'idb-keyval';
 import { generateInitialState } from './index';
@@ -22,17 +13,22 @@ import { generateInitialState } from './index';
 let idbKeys = [];
 
 export async function loadState () {
+  const initial = async () => {
+    const s = await generateInitialState();
+    await saveState(s);
+    return s;
+  };
   idbKeys = await keys();
   if (!idbKeys.length) {
     let state = loadLegacyLocalStorageState();
     if (state) return state;
-    return await generateInitialState();
+    return await initial();
   }
   try {
     return await loadIDBState();
   } catch (e) {
     console.error(e);
-    return await generateInitialState();
+    return await initial();
   }
 }
 
@@ -106,14 +102,6 @@ export async function saveState (state) {
   }
 }
 
-// Combinators
-
-// Delete a specific object in a namespace without removing
-// references to it in other objects
-export async function deleteAtomically (namespace, id) {
-  return await del('mirror.'+namespace+'.'+id);
-}
-
 export async function load (namespace, id = null) {
   try {
     if (!id) { // eg tabOrder
@@ -127,9 +115,24 @@ export async function load (namespace, id = null) {
 }
 
 export async function commit (editSet) {
-  // TODO: IndexedDB::commit
   // needs to update idbKeys
-  return null;
+  const promises = [];
+  for (let edit of editSet.set) {
+    switch (edit.type) {
+      case 'add':
+      case 'edit':
+        promises.push(set(`mirror.${edit.namespace}.${edit.object.id}`, edit.object));
+        break;
+      case 'delete':
+        promises.push(del(`mirror.${edit.namespace}.${edit.id}`));
+        break;
+      case 'param':
+        promises.push(set(`mirror.${edit.namespace}`, edit.value));
+        break;
+      default:
+    }
+  }
+  return await Promise.all(promises);
 }
 
 // For manual intervention of corrupted state

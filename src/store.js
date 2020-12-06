@@ -4,7 +4,7 @@ import thunk from 'redux-thunk';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
 import * as kanban from './ducks/kanban';
 import { objectMap } from './common';
-import { loadState, saveState } from './backends';
+import { loadState } from './backends';
 
 const store = configureStore({
   reducer: kanban.default,
@@ -36,8 +36,3 @@ export const globalSelectors = {
 export const selectors = {
   boards: objectMap(kanban.selectors, localSelector => state => localSelector(globalSelectors.boards(state)))
 };
-
-// Save board state excluding history
-const indexedDBSubscriber = () => saveState(globalSelectors.boards(store.getState()));
-store.subscribe(indexedDBSubscriber);
-indexedDBSubscriber(); // save data generated on first run
