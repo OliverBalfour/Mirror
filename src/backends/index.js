@@ -2,68 +2,42 @@
 import * as ghb from './github';
 import * as idb from './indexeddb';
 
+import EditSet from './edit-set';
+export const UNDO_LIMIT = 20;
+let editSetHistory = {
+  past: [],    // [oldest edit,  ..., 1 edit ago]
+  future: [],  // [1 edit ahead, ..., n edits ahead]
+}
+EditSet.prototype.commit = function () {
+  commit(this);
+  editSetHistory.past.push(this);
+  if (editSetHistory.past.length > UNDO_LIMIT)
+    editSetHistory.past.shift();
+  // Clear the future for any state mutating actions
+  editSetHistory.future = [];
+}
+const undoCommit = () => {
+  const set = editSetHistory.past.pop();
+  editSetHistory.future.unshift(set);
+  if (editSetHistory.future.length > UNDO_LIMIT)
+    editSetHistory.future.pop();
+  commit(set.invert());
+};
+const redoCommit = () => {
+  const set = editSetHistory.future.shift();
+  editSetHistory.past.push(set);
+  if (editSetHistory.past.length > UNDO_LIMIT)
+    editSetHistory.past.shift();
+  commit(set);
+};
+export { EditSet, undoCommit, redoCommit };
+
 export const namespaceNames = {
   cards: 'cards',
   columns: 'columns',
   tabs: 'tabs',
   tabOrder: 'tabOrder',
   starredZettels: 'starredZettels',
-}
-
-export class EditSet {
-  constructor (other) { this.set = [] }
-  add    (namespace, object) { this.set.push({ type: 'add',    namespace, object }); return this }
-  edit   (namespace, object) { this.set.push({ type: 'edit',   namespace, object }); return this }
-  delete (namespace, id    ) { this.set.push({ type: 'delete', namespace, id     }); return this }
-  // params are always present, this edit updates a param
-  param  (namespace, value ) { this.set.push({ type: 'param',  namespace, value  }); return this }
-  concat (produceOther) {
-    this.set.push(...produceOther().set);
-    // Prune duplicates (later edits should override earlier ones)
-    const ids = [];
-    for (let i = this.set.length - 1; i >= 0; i--) {
-      const edit = this.set[i];
-      let id;
-      switch (edit.type) {
-        case 'add':
-        case 'edit':
-          id = edit.object.id;
-          break;
-        case 'delete':
-          id = edit.id;
-          break;
-        case 'param':
-          id = edit.namespace;
-          break;
-        default:
-      }
-      if (ids.indexOf(id) !== -1) {
-        this.set.splice(i, 1);
-      } else {
-        ids.push(id);
-      }
-    }
-    return this;
-  }
-  editAll (namespace, objectDict) {
-    for (let id in objectDict) {
-      this.edit(namespace, objectDict[id]);
-    }
-    return this;
-  }
-  editAllByID (namespace, objectDict, arrayOfIDs) {
-    for (let id of arrayOfIDs) {
-      this.edit(namespace, objectDict[id]);
-    }
-    return this;
-  }
-  deleteAllByID (namespace, arrayOfIDs) {
-    for (let id of arrayOfIDs) {
-      this.delete(namespace, id);
-    }
-    return this;
-  }
-  commit () { commit(this) }
 }
 
 export async function loadState () {
@@ -89,7 +63,7 @@ export async function load (namespace, id = null) {
 let editSetBuffer = new EditSet();
 let timer = null;
 let waitingOn = [];
-export const commit = editSet => new Promise((resolve, reject) => {
+const commit = editSet => new Promise((resolve, reject) => {
   const promises = [
     idb.commit(editSet)
   ];
@@ -105,7 +79,7 @@ export const commit = editSet => new Promise((resolve, reject) => {
       }, 5000);
       Promise.all(promises).then(resolve);
     } else {
-      editSetBuffer.concat(() => editSet);
+      editSetBuffer.concat(editSet);
       waitingOn.push(resolve);
     }
   } else {

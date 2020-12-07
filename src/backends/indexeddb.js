@@ -74,8 +74,11 @@ async function loadIDBState () {
 
 function loadLegacyLocalStorageState () {
   try {
-    if (Object.prototype.hasOwnProperty.call(localStorage, 'kanban'))
-      return JSON.parse(localStorage.kanban);
+    if (Object.prototype.hasOwnProperty.call(localStorage, 'kanban')) {
+      const result = JSON.parse(localStorage.kanban);
+      delete localStorage.kanban;
+      return result;
+    }
   } catch (e) {
     console.error(e);
     return null;
@@ -86,6 +89,7 @@ export async function saveState (state) {
   try {
     if (!state || state.loading) return;
     set('mirror.tabOrder', state.tabOrder);
+    console.log(state.tabOrder);
     set('mirror.starredZettels', state.starredZettels);
     let namespaces = ['cards', 'columns', 'tabs'];
     let promises = [];

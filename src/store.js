@@ -7,6 +7,8 @@ import { objectMap } from './common';
 import { loadState } from './backends';
 
 const store = configureStore({
+  // DEBUG:
+  // reducer: (s, a) => { console.log(a); kanban.default(s, a) },
   reducer: kanban.default,
   middleware: getDefault => getDefault().concat(thunk),
 });

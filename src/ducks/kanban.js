@@ -8,10 +8,10 @@
  */
 
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import undoable from 'redux-undo';
+import undoable, { ActionTypes } from 'redux-undo';
 import produce from 'immer';
 import { generateID, objectMap, deleteInList, createReducer } from '../common';
-import { EditSet, load, namespaceNames as c } from '../backends';
+import { EditSet, load, namespaceNames as c, undoCommit, redoCommit, UNDO_LIMIT } from '../backends';
 
 // Action creators
 
@@ -103,6 +103,16 @@ const reducer = createReducer(loadingState, {
   // Only used for updating the initial state from the loading state
   // Makes no changes to the remote (pure functional reducer)
   [unsafeSetState]: (ps, a) => a.payload,
+  // Invert the edit sets for IndexedDB and GitHub
+  // Every other action clears the redo stack if present
+  [ActionTypes.UNDO]: (ps, a) => {
+    undoCommit();
+    return ps;
+  },
+  [ActionTypes.REDO]: (ps, a) => {
+    redoCommit();
+    return ps;
+  },
   [transferCard]: (ps, a) => {
     const epochms = new Date().getTime();
     const { srcColID, dstColID, srcIndex, dstIndex } = a.payload;
@@ -115,9 +125,9 @@ const reducer = createReducer(loadingState, {
       s.columns[dstColID].items.splice(dstIndex, 0, cardID);
     });
     new EditSet()
-      .edit(c.cards, ns.cards[cardID])
-      .edit(c.columns, ns.columns[srcColID])
-      .edit(c.columns, ns.columns[dstColID])
+      .edit(c.cards, ns.cards[cardID], ps.cards[cardID])
+      .edit(c.columns, ns.columns[srcColID], ps.columns[srcColID])
+      .edit(c.columns, ns.columns[dstColID], ps.columns[dstColID])
       .commit();
     return ns;
   },
@@ -132,8 +142,8 @@ const reducer = createReducer(loadingState, {
       s.columns[colID].items.splice(dstIndex, 0, cardID);
     });
     new EditSet()
-      .edit(c.columns, ns.columns[colID])
-      .edit(c.cards, ns.cards[cardID])
+      .edit(c.columns, ns.columns[colID], ps.columns[colID])
+      .edit(c.cards, ns.cards[cardID], ps.cards[cardID])
       .commit();
     return ns;
   },
@@ -151,7 +161,7 @@ const reducer = createReducer(loadingState, {
     });
     new EditSet()
       .add(c.cards, card)
-      .edit(c.columns, ns.columns[colID])
+      .edit(c.columns, ns.columns[colID], ps.columns[colID])
       .commit();
     return ns;
   },
@@ -166,8 +176,8 @@ const reducer = createReducer(loadingState, {
       delete s.columns[colID];
     });
     new EditSet()
-      .editAll(c.tabs, ns.tabs)
-      .deleteAllByID(c.cards, ps.columns[colID].items)
+      .editAll(c.tabs, ns.tabs, ps.tabs)
+      .deleteAllByID(c.cards, ps.columns[colID].items, ps.cards)
       .commit();
     return ns;
   },
@@ -178,7 +188,7 @@ const reducer = createReducer(loadingState, {
       s.columns[colID].edited = new Date().getTime();
     });
     new EditSet()
-      .edit(c.columns, ns.columns[colID])
+      .edit(c.columns, ns.columns[colID], ps.columns[colID])
       .commit();
     return ns;
   },
@@ -189,7 +199,7 @@ const reducer = createReducer(loadingState, {
       s.cards[cardID].edited = new Date().getTime();
     });
     new EditSet()
-      .edit(c.cards, ns.cards[cardID])
+      .edit(c.cards, ns.cards[cardID], ps.cards[cardID])
       .commit();
     return ns;
   },
@@ -207,8 +217,8 @@ const reducer = createReducer(loadingState, {
       delete s.cards[a.payload];
     });
     new EditSet()
-      .delete(c.cards, cardID)
-      .editAllByID(c.columns, ns.columns, colIDs)
+      .delete(c.cards, cardID, ps.cards[cardID])
+      .editAllByID(c.columns, ns.columns, colIDs, ps.columns)
       .commit();
     return ns;
   },
@@ -224,7 +234,7 @@ const reducer = createReducer(loadingState, {
     });
     new EditSet()
       .add(c.columns, column)
-      .edit(c.tabs, ns.tabs[tabID])
+      .edit(c.tabs, ns.tabs[tabID], ps.tabs[tabID])
       .commit();
     return ns;
   },
@@ -242,16 +252,16 @@ const reducer = createReducer(loadingState, {
       }
     });
     new EditSet()
-      .edit(c.cards, ns.cards[card.id])
-      .concat(() => {
+      .edit(c.cards, ns.cards[card.id], ps.cards[card.id])
+      .concatSimple((() => {
         // Update columns if changed
         const set = new EditSet();
         if (srcColID !== dstColID) {
-          set.edit(c.columns, ns.columns[srcColID]);
-          set.edit(c.columns, ns.columns[dstColID]);
+          set.edit(c.columns, ns.columns[srcColID], ps.columns[srcColID]);
+          set.edit(c.columns, ns.columns[dstColID], ps.columns[dstColID]);
         }
         return set;
-      })
+      })())
       .commit();
     return ns;
   },
@@ -271,10 +281,10 @@ const reducer = createReducer(loadingState, {
       s.tabOrder.splice(tabIdx, 1);
     });
     new EditSet()
-      .deleteAllByID(c.cards, cardIDs)
-      .deleteAllByID(c.columns, tab.columns)
-      .delete(c.tabs, tab.id)
-      .param(c.tabOrder, ns.tabOrder)
+      .deleteAllByID(c.cards, cardIDs, ps.cards)
+      .deleteAllByID(c.columns, tab.columns, ps.columns)
+      .delete(c.tabs, tab.id, tab)
+      .param(c.tabOrder, ns.tabOrder, ps.tabOrder)
       .commit();
     return ns;
   },
@@ -288,7 +298,7 @@ const reducer = createReducer(loadingState, {
     });
     new EditSet()
       .add(c.tabs, tab)
-      .param(c.tabOrder, ns.tabOrder)
+      .param(c.tabOrder, ns.tabOrder, ps.tabOrder)
       .commit();
     return ns;
   },
@@ -299,7 +309,7 @@ const reducer = createReducer(loadingState, {
       s.tabs[tabID].edited = new Date().getTime();
     });
     new EditSet()
-      .edit(c.tabs, ns.tabs[tabID])
+      .edit(c.tabs, ns.tabs[tabID], ps.tabs[tabID])
       .commit();
     return ns;
   },
@@ -314,7 +324,7 @@ const reducer = createReducer(loadingState, {
       s.tabs[tabID].edited = new Date().getTime();
     });
     new EditSet()
-      .edit(c.tabs, ns.tabs[tabID])
+      .edit(c.tabs, ns.tabs[tabID], ps.tabs[tabID])
       .commit();
     return ns;
   },
@@ -327,7 +337,7 @@ const reducer = createReducer(loadingState, {
       s.tabOrder.splice(dstIdx, 0, tabID);
     });
     new EditSet()
-      .param(c.tabOrder, ns.tabOrder)
+      .param(c.tabOrder, ns.tabOrder, ps.tabOrder)
       .commit();
     return ns;
   },
@@ -335,19 +345,22 @@ const reducer = createReducer(loadingState, {
     // Archived cards are deleted from memory but stored in IndexedDB and the Gist
     const colID = a.payload;
     const epochms = new Date().getTime();
+    // Detach cards from column, edit cards
     const ns = produce(ps, s => {
       s.columns[colID].items.forEach(cardID => {
         let card = s.cards[cardID];
         card.moved = card.edited = card.archived = epochms;
-        card.archivedFromColID = a.payload;
+        card.archivedFromColID = colID;
       });
       s.columns[colID].items = [];
       s.columns[colID].edited = epochms;
     });
+    // Commit only those changes
     new EditSet()
-      .editAllByID(c.cards, ns.cards, ns.columns[colID].items)
-      .edit(c.columns, ns.columns[colID])
+      .editAllByID(c.cards, ns.cards, ps.columns[colID].items, ps.cards)
+      .edit(c.columns, ns.columns[colID], ps.columns[colID])
       .commit();
+    // Delete references to cards (will be GC'd once the edits are cleared from the undo stack)
     const nns = produce(ns, s => {
       s.columns[colID].items.forEach(cardID => delete s.cards[cardID]);
     });
@@ -380,7 +393,7 @@ const reducer = createReducer(loadingState, {
       s.cards[zettel.id].edited = epochms;
     });
     new EditSet()
-      .edit(c.cards, zettel)
+      .edit(c.cards, zettel, ps.cards[zettel.id])
       .commit();
     return ns;
   },
@@ -391,8 +404,8 @@ const reducer = createReducer(loadingState, {
       delete s.cards[cardID];
     });
     new EditSet
-      .param(c.starredZettels, ns.starredZettels)
-      .delete(c.cards, cardID)
+      .param(c.starredZettels, ns.starredZettels, ps.starredZettels)
+      .delete(c.cards, cardID, ps.cards[cardID])
       .commit();
     return ns;
   },
@@ -406,7 +419,7 @@ const reducer = createReducer(loadingState, {
         deleteInList(s.starredZettels, cardID);
     });
     new EditSet()
-      .param(c.starredZettels, ns.starredZettels)
+      .param(c.starredZettels, ns.starredZettels, ps.starredZettels)
       .commit();
     return ns;
   },
@@ -426,7 +439,7 @@ const reducer = createReducer(loadingState, {
         });
     });
     new EditSet()
-      .edit(c.columns, ns.columns[colID])
+      .edit(c.columns, ns.columns[colID], ps.columns[colID])
       .commit();
     return ns;
   },
@@ -443,4 +456,7 @@ const reducer = createReducer(loadingState, {
 
 // Undoable reducer
 // TODO: does lazy loading break undo?
-export default undoable(reducer, {limit:20});
+export default undoable(reducer, {
+  limit: UNDO_LIMIT,         // Keep in sync with editSetBuffer max size
+  neverSkipReducer: true,    // So we can call commit(set.invert())
+});

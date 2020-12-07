@@ -11,6 +11,10 @@ export const objectMap = (object, mapFn) =>
     return result
   }, {});
 
+// Source: https://stackoverflow.com/a/52323412/4642943
+export const shallowEqual = (obj1, obj2) =>
+  Object.keys(obj1).length === Object.keys(obj2).length &&
+  Object.keys(obj1).every(key => obj1[key] === obj2[key]);
 
 export const deleteInList = (list, elem) => {
   let index = list.indexOf(elem);
@@ -61,14 +65,6 @@ export function createReducer (initialState, actionMap) {
   return (prevState = initialState, action) => {
     if (Object.prototype.hasOwnProperty.call(actionMap, action.type)) {
       const nextState = actionMap[action.type](prevState, action);
-
-      // BUG: prevState is the undo state { present, past, future }
-      // Whereas nextState is what we would expect
-      // Why does the initial state not work as expected either?
-      // console.log(initialState);
-      // console.log(prevState);
-      // console.log(nextState);
-
       if (!nextState)
         console.error(`Invalid state produced by createReducer for ${action.type}: ${nextState}`);
       return nextState;
