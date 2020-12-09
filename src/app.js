@@ -76,14 +76,12 @@ const Root = () => {
   const style = { height: "calc(100% - 48px)" };
 
   return (
-    <Provider store={store}>
-      <div id="jsx-root">
-        <div style={style}>
-          <ComponentsContainer active={active} setActive={setActive} />
-        </div>
-        <MenuBar active={active} setActive={setActive} />
+    <div id="jsx-root">
+      <div style={style}>
+        <ComponentsContainer active={active} setActive={setActive} />
       </div>
-    </Provider>
+      <MenuBar active={active} setActive={setActive} />
+    </div>
   );
 }
 

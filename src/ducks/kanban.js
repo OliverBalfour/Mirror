@@ -8,10 +8,10 @@
  */
 
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import undoable, { ActionTypes } from 'redux-undo';
+import undoable, { ActionTypes, excludeAction } from 'redux-undo';
 import produce from 'immer';
 import { generateID, objectMap, deleteInList, createReducer } from '../common';
-import { EditSet, load, namespaceNames as c, undoCommit, redoCommit, UNDO_LIMIT } from '../backends';
+import { EditSet, load, namespaceNames as c, hist, UNDO_LIMIT } from '../backends';
 
 // Action creators
 
@@ -106,11 +106,11 @@ const reducer = createReducer(loadingState, {
   // Invert the edit sets for IndexedDB and GitHub
   // Every other action clears the redo stack if present
   [ActionTypes.UNDO]: (ps, a) => {
-    undoCommit();
+    hist.undo.commit();
     return ps;
   },
   [ActionTypes.REDO]: (ps, a) => {
-    redoCommit();
+    hist.redo.commit();
     return ps;
   },
   [transferCard]: (ps, a) => {
@@ -342,7 +342,7 @@ const reducer = createReducer(loadingState, {
     return ns;
   },
   [archiveCardsInColumn]: (ps, a) => {
-    // Archived cards are deleted from memory but stored in IndexedDB and the Gist
+    // Archived cards are stored in IndexedDB and the Gist
     const colID = a.payload;
     const epochms = new Date().getTime();
     // Detach cards from column, edit cards
@@ -355,16 +355,11 @@ const reducer = createReducer(loadingState, {
       s.columns[colID].items = [];
       s.columns[colID].edited = epochms;
     });
-    // Commit only those changes
     new EditSet()
       .editAllByID(c.cards, ns.cards, ps.columns[colID].items, ps.cards)
       .edit(c.columns, ns.columns[colID], ps.columns[colID])
       .commit();
-    // Delete references to cards (will be GC'd once the edits are cleared from the undo stack)
-    const nns = produce(ns, s => {
-      s.columns[colID].items.forEach(cardID => delete s.cards[cardID]);
-    });
-    return nns;
+    return ns;
   },
   [addZettel]: (ps, a) => {
     const { zettel } = a.payload;
@@ -453,10 +448,38 @@ const reducer = createReducer(loadingState, {
   [loadZettel.rejected]: (ps, a) =>
     produce(ps, s => s.loadingZettel = a.payload),
 });
+// Actions which do not mutate external state and thus cannot be undone
+const undoBlacklist = [
+  unsafeSetState.type,
+  loadZettel.pending.type,
+  loadZettel.fulfilled.type,
+  loadZettel.rejected.type,
+];
 
 // Undoable reducer
-// TODO: does lazy loading break undo?
-export default undoable(reducer, {
-  limit: UNDO_LIMIT,         // Keep in sync with editSetBuffer max size
-  neverSkipReducer: true,    // So we can call commit(set.invert())
+const undoableReducer = undoable(reducer, {
+  // Keep in sync with editSetBuffer max size
+  limit: UNDO_LIMIT,
+  // So we can listen to UNDO events and call commit(set.invert())
+  neverSkipReducer: true,
+  filter: (action, currentState, previousHistory) => {
+    return undoBlacklist.indexOf(action.type) === -1;
+  }
 });
+
+export default (s, a) => {
+  if (a.type === ActionTypes.UNDO && !hist.undo.allowed())
+    return s;
+
+  if (a.type === ActionTypes.REDO && !hist.redo.allowed())
+    return s;
+
+  if (undoBlacklist.indexOf(a.type) !== -1) {
+    // Simulate undoable reducer
+    // We can't use the filter because the filter doesn't let us
+    // selectively stop undo from applying
+    return {...s, present: reducer(s.present, a)};
+  }
+
+  return undoableReducer(s, a);
+};

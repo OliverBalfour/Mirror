@@ -1,6 +1,5 @@
 
 import { configureStore } from '@reduxjs/toolkit';
-import thunk from 'redux-thunk';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
 import * as kanban from './ducks/kanban';
 import { objectMap } from './common';
@@ -10,7 +9,6 @@ const store = configureStore({
   // DEBUG:
   // reducer: (s, a) => { console.log(a); kanban.default(s, a) },
   reducer: kanban.default,
-  middleware: getDefault => getDefault().concat(thunk),
 });
 
 loadState().then(state => {

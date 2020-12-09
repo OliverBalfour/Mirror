@@ -4,33 +4,41 @@ import * as idb from './indexeddb';
 
 import EditSet from './edit-set';
 export const UNDO_LIMIT = 20;
-let editSetHistory = {
-  past: [],    // [oldest edit,  ..., 1 edit ago]
-  future: [],  // [1 edit ahead, ..., n edits ahead]
-}
 EditSet.prototype.commit = function () {
   commit(this);
-  editSetHistory.past.push(this);
-  if (editSetHistory.past.length > UNDO_LIMIT)
-    editSetHistory.past.shift();
+  hist.editSetHistory.past.push(this);
+  if (hist.editSetHistory.past.length > UNDO_LIMIT)
+    hist.editSetHistory.past.shift();
   // Clear the future for any state mutating actions
-  editSetHistory.future = [];
+  hist.editSetHistory.future = [];
 }
-const undoCommit = () => {
-  const set = editSetHistory.past.pop();
-  editSetHistory.future.unshift(set);
-  if (editSetHistory.future.length > UNDO_LIMIT)
-    editSetHistory.future.pop();
-  commit(set.invert());
-};
-const redoCommit = () => {
-  const set = editSetHistory.future.shift();
-  editSetHistory.past.push(set);
-  if (editSetHistory.past.length > UNDO_LIMIT)
-    editSetHistory.past.shift();
-  commit(set);
-};
-export { EditSet, undoCommit, redoCommit };
+const hist = {
+  editSetHistory: {
+    past: [],    // [oldest edit,  ..., 1 edit ago]
+    future: [],  // [1 edit ahead, ..., n edits ahead]
+  },
+  undo: {
+    allowed: () => hist.editSetHistory.past.length > 0,
+    commit: () => {
+      const set = hist.editSetHistory.past.pop();
+      hist.editSetHistory.future.unshift(set);
+      if (hist.editSetHistory.future.length > UNDO_LIMIT)
+        hist.editSetHistory.future.pop();
+      commit(set.invert());
+    },
+  },
+  redo: {
+    allowed: () => hist.editSetHistory.future.length > 0,
+    commit: () => {
+      const set = hist.editSetHistory.future.shift();
+      hist.editSetHistory.past.push(set);
+      if (hist.editSetHistory.past.length > UNDO_LIMIT)
+        hist.editSetHistory.past.shift();
+      commit(set);
+    }
+  }
+}
+export { EditSet, hist };
 
 export const namespaceNames = {
   cards: 'cards',
