@@ -6,7 +6,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import * as duck from '../ducks/kanban';
 import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
-import { Description, DateTime, EBS } from '../kanban/attributes';
+import { Description, DateTime, Duration } from '../kanban/attributes';
 import { ReloadProtect } from '../common';
 import { MarkdownBase } from './markdown-base';
 
@@ -112,7 +112,7 @@ export const CardEditDialog = ({ respond, card }) => {
           multiline rowsMax={3} value={newCard.content} onChange={e => setContent(e.target.value)} />
         <Description.Edit card={newCard} setCard={setCard} />
         <DateTime.Edit    card={newCard} setCard={setCard} />
-        <EBS.Edit         card={newCard} setCard={setCard} />
+        <Duration.Edit    card={newCard} setCard={setCard} />
       </DialogContent>
       <DialogActions>
         <Button onClick={deleteCard}>Delete</Button>

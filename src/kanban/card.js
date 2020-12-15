@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { selectors } from '../store';
 import { Draggable } from 'react-beautiful-dnd';
 import { Markdown } from '../components';
-import { Description, DateTime, EBS } from './attributes';
+import { Description, DateTime, Duration } from './attributes';
 
 export default React.memo(({ card, index, setEditingCard }) => {
   const cards = useSelector(selectors.boards.cards);
@@ -24,7 +24,7 @@ export default React.memo(({ card, index, setEditingCard }) => {
             <Markdown source={content} cards={cards} />
             <Description.Indicator card={card} />
             <DateTime.Indicator    card={card} />
-            <EBS.Indicator         card={card} />
+            <Duration.Indicator    card={card} />
           </div>
         )}
       </Draggable>

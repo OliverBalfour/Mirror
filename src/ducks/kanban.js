@@ -10,7 +10,7 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import undoable, { ActionTypes } from 'redux-undo';
 import produce from 'immer';
-import { generateID, objectMap, deleteInList, createReducer } from '../common';
+import { generateID, objectMap, deleteInList, createReducer, shallowEqual } from '../common';
 import { EditSet, load, namespaceNames as c, hist, UNDO_LIMIT } from '../backends';
 
 // Action creators
@@ -116,6 +116,8 @@ const reducer = createReducer(loadingState, {
   [transferCard]: (ps, a) => {
     const epochms = new Date().getTime();
     const { srcColID, dstColID, srcIndex, dstIndex } = a.payload;
+    if (srcColID === dstColID && srcIndex === dstIndex)
+      return ps;
     const cardID = ps.columns[srcColID].items[srcIndex];
     const ns = produce(ps, s => {
       s.columns[srcColID].items.splice(srcIndex, 1);
@@ -133,6 +135,8 @@ const reducer = createReducer(loadingState, {
   },
   [reorderCard]: (ps, a) => {
     const { colID, srcIndex, dstIndex } = a.payload;
+    if (srcIndex === dstIndex)
+      return ps;
     const epochms = new Date().getTime();
     const cardID = ps.columns[colID].items[srcIndex];
     const ns = produce(ps, s => {
@@ -183,6 +187,8 @@ const reducer = createReducer(loadingState, {
   },
   [renameColumn]: (ps, a) => {
     const { colID, name } = a.payload;
+    if (ps.columns[colID].name === name)
+      return ps;
     const ns = produce(ps, s => {
       s.columns[colID].name = name;
       s.columns[colID].edited = new Date().getTime();
@@ -194,6 +200,8 @@ const reducer = createReducer(loadingState, {
   },
   [editCardContent]: (ps, a) => {
     const { cardID, content } = a.payload;
+    if (ps.cards[cardID].content === content)
+      return ps;
     const ns = produce(ps, s => {
       s.cards[cardID].content = content;
       s.cards[cardID].edited = new Date().getTime();
@@ -240,6 +248,9 @@ const reducer = createReducer(loadingState, {
   },
   [editCard]: (ps, a) => {
     const { card, colID: dstColID } = a.payload;
+    // Assume card is a flat struct
+    if (shallowEqual(ps.cards[card.id], card))
+      return ps;
     const epochms = new Date().getTime();
     const srcColID = Object.keys(ps.columns).filter(colID => ps.columns[colID].items.indexOf(card.id) !== -1)[0];
     const ns = produce(ps, s => {
@@ -304,6 +315,8 @@ const reducer = createReducer(loadingState, {
   },
   [renameTab]: (ps, a) => {
     const { tabID, name } = a.payload;
+    if (ps.tabs[tabID].namd === name)
+      return ps;
     const ns = produce(ps, s => {
       s.tabs[tabID].name = name;
       s.tabs[tabID].edited = new Date().getTime();
@@ -330,6 +343,7 @@ const reducer = createReducer(loadingState, {
   },
   [moveTab]: (ps, a) => {
     const [srcIdx, dstIdx] = a.payload;
+    if (srcIdx === dstIdx) return ps;
     const tabID = ps.tabOrder[srcIdx];
     if (dstIdx < 0 || dstIdx >= ps.tabs.length) return ps;
     const ns = produce(ps, s => {
@@ -344,6 +358,7 @@ const reducer = createReducer(loadingState, {
   [archiveCardsInColumn]: (ps, a) => {
     // Archived cards are stored in IndexedDB and the Gist
     const colID = a.payload;
+    if (ps.columns[colID].items.length === 0) return ps;
     const epochms = new Date().getTime();
     // Detach cards from column, edit cards
     const ns = produce(ps, s => {
@@ -380,6 +395,7 @@ const reducer = createReducer(loadingState, {
   },
   [editZettel]: (ps, a) => {
     const { zettel } = a.payload;
+    if (shallowEqual(ps.cards[zettel.id], zettel)) return ps;
     const epochms = new Date().getTime();
     // editZettel will not add new zettels
     if (Object.keys(ps.cards).indexOf(zettel.id) === -1) return ps;
@@ -457,6 +473,8 @@ const undoBlacklist = [
 ];
 
 // Undoable reducer
+// Note that if an identical state is produced (via ===) the action is ignored
+// The app depends on this behaviour
 const undoableReducer = undoable(reducer, {
   // Keep in sync with editSetBuffer max size
   limit: UNDO_LIMIT,

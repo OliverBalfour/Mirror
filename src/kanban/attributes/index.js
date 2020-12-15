@@ -4,8 +4,8 @@ import { Chip, Button } from '@material-ui/core';
 
 import * as Description from './description';
 import * as DateTime from './datetime';
-import * as EBS from './ebs';
-export { Description, DateTime, EBS };
+import * as Duration from './duration';
+export { Description, DateTime, Duration };
 
 export const IndicatorBuilder = ({ icon, label, title, className }) =>
   <Chip size='small' icon={icon}
