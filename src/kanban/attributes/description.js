@@ -22,18 +22,42 @@ export const Edit = ({ card, setCard }) => {
       </AttributeHeader>
     );
 
+  const handleKeyDown = e => {
+    if (editingDescription) {
+      // Escape
+      if (e.which === 27) {
+        setEditingDescription(false);
+        // Don't escape the edit modal dialog
+        e.stopPropagation();
+      }
+    } else {
+      // Space and Enter while focused enable editing mode
+      if (document.activeElement === e.target) {
+        if ([32, 13].indexOf(e.which) !== -1) {
+          // Add a timeout to prevent the space/enter from being typed
+          setTimeout(() => setEditingDescription(true), 0);
+        }
+      }
+    }
+  };
+
   return !editingDescription ? (
-    <div style={{marginTop: 8}}>
-      <div onClick={() => setEditingDescription(true)}>
-        <InputLabel className="custom-label">Description</InputLabel>
-      </div>
-      <Markdown source={card.description} cards={cards} />
+    <div style={{marginTop: 8, overflow: 'auto'}}
+      >
+      <InputLabel className="custom-label"
+        onClick={() => setEditingDescription(true)}>
+        Description</InputLabel>
+      <Markdown source={card.description} cards={cards}
+        tabIndex='0' onKeyDown={handleKeyDown}
+        className="markdown-selectable markdown"
+        onDoubleClick={() => setEditingDescription(true)} />
     </div>
   ) : (
     <React.Fragment>
       <InputLabel className="custom-label">Description</InputLabel>
       <ClickAwayListener onClickAway={() => setEditingDescription(false)}>
-        <div style={{width:'100%',height:'100%'}}>
+        <div style={{width:'100%',height:'100%'}}
+          onKeyDown={handleKeyDown}>
           <AutocompleteEditor value={card.description} setValue={setDescription}
             autoFocus rows={6} rowsMax={24} />
         </div>

@@ -8,7 +8,7 @@
  */
 
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import undoable, { ActionTypes, excludeAction } from 'redux-undo';
+import undoable, { ActionTypes } from 'redux-undo';
 import produce from 'immer';
 import { generateID, objectMap, deleteInList, createReducer } from '../common';
 import { EditSet, load, namespaceNames as c, hist, UNDO_LIMIT } from '../backends';
