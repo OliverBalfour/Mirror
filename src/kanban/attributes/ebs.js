@@ -123,27 +123,27 @@ const computeEstimate = (s, historical) => {
 // Pretty print seconds in short form like 3600->1h, 6300->1h45m (no days or seconds)
 const prettySeconds = s => {
   if (typeof (s) === 'string') return s;
-  const hours = Math.floor(s / 3600);
+  const days = Math.floor(s / 86400);
+  const hours = Math.floor((s % 86400) / 3600);
   const minutes = Math.floor((s % 3600) / 60);
-  if (hours === 0 && minutes === 0) return '0';
-  return (hours ? hours + 'h' : '') + (minutes ? minutes + 'm' : '');
+  if (days === 0 && hours === 0 && minutes === 0) return '0m';
+  return (days ? days + 'd ' : '') + (hours ? hours + 'h ' : '') + (minutes ? minutes + 'm' : '');
 };
 
 // Inverse of prettySeconds; used so the input field can be edited in pretty form
 let unprettySeconds = s => {
-  if (s === '0') return 0;
-
-  // this parses it to [x,'1h', '30m'] if possible, or [x,'1h',undefined] or [x,undefined,'30m']
+  // this parses it to [x, '0d','1h', '30m'] if possible, or [x, undefined, '1h',undefined]
+  // or [x, undefined, undefined,'30m']
   // if only one is present, where x is irrelevant
-  let groups = (/^(\d+h|\d*\.\d+h)?(\d+m|\d*\.\d+m)?$/m).exec(s);
+  let groups = (/^(\d+d|\d*\.\d+d)?\s*(\d+h|\d*\.\d+h)?\s*(\d+m|\d*\.\d+m)?$/m).exec(s);
 
-  // check there are 3 matches where at least one of the latter two are defined
-  if (!groups || groups.length !== 3 || !groups.slice(1).filter(x=>x).length)
+  // check there are 4 matches where at least one of the latter 3 are defined
+  if (!groups || groups.length !== 4 || !groups.slice(1).filter(x=>x).length)
     return null;
   else groups = groups.slice(1);
 
   const pf = k => parseFloat(k.substring(0, k.length-1)); // "1.5h" -> 1.5
-  return 3600*pf(groups[0] || '00') + 60*pf(groups[1] || '00');
+  return 86400*pf(groups[0] || '0d') + 3600*pf(groups[1] || '0h') + 60*pf(groups[2] || '0m');
 };
 
 export const Indicator = ({ card }) => {
