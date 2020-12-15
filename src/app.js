@@ -8,7 +8,7 @@ import React from 'react';
 import { Provider, useSelector } from 'react-redux';
 import { useHashLocation, Hidden } from './common';
 
-import { MenuBar } from './components';
+import { MenuBar, LoadingScreen } from './components';
 import Kanban from './kanban';
 import Zettelkasten from './zettelkasten';
 import store, { globalSelectors as sel } from './store';
@@ -53,7 +53,7 @@ const Root = () => {
     setTabURLs(getScreenNames());
     setLoading(false);
   }
-  if (currentlyLoading) return <span>Loading...</span>;
+  if (currentlyLoading) return <LoadingScreen />;
   const setTabURL = (newURL, i, move) => {
     let newTabURLs = tabURLs.slice(0);
     newTabURLs[i] = newURL;
