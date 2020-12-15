@@ -149,6 +149,7 @@ export const AboutDialog = ({ open, respond }) => {
 export const GitHubLoginDialog = ({ open, respond }) => {
   const [token, setToken] = React.useState("");
   const [gistID, setGistID] = React.useState("");
+  const [username, setUsername] = React.useState("");
   return (
     <Dialog open={open} onClose={respond} fullWidth>
       <DialogTitle>Log in via GitHub</DialogTitle>
@@ -169,12 +170,15 @@ export const GitHubLoginDialog = ({ open, respond }) => {
         <InputLabel className="custom-label">Gist ID</InputLabel>
         <TextField margin="dense" fullWidth
           value={gistID} onChange={e => setGistID(e.target.value)} />
+        <InputLabel className="custom-label">GitHub Username</InputLabel>
+        <TextField margin="dense" fullWidth
+          value={username} onChange={e => setUsername(e.target.value)} />
       </DialogContent>
       <DialogActions>
         <Button onClick={() => respond(false)} color="primary">
           Cancel
         </Button>
-        <Button onClick={() => respond(token, gistID)} color="primary" variant="contained">
+        <Button onClick={() => respond(token, gistID, username)} color="primary" variant="contained">
           Log in
         </Button>
       </DialogActions>

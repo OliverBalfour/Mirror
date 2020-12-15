@@ -49,19 +49,27 @@ export const namespaceNames = {
 }
 
 export async function loadState () {
+  // Return only the IndexedDB state
+  // And load any new mutations to this state in the background
+  // TODO: load state async and have loading status indicator
+  // this needs to update IndexedDB and give the user an indication of when it's done
+  // TODO: this belongs somewhere else
+  if (localStorage["__GITHUB_TOKEN"])
+    localStorage["__GITHUB_GIST_LATEST_SHA"] = await ghb.getLatestSHA();
+  // localStorage["__GITHUB_GIST_CURRENT_SHA"]
   return await idb.loadState();
 }
 
-// TODO: save state should use edit sets instead of saving everything each edit
 export async function saveState (state) {
-  return await Promise.all([idb.saveState(state)]);
+  return await Promise.all([idb.saveState(state), ghb.saveState(state)]);
 }
 
 // Load tabOrder: await load('tabOrder')
 // Load card: await load('cards', cardID)
 export async function load (namespace, id = null) {
-  // Assumes the cache is up-to-date with the remote
-  return await idb.load(namespace, id);
+  const local = await idb.load(namespace, id);
+  if (local) return local;
+  return ghb.load(namespace, id);
 }
 
 // To avoid data races, we rate limit edits to 5s intervals where extra

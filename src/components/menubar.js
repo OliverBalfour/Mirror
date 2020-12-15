@@ -49,7 +49,7 @@ export default ({ active, setActive }) => {
         </Toolbar>
       </AppBar>
       <AboutDialog open={aboutOpen} respond={() => setAboutOpen(false)} />
-      <GitHubLoginDialog open={GHOpen} respond={(token, gistID) => {
+      <GitHubLoginDialog open={GHOpen} respond={(token, gistID, username) => {
         setGHOpen(false);
         if (token !== false) {
           // This is fairly insecure, especially given there are possible XSS vulnerabilities
@@ -57,6 +57,7 @@ export default ({ active, setActive }) => {
           // once security becomes a bigger concern.
           localStorage["__GITHUB_TOKEN"] = token;
           localStorage["__GITHUB_GIST_ID"] = gistID;
+          localStorage["__GITHUB_USERNAME"] = username;
           if (window.__GHLoggedIn) window.__GHLoggedIn();
         }
       }} />

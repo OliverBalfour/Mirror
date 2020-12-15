@@ -1,4 +1,12 @@
 
+/**
+ * GitHub Gist backend for synchronisation between clients
+ *
+ * Any discrepancies in the exported functions are due to API
+ * limitations
+ */
+
+// GitHub API client dynamic import
 const getOctokit = () => import("@octokit/rest").then(({ Octokit }) =>
   new Octokit({
     auth: localStorage["__GITHUB_TOKEN"],
@@ -57,12 +65,15 @@ function compileEditSet (editSet) {
 }
 
 function getEditFilename (edit) {
-  if (edit.namespace === 'cards')
-    return edit.object.id + '.md';
-  else if (edit.type === 'param')
-    return edit.namespace + '.md';
+  return getFilename(edit.namespace, edit.object ? edit.object.id : null);
+}
+function getFilename (namespace, id = null) {
+  if (namespace === 'cards')
+    return `${id}.md`;
+  else if (id)
+    return `${namespace}.${id}.md`;
   else
-    return edit.namespace + '.' + edit.object.id + '.md';
+    return `${namespace}.md`;
 }
 
 function serializeObject (object) {
@@ -105,4 +116,32 @@ const initialiseGitHubClient = () => {
 window.__GHLoggedIn = initialiseGitHubClient;
 if (localStorage["__GITHUB_TOKEN"]) {
   window.__GHLoggedIn();
+}
+
+// TODO: save initial state, or save state after logging in
+export const saveState = async state => null;
+
+async function get (filename) {
+  // There is an undocumented endpoint for accessing raw files here:
+  // https://gist.githubusercontent.com/:user/:id/raw/:sha/:filename
+  const username = localStorage["__GITHUB_USERNAME"];
+  const id = localStorage["__GITHUB_GIST_ID"];
+  const sha = localStorage["__GITHUB_GIST_LATEST_SHA"];
+  const endpoint = `https://gist.githubusercontent.com/${username}/${id}/raw/${sha}/${filename}`;
+  const res = await fetch(endpoint);
+  return deserializeObject(res.text());
+}
+
+export async function load (namespace, id = null) {
+  try {
+    return await get(getFilename(namespace, id));
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function getLatestSHA () {
+  const gh = await getOctokit();
+  const commits = await gh.gists.listCommits({ gist_id: localStorage["__GITHUB_GIST_ID"], per_page: 1 });
+  return commits[0].version;
 }
