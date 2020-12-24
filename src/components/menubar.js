@@ -8,6 +8,8 @@
  */
 
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import * as duck from '../ducks/kanban';
 import { AppBar, Toolbar, IconButton, Tabs, Tab } from '@material-ui/core';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
@@ -16,10 +18,15 @@ import PopoverMenu from './popovermenu';
 import { downloadData } from '../common';
 import { UndoRedo } from '../components';
 import { AboutDialog, GitHubLoginDialog } from './dialogs';
+import { config, postLogIn } from '../backends/github';
+
+const noop = () => '';
+const emailAddress = 'leolalor1+mirrorsupport'+noop()+'@googlemail'+noop()+'.com';
 
 export default ({ active, setActive }) => {
   const [aboutOpen, setAboutOpen] = React.useState(false);
   const [GHOpen, setGHOpen] = React.useState(false);
+  const dispatch = useDispatch();
   return (
     <React.Fragment>
       <AppBar color="primary" style={{ top: 'auto', bottom: 0 }}>
@@ -35,7 +42,7 @@ export default ({ active, setActive }) => {
           <UndoRedo />
           <PopoverMenu map={{
             // eslint-disable-next-line
-            "Submit feedback": () => window.open('mailto'+':oliver.'+'leo.balfour+mirrorsupport'+'@googlemail'+'.com', '_blank'),
+            "Submit feedback": () => window.open(`mailto:${emailAddress}`, '_blank'),
             "About": () => setAboutOpen(true),
             "Login via GitHub": () => setGHOpen(true),
             "Clear saved state": () => window.prompt("Delete all saved state? Pressing undo will fix this. Type YES to confirm", "NO") === "YES" && localStorage.clear(),
@@ -49,16 +56,13 @@ export default ({ active, setActive }) => {
         </Toolbar>
       </AppBar>
       <AboutDialog open={aboutOpen} respond={() => setAboutOpen(false)} />
-      <GitHubLoginDialog open={GHOpen} respond={(token, gistID, username) => {
+      <GitHubLoginDialog open={GHOpen} respond={(token, gist_id, username) => {
         setGHOpen(false);
         if (token !== false) {
-          // This is fairly insecure, especially given there are possible XSS vulnerabilities
-          // See https://stackoverflow.com/a/58467408/4642943 for alternatives
-          // once security becomes a bigger concern.
-          localStorage["__GITHUB_TOKEN"] = token;
-          localStorage["__GITHUB_GIST_ID"] = gistID;
-          localStorage["__GITHUB_USERNAME"] = username;
-          if (window.__GHLoggedIn) window.__GHLoggedIn();
+          config.token = token;
+          config.gist_id = gist_id;
+          config.username = username;
+          postLogIn().then(state => dispatch(duck.overwriteState(state)));
         }
       }} />
     </React.Fragment>

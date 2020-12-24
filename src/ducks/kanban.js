@@ -10,12 +10,16 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import undoable, { ActionTypes } from 'redux-undo';
 import produce from 'immer';
-import { generateID, objectMap, deleteInList, createReducer, shallowEqual } from '../common';
+import { generateID, objectMap, deleteInList, createReducer, shallowEqual,
+  structuredClone, overwriteObject } from '../common';
 import { EditSet, load, namespaceNames as c, hist, UNDO_LIMIT } from '../backends';
 
 // Action creators
 
 export const unsafeSetState = createAction('mirror/SET_STATE');  // Used for async initial state
+// TODO: how should overwriteState be treated by undo/redo?
+// Used to overwrite local data with updates from remote
+export const overwriteState = createAction('mirror/OVERWRITE_STATE');
 
 export const transferCard = createAction('kanban/TRANSFER_CARD');
 export const reorderCard = createAction('kanban/REORDER_CARD');
@@ -103,6 +107,14 @@ const reducer = createReducer(loadingState, {
   // Only used for updating the initial state from the loading state
   // Makes no changes to the remote (pure functional reducer)
   [unsafeSetState]: (ps, a) => a.payload,
+  // Update the state, for loading remote state on top of existing state
+  // This does not copy everything into memory, it only overwrites existing state keys
+  [overwriteState]: (ps, a) => {
+    if (JSON.stringify(a.payload) === "{}") return ps;
+    const ns = structuredClone(ps);
+    overwriteObject(ns, a.payload);
+    return ns;
+  },
   // Invert the edit sets for IndexedDB and GitHub
   // Every other action clears the redo stack if present
   [ActionTypes.UNDO]: (ps, a) => {

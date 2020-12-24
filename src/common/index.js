@@ -22,6 +22,26 @@ export const deleteInList = (list, elem) => {
   return index !== -1;
 };
 
+// Deep copy synchronously via structured clone algorithm
+// Source: https://twitter.com/DasSurma/status/955484341358022657
+export const structuredClone = obj => {
+  const oldState = window.history.state;
+  window.history.replaceState(obj, window.title);
+  const copy = window.history.state;
+  window.history.replaceState(oldState, window.title);
+  return copy;
+};
+
+// Overwrite properties in a with those in b, recursively for deeply nested objects
+export const overwriteObject = (src, diff) => {
+  for (let key in diff)
+    if (Object.prototype.hasOwnProperty.call(src, key) && src[key])
+      if (typeof src[key] === 'object')
+        src[key] = overwriteObject(src[key], diff[key]);
+      else
+        src[key] = diff[key];
+};
+
 // Web: Download content as filename with specificed MIME type
 export const downloadData = (content, filename, type) => {
   if(!type) type = 'application/octet-stream';

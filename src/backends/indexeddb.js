@@ -51,6 +51,7 @@ const getAllInNamespace = (state, namespace, whitelist = null) => {
 
 async function loadIDBState () {
   const state = {
+  // TODO: shallowNamespaces, standaloneNamespaces
     tabOrder: await get('mirror.tabOrder'),
     starredZettels: await get('mirror.starredZettels') || [],
     cards: {},
@@ -88,8 +89,8 @@ function loadLegacyLocalStorageState () {
 export async function saveState (state) {
   try {
     if (!state || state.loading) return;
+    // TODO: shallowNamespaces, standaloneNamespaces
     set('mirror.tabOrder', state.tabOrder);
-    console.log(state.tabOrder);
     set('mirror.starredZettels', state.starredZettels);
     let namespaces = ['cards', 'columns', 'tabs'];
     let promises = [];
@@ -143,5 +144,11 @@ export async function commit (editSet) {
 window.deleteAllState = async () => {
   let res = await Promise.all(idbKeys.map(key => del(key)));
   idbKeys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith('__GITHUB')) {
+      delete localStorage[key];
+    }
+  }
   return res;
 };

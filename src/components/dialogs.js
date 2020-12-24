@@ -131,7 +131,7 @@ export const AboutDialog = ({ open, respond }) => {
         <DialogContentText>
           A free and open source personal task management and note taking app.<br/>
 
-          Made by Oliver Balfour. &copy; 2020.<br/>
+          Made by Oliver Balfour. &copy; 2020-2021.<br/>
 
           App icon is <a href="https://thenounproject.com/term/mirror/340140/">Mirror</a>&nbsp;
           by Lastspark from <a href="http://thenounproject.com/">The Noun Project</a>.
@@ -160,19 +160,21 @@ export const GitHubLoginDialog = ({ open, respond }) => {
             the \`gist\` permission and save it somewhere safe. Then, go to
             [gist.github.com](https://gist.github.com) and create a new Gist
             with any title and add one file, \`main.md\`, with any contents.
-            Then click "Create secret gist". Copy the ID from the URL. In the
-            main popup menu (three dots in bottom right) select "Login via
-            GitHub" and enter your token and the gist ID.`} />
+            Then click "Create secret gist" and copy the gist ID from the URL.
+            Enter your token, gist ID and username below.`} />
         </DialogContentText>
-        <InputLabel className="custom-label">GitHub access token</InputLabel>
-        <TextField margin="dense" autoFocus fullWidth
-          value={token} onChange={e => setToken(e.target.value)} />
-        <InputLabel className="custom-label">Gist ID</InputLabel>
-        <TextField margin="dense" fullWidth
-          value={gistID} onChange={e => setGistID(e.target.value)} />
         <InputLabel className="custom-label">GitHub Username</InputLabel>
         <TextField margin="dense" fullWidth
-          value={username} onChange={e => setUsername(e.target.value)} />
+          value={username} onChange={e => setUsername(e.target.value)}
+          autoComplete="username" />
+        <InputLabel className="custom-label">Gist ID</InputLabel>
+        <TextField margin="dense" fullWidth
+          value={gistID} onChange={e => setGistID(e.target.value)}
+          autoComplete="off" />
+        <InputLabel className="custom-label">GitHub access token</InputLabel>
+        <TextField margin="dense" autoFocus fullWidth
+          value={token} onChange={e => setToken(e.target.value)}
+          type="password" autoComplete="current-password" />
       </DialogContent>
       <DialogActions>
         <Button onClick={() => respond(false)} color="primary">

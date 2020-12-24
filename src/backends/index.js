@@ -48,16 +48,29 @@ export const namespaceNames = {
   starredZettels: 'starredZettels',
 }
 
+// Namespaces that are not objects but not necessarily primitives
+export const standaloneNamespaces = [
+  'tabOrder',
+  'starredZettels',
+];
+
+// Namespaces that are dictionaries of depth one
+export const shallowNamespaces = [
+  'cards',
+  'columns',
+  'tabs',
+];
+
 export async function loadState () {
   // Return only the IndexedDB state
   // And load any new mutations to this state in the background
-  // TODO: load state async and have loading status indicator
+  // TODO: load state async and have loading status indicator rather than blocking
   // this needs to update IndexedDB and give the user an indication of when it's done
-  // TODO: this belongs somewhere else
-  if (localStorage["__GITHUB_TOKEN"])
-    localStorage["__GITHUB_GIST_LATEST_SHA"] = await ghb.getLatestSHA();
-  // localStorage["__GITHUB_GIST_CURRENT_SHA"]
-  return await idb.loadState();
+  let state = await idb.loadState();
+  if (ghb.loggedIn()) {
+    state = { ...state, ...await ghb.synchroniseState() };
+  }
+  return state;
 }
 
 export async function saveState (state) {
@@ -83,7 +96,7 @@ const commit = editSet => new Promise((resolve, reject) => {
   const promises = [
     idb.commit(editSet)
   ];
-  if (localStorage["__GITHUB_TOKEN"]) {
+  if (ghb.loggedIn()) {
     if (!timer) {
       promises.push(ghb.commit(editSet));
       timer = setTimeout(() => {
