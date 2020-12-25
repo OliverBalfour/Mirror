@@ -19,13 +19,7 @@ const getURLPart = (str, n) =>
   str.split("/").filter(s=>s.length)[n < 0 ? str.length + n : n];
 const getScreen = loc =>
   Math.max(baseTabNames.indexOf(getURLPart(loc, 0)), 0);
-const getScreenNames = () => {
-  let screenNames = ["/boards/", "/notes/main"];
-  // boards get special treatment of /boards/FIRST_TAB
-  const state = sel.boards(store.getState());
-  screenNames[0] += state.tabs[state.tabOrder[0]].name.toLowerCase();
-  return screenNames;
-}
+const getScreenNames = () => ["/boards/", "/notes/main"];
 
 const ComponentsContainer = ({ active, setActive }) => {
   return (

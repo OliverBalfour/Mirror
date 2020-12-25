@@ -8,9 +8,7 @@
 
 // IndexedDB wrapper with a simple async key-value storage API
 import { get, set, keys, del } from 'idb-keyval';
-import { generateInitialState } from './index';
-
-let idbKeys = [];
+import { generateInitialState, standaloneNamespaces, shallowNamespaces } from './index';
 
 export async function loadState () {
   const initial = async () => {
@@ -18,7 +16,7 @@ export async function loadState () {
     await saveState(s);
     return s;
   };
-  idbKeys = await keys();
+  const idbKeys = await keys();
   if (!idbKeys.length) {
     let state = loadLegacyLocalStorageState();
     if (state) return state;
@@ -32,32 +30,31 @@ export async function loadState () {
   }
 }
 
-const getAllInNamespace = (state, namespace, whitelist = null) => {
+const getAllInNamespace = async (state, namespace, whitelist = null) => {
   let promises = [];
-  let namespaces = ['cards', 'columns', 'tabs'];
-  for (let key of idbKeys) {
+  for (let key of await keys()) {
     let chunks = key.split('.');
-    let namespaceIndex = namespaces.indexOf(chunks[1]);
-    if (namespaceIndex !== -1) {
+    if (chunks[1] === namespace) {
       let id = chunks[2];
       if (whitelist && whitelist.indexOf(id) === -1) continue;
       promises.push(
-        get(key).then(key => state[namespaces[namespaceIndex]][id] = key)
+        get(key).then(key => state[namespace][id] = key)
       );
     }
   }
-  return Promise.all(promises).then(() => state);
+  await Promise.all(promises);
+  return state;
 }
 
 async function loadIDBState () {
   const state = {
-  // TODO: shallowNamespaces, standaloneNamespaces
-    tabOrder: await get('mirror.tabOrder'),
-    starredZettels: await get('mirror.starredZettels') || [],
     cards: {},
     columns: {},
     tabs: {},
   };
+  for (let key of standaloneNamespaces) {
+    state[key] = await get(`mirror.${key}`) || [];
+  }
   let promises = [
     getAllInNamespace(state, 'tabs'),
     getAllInNamespace(state, 'columns').then(() => {
@@ -89,12 +86,12 @@ function loadLegacyLocalStorageState () {
 export async function saveState (state) {
   try {
     if (!state || state.loading) return;
-    // TODO: shallowNamespaces, standaloneNamespaces
-    set('mirror.tabOrder', state.tabOrder);
-    set('mirror.starredZettels', state.starredZettels);
-    let namespaces = ['cards', 'columns', 'tabs'];
+    await set('mirror.starredZettels', []);
+    for (let key of standaloneNamespaces) {
+      await set(`mirror.${key}`, state[key]);
+    }
     let promises = [];
-    for (let namespace of namespaces) {
+    for (let namespace of shallowNamespaces) {
       for (let id in state[namespace]) {
         promises.push(
           set(`mirror.${namespace}.${id}`, state[namespace][id])
@@ -120,7 +117,6 @@ export async function load (namespace, id = null) {
 }
 
 export async function commit (editSet) {
-  // needs to update idbKeys
   const promises = [];
   for (let edit of editSet.set) {
     switch (edit.type) {
@@ -142,9 +138,8 @@ export async function commit (editSet) {
 
 // For manual intervention of corrupted state
 window.deleteAllState = async () => {
-  let res = await Promise.all(idbKeys.map(key => del(key)));
-  idbKeys = [];
-  for (let i = 0; i < localStorage.length; i++) {
+  let res = await Promise.all((await keys()).map(key => del(key)));
+  for (let i = localStorage.length - 1; i >= 0; i--) {
     const key = localStorage.key(i);
     if (key.startsWith('__GITHUB')) {
       delete localStorage[key];
@@ -152,3 +147,8 @@ window.deleteAllState = async () => {
   }
   return res;
 };
+
+window.__idb = { get, set, keys, del };
+window.__idb.getAll = async () => Promise.all(
+  (await window.__idb.keys()).map(async x => [x, await window.__idb.get(x)])
+);

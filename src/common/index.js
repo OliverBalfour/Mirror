@@ -32,15 +32,26 @@ export const structuredClone = obj => {
   return copy;
 };
 
-// Overwrite properties in a with those in b, recursively for deeply nested objects
-export const overwriteObject = (src, diff) => {
-  for (let key in diff)
-    if (Object.prototype.hasOwnProperty.call(src, key) && src[key])
-      if (typeof src[key] === 'object')
-        src[key] = overwriteObject(src[key], diff[key]);
-      else
-        src[key] = diff[key];
-};
+// Deep merge two objects
+// Source: https://stackoverflow.com/a/34749873/4642943
+export function isObject(item) {
+  return (item && typeof item === 'object' && !Array.isArray(item));
+}
+export function mergeDeep(target, ...sources) {
+  if (!sources.length) return target;
+  const source = sources.shift();
+  if (isObject(target) && isObject(source)) {
+    for (const key in source) {
+      if (isObject(source[key])) {
+        if (!target[key]) Object.assign(target, { [key]: {} });
+        mergeDeep(target[key], source[key]);
+      } else {
+        Object.assign(target, { [key]: source[key] });
+      }
+    }
+  }
+  return mergeDeep(target, ...sources);
+}
 
 // Web: Download content as filename with specificed MIME type
 export const downloadData = (content, filename, type) => {

@@ -119,19 +119,22 @@ function serializeObject (object) {
   let frontmatter = [];
   for (let key in object) {
     if (specialKeys.indexOf(key) === -1) {
-      frontmatter.push(`${key}: ${JSON.stringify(object[key])}`);
+      const value = key === 'time' ? new Date(object[key]).getTime() : JSON.stringify(object[key]);
+      frontmatter.push(`${key}: ${value}`);
     }
   }
-  let serialized = `---\n${frontmatter}\n---\n`;
+  let serialized = `---\n${frontmatter.join('\n')}\n---\n`;
   if (object.description) serialized += object.description;
   return serialized;
 }
 
 function deserializeObject (markdown) {
   const object = {};
-  const [ , frontmatter, description] = markdown.split('---');
+  const [start , frontmatter, description] = markdown.split('---');
+  if (!frontmatter) return JSON.parse(start);
   frontmatter.split('\n').filter(str => str.trim().length).forEach(str => {
-    const [key, leftPaddedValue] = str.split(':');
+    const [key, ...leftPaddedValues] = str.split(':');
+    const leftPaddedValue = leftPaddedValues.join(':');
     // Need to be careful with these objects; if someone edits a GitHub Gist
     // file to include "hasOwnProperty: 0" it could cause a crash
     object[key] = JSON.parse(leftPaddedValue.trimStart());
@@ -152,15 +155,20 @@ export async function postLogIn () {
   // that is not overwritten.
 
     // SHA must be set prior to calling `get`
-  config.sha.current = config.sha.latest = await getLatestSHA();
+  config.sha.latest = await getLatestSHA();
   const hasLoggedInBefore = (await get('__logged_in', false)).status !== 404;
 
+  console.log('Logging in. Has ' + (hasLoggedInBefore ? '' : 'not ') + 'logged in before.');
+
   if (hasLoggedInBefore) {
-    return synchroniseState();
+    const state = await synchroniseState();
+    console.log('Finished loading and caching remote state.');
+    return state;
   } else {
     await set('__logged_in', 'true');
     // Updates SHAs
     await saveState(await idb.loadState());
+    console.log('Finished writing local state to remote.');
     return {};
   }
 }
@@ -168,9 +176,14 @@ export async function postLogIn () {
 // Call on app initialisation and periodically thereafter
 export const synchroniseState = async () => {
   config.sha.latest = await getLatestSHA();
+  if (config.sha.latest === config.sha.current) {
+    console.log('No state updates required');
+    return {};
+  }
   const files = await getAllModifiedFiles();
   const diff = getDiffObject(files);
   await idb.saveState(diff);
+  console.log(`Updated local state: ${(config.sha.current || 'none').substring(0, 10)}..${config.sha.latest.substring(0, 10)}`);
   config.sha.current = config.sha.latest;
   return diff;
 }
@@ -276,24 +289,27 @@ async function getAllModifiedFiles () {
   const files = {};
   let i = SHAs.length;
   while (i --> 0) {
-    const revision = getGistRevision(SHAs[i]);
+    const revision = await getGistRevision(SHAs[i]);
     for (let file in revision) {
+      if (file === '__logged_in') continue;
       files[file] = revision[file].content;
     }
   }
   return files;
 }
 
-async function getDiffObject (files) {
+function getDiffObject (files) {
   const diff = {};
   for (let filename in files) {
+    const object = deserializeObject(files[filename]);
+    // The object may be stored in a deep hierarchy
     const path = getObjectPath(filename);
     let ptr = diff;
-    for (let layer of path) {
+    for (let layer of path.slice(0, -1)) {
       ptr[layer] = ptr[layer] || {};
       ptr = ptr[layer];
     }
-    ptr[path[path.length - 1]] = files[filename];
+    ptr[path[path.length - 1]] = object;
   }
   return diff;
 }
