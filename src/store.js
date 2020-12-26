@@ -11,7 +11,8 @@ const store = configureStore({
   reducer: kanban.default,
 });
 
-loadState().then(state => {
+// Load state. Ignore lazy loading for now.
+loadState(true).then(state => {
   store.dispatch(kanban.unsafeSetState(state));
 });
 

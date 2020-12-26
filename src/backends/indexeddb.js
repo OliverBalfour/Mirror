@@ -10,7 +10,8 @@
 import { get, set, keys, del } from 'idb-keyval';
 import { generateInitialState, standaloneNamespaces, shallowNamespaces } from './index';
 
-export async function loadState () {
+// If loadAll is false, zettels other than main are not loaded (need lazy loading)
+export async function loadState (loadAll = true) {
   const initial = async () => {
     const state = await generateInitialState();
     await saveState(state);
@@ -26,7 +27,7 @@ export async function loadState () {
     return await initial();
   }
   try {
-    return await loadIDBState();
+    return await loadIDBState(loadAll);
   } catch (e) {
     console.error(e);
     return await initial();
@@ -49,7 +50,7 @@ const getAllInNamespace = async (state, namespace, whitelist = null) => {
   return state;
 }
 
-async function loadIDBState () {
+async function loadIDBState (loadAll = true) {
   const state = {
     cards: {},
     columns: {},
@@ -61,12 +62,16 @@ async function loadIDBState () {
   let promises = [
     getAllInNamespace(state, 'tabs'),
     getAllInNamespace(state, 'columns').then(() => {
-      // Only load cards in the Kanban boards and the main Zettelkasten note
-      let whitelist = ['main'];
-      for (let colID in state.columns) {
-        whitelist.push(...state.columns[colID].items);
+      if (!loadAll) {
+        // Only load cards in the Kanban boards and the main Zettelkasten note
+        let whitelist = ['main'];
+        for (let colID in state.columns) {
+          whitelist.push(...state.columns[colID].items);
+        }
+        return getAllInNamespace(state, 'cards', whitelist);
+      } else {
+        return getAllInNamespace(state, 'cards');
       }
-      return getAllInNamespace(state, 'cards', whitelist);
     })
   ];
   await Promise.all(promises);

@@ -61,12 +61,11 @@ export const shallowNamespaces = [
   'tabs',
 ];
 
-export async function loadState () {
-  // Return only the IndexedDB state
-  // And load any new mutations to this state in the background
+export async function loadState (loadAll = true) {
+  // Return the IndexedDB state with GitHub mutations too
   // TODO: load state async and have loading status indicator rather than blocking
-  // this needs to update IndexedDB and give the user an indication of when it's done
-  let state = await idb.loadState();
+  // this needs to give the user an indication of when it's done
+  let state = await idb.loadState(loadAll);
   if (ghb.loggedIn()) {
     state = { ...state, ...await ghb.synchroniseState() };
   }

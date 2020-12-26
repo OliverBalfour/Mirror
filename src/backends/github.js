@@ -6,7 +6,7 @@
  * limitations
  */
 
-import { standaloneNamespaces, shallowNamespaces, EditSet } from './';
+import { standaloneNamespaces, shallowNamespaces, namespaceNames, EditSet } from './';
 import * as idb from './indexeddb';
 
 // GitHub API client dynamic import (memoised)
@@ -177,6 +177,11 @@ export async function postLogIn () {
   return state;
 }
 
+export const forcePush = async () => {
+  await saveState(await idb.loadState());
+  console.log('Finished force pushing local state to remote.');
+}
+
 // Call on app initialisation and periodically thereafter
 export const synchroniseState = async () => {
   config.sha.latest = await getLatestSHA();
@@ -308,7 +313,16 @@ async function getAllModifiedFiles () {
 function getDiffObject (files) {
   const diff = {};
   for (let filename in files) {
-    const object = deserializeObject(files[filename]);
+    // Ignore extraneous files
+    if (!Object.prototype.hasOwnProperty.call(namespaceNames, filename.split('.')[0]))
+      continue;
+    let object;
+    try {
+      object = deserializeObject(files[filename]);
+    } catch (e) {
+      console.error(e);
+      continue;
+    }
     // The object may be stored in a deep hierarchy
     const path = getObjectPath(filename);
     let ptr = diff;
