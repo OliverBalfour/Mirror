@@ -94,9 +94,11 @@ function loadLegacyLocalStorageState () {
 export async function saveState (state) {
   try {
     if (!state || state.loading) return;
-    await set('mirror.starredZettels', []);
+    if (await get('mirror.starredZettels') == null)
+      await set('mirror.starredZettels', []);
     for (let key of standaloneNamespaces) {
-      await set(`mirror.${key}`, state[key]);
+      if (Object.prototype.hasOwnPrototype.call(state, key))
+        await set(`mirror.${key}`, state[key]);
     }
     let promises = [];
     for (let namespace of shallowNamespaces) {

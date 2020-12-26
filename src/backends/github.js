@@ -228,6 +228,7 @@ async function get (filename, deserialize = true) {
 // Warning: this will change the remote latest commit SHA
 // but not update it locally. Call updateLatestSHA if needed.
 async function set (filename, content) {
+  if (content.length === 0) content = 'null';
   const files = { [filename]: { filename, content } };
   const gh = await getOctokit();
   await gh.request('PATCH /gists/{gist_id}', {
