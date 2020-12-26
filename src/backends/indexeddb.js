@@ -97,7 +97,7 @@ export async function saveState (state) {
     if (await get('mirror.starredZettels') == null)
       await set('mirror.starredZettels', []);
     for (let key of standaloneNamespaces) {
-      if (Object.prototype.hasOwnPrototype.call(state, key))
+      if (Object.prototype.hasOwnProperty.call(state, key))
         await set(`mirror.${key}`, state[key]);
     }
     let promises = [];

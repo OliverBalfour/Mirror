@@ -10,7 +10,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import * as duck from '../ducks/kanban';
-import { loggedIn, logOut, forcePush } from '../backends/github';
+import { loggedIn, logOut, forcePush, forcePull } from '../backends/github';
 import { AppBar, Toolbar, IconButton, Tabs, Tab } from '@material-ui/core';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
@@ -29,7 +29,9 @@ export default ({ active, setActive }) => {
   const dispatch = useDispatch();
 
   const githubItem = () => loggedIn()
-    ? { "Log out of GitHub": logOut, "Force push to GitHub": forcePush }
+    ? { "Log out of GitHub": logOut,
+        "Force push to GitHub": forcePush,
+        "Force pull from GitHub": forcePull }
     : { "Log in via GitHub": () => setGHOpen(true) };
 
   const menuItems = {

@@ -182,6 +182,16 @@ export const forcePush = async () => {
   console.log('Finished force pushing local state to remote.');
 }
 
+export const forcePull = async () => {
+  const allSHAs = await getNewCommitSHAs(null);
+  const files = await getAllModifiedFiles(allSHAs);
+  const diff = getDiffObject(files);
+  await idb.saveState(diff);
+  config.sha.current = config.sha.latest = allSHAs[0];
+  console.log(`Reset local state to ${config.sha.current.substring(0, 10)}`);
+  window.location.reload();
+}
+
 // Call on app initialisation and periodically thereafter
 export const synchroniseState = async () => {
   config.sha.latest = await getLatestSHA();
@@ -261,9 +271,8 @@ async function updateLatestSHA () {
 }
 
 // Returns a list of commits in order of newest to oldest since the last known commit
-export async function getNewCommitSHAs () {
+export async function getNewCommitSHAs (since = config.sha.current) {
   const gh = await getOctokit();
-  const SHA = config.sha.current;
   const SHAs = [];
   let page_no = 1;
   while (page_no < 100) {
@@ -275,7 +284,7 @@ export async function getNewCommitSHAs () {
     if (commits.length === 0) break;
     for (let commit of commits) {
       const { version } = commit;
-      if (SHA === version) break;
+      if (since === version) break;
       SHAs.push(version);
     }
     page_no++;
@@ -297,8 +306,8 @@ async function getGistRevision (sha) {
 
 // Returns a dict with key = filename, value = contents
 // Assumes no truncation, does not handle errors
-async function getAllModifiedFiles () {
-  const SHAs = await getNewCommitSHAs();
+async function getAllModifiedFiles (SHAs = null) {
+  if (!SHAs) SHAs = await getNewCommitSHAs();
   const files = {};
   let i = SHAs.length;
   while (i --> 0) {
