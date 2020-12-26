@@ -8,8 +8,8 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
 import { PopoverMenu, ConfirmDialog, PromptDialog } from '../components';
 
-// header name, add button, chips for each addon (WIP limit, EBS time estimate, etc), menu button
-export default ({ col, add, menu }) => {
+// header name, add button, chips for each addon (WIP limit, EBS time estimate, etc)
+export default ({ col, add }) => {
   const dispatch = useDispatch();
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);

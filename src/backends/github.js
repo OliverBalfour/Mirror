@@ -6,7 +6,7 @@
  * limitations
  */
 
-import { standaloneNamespaces, shallowNamespaces, namespaceNames, EditSet } from './';
+import { standaloneNamespaces, shallowNamespaces, EditSet } from './';
 import * as idb from './indexeddb';
 
 // GitHub API client dynamic import (memoised)
@@ -178,11 +178,15 @@ export async function postLogIn () {
 }
 
 export const forcePush = async () => {
+  if (window.prompt('Force push to GitHub? This will reversibly OVERWRITE REMOTE STATE.'
+    + 'Only use if corrupted. Enter "PUSH" to continue') !== 'PUSH') return;
   await saveState(await idb.loadState());
   console.log('Finished force pushing local state to remote.');
 }
 
 export const forcePull = async () => {
+  if (window.prompt('Force pull from GitHub? This will IRREVERSIBLY OVERWRITE LOCAL STATE.'
+    + 'Only use if corrupted. Enter "PULL" to continue') !== 'PULL') return;
   const allSHAs = await getNewCommitSHAs(null);
   const files = await getAllModifiedFiles(allSHAs);
   const diff = getDiffObject(files);
@@ -324,13 +328,12 @@ function getDiffObject (files) {
   const diff = {};
   for (let filename in files) {
     // Ignore extraneous files
-    if (!Object.prototype.hasOwnProperty.call(namespaceNames, filename.split('.')[0]))
-      continue;
+    // As card filenames aren't qualified, we can't just assume a file is extraneous
+    // and ignore it. Thus, we ignore files iff there is a parsing error
     let object;
     try {
       object = deserializeObject(files[filename]);
     } catch (e) {
-      console.error(e);
       continue;
     }
     // The object may be stored in a deep hierarchy

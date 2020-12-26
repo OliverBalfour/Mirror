@@ -34,9 +34,6 @@ export default React.memo(({ col, index, setEditingCard }) => {
     setEditingNew(!editingNew);
   };
   const scrollContainerRef = React.useRef(null);
-  const menuButton = () => {
-    console.log('pressed menu button');
-  };
   const internals = (
     <Droppable droppableId={id} className='card-droppable' type="card" ignoreContainerClipping>
       {(provided, snapshot) => (
@@ -67,7 +64,7 @@ export default React.memo(({ col, index, setEditingCard }) => {
           style={provided.draggableProps.style}>
           <div className="column">
             <div {...provided.dragHandleProps}>
-              <ColumnHeader col={col} add={addButton} menu={menuButton} />
+              <ColumnHeader col={col} add={addButton} />
             </div>
             {internals}
           </div>
