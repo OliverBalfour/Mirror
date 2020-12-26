@@ -11,7 +11,7 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import undoable, { ActionTypes } from 'redux-undo';
 import produce from 'immer';
 import { generateID, objectMap, deleteInList, createReducer, shallowEqual,
-  structuredClone, mergeDeep } from '../common';
+  structuredClone, deepMerge } from '../common';
 import { EditSet, load, namespaceNames as c, hist, UNDO_LIMIT } from '../backends';
 
 // Action creators
@@ -112,7 +112,7 @@ const reducer = createReducer(loadingState, {
   [overwriteState]: (ps, a) => {
     if (JSON.stringify(a.payload) === "{}") return ps;
     const ns = structuredClone(ps);
-    mergeDeep(ns, a.payload);
+    deepMerge(ns, a.payload);
     return ns;
   },
   // Invert the edit sets for IndexedDB and GitHub

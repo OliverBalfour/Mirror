@@ -33,24 +33,15 @@ export const structuredClone = obj => {
 };
 
 // Deep merge two objects
-// Source: https://stackoverflow.com/a/34749873/4642943
-export function isObject(item) {
-  return (item && typeof item === 'object' && !Array.isArray(item));
-}
-export function mergeDeep(target, ...sources) {
-  if (!sources.length) return target;
-  const source = sources.shift();
-  if (isObject(target) && isObject(source)) {
-    for (const key in source) {
-      if (isObject(source[key])) {
-        if (!target[key]) Object.assign(target, { [key]: {} });
-        mergeDeep(target[key], source[key]);
-      } else {
-        Object.assign(target, { [key]: source[key] });
-      }
-    }
-  }
-  return mergeDeep(target, ...sources);
+export const isObject = item => item && typeof item === 'object' && !Array.isArray(item);
+export function deepMerge (target, source) {
+  if (isObject(target) && isObject(source))
+    for (const key in source)
+      if (isObject(source[key]) && isObject(target[key]))
+        deepMerge(target[key], source[key]);
+      else
+        target[key] = source[key];
+  return target;
 }
 
 // Web: Download content as filename with specificed MIME type

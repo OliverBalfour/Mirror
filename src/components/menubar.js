@@ -10,12 +10,12 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import * as duck from '../ducks/kanban';
+import { loggedIn, logOut } from '../backends/github';
 import { AppBar, Toolbar, IconButton, Tabs, Tab } from '@material-ui/core';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import NotesIcon from '@material-ui/icons/Notes';
 import PopoverMenu from './popovermenu';
-import { downloadData } from '../common';
 import { UndoRedo } from '../components';
 import { AboutDialog, GitHubLoginDialog } from './dialogs';
 import { config, postLogIn } from '../backends/github';
@@ -27,6 +27,18 @@ export default ({ active, setActive }) => {
   const [aboutOpen, setAboutOpen] = React.useState(false);
   const [GHOpen, setGHOpen] = React.useState(false);
   const dispatch = useDispatch();
+
+  const githubItem = () => loggedIn()
+    ? { "Log out of GitHub": logOut }
+    : { "Log in via GitHub": () => setGHOpen(true) };
+
+  const menuItems = {
+    "Submit feedback": () => window.open(`mailto:${emailAddress}`, '_blank'),
+    "About": () => setAboutOpen(true),
+    ...githubItem(),
+    "Clear saved state": () => window.prompt("Delete all saved state? Pressing undo will fix this. Type YES to confirm", "NO") === "YES" && window.deleteAllState(),
+  };
+
   return (
     <React.Fragment>
       <AppBar color="primary" style={{ top: 'auto', bottom: 0 }}>
@@ -40,15 +52,7 @@ export default ({ active, setActive }) => {
           </Tabs>
           <div style={{ flexGrow: 1 }} />
           <UndoRedo />
-          <PopoverMenu map={{
-            // eslint-disable-next-line
-            "Submit feedback": () => window.open(`mailto:${emailAddress}`, '_blank'),
-            "About": () => setAboutOpen(true),
-            "Login via GitHub": () => setGHOpen(true),
-            "Clear saved state": () => window.prompt("Delete all saved state? Pressing undo will fix this. Type YES to confirm", "NO") === "YES" && localStorage.clear(),
-            "Import state": () => { localStorage.kanban = window.prompt("Paste your exported state here. Press cancel (or the undo button after pressing OK) to revert. Refresh the page to confirm and reload state.") },
-            "Export state": () => downloadData(localStorage.kanban, "mirror-backup.json", "application/json"),
-          }}>
+          <PopoverMenu map={menuItems}>
             <IconButton edge="end" color="inherit">
               <MoreIcon />
             </IconButton>

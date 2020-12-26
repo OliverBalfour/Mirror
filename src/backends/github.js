@@ -9,12 +9,17 @@
 import { standaloneNamespaces, shallowNamespaces, EditSet } from './';
 import * as idb from './indexeddb';
 
-// GitHub API client dynamic import
-const getOctokit = () => import("@octokit/rest").then(({ Octokit }) =>
+// GitHub API client dynamic import (memoised)
+let __octokit = null;
+const __getOctokit = () => import("@octokit/core").then(({ Octokit }) =>
   new Octokit({
     auth: config.token,
   })
 );
+const getOctokit = async () => {
+  if (__octokit) return __octokit;
+  return __octokit = await __getOctokit();
+}
 
 export const config = {
   sha: {
@@ -44,11 +49,11 @@ export async function commit (editSet) {
   // TODO: handle this case in a user-friendly way
   const gh = await getOctokit();
   const update = set =>
-    gh.gists.update({
+    gh.request('PATCH /gists/{gist_id}', {
       gist_id: config.gist_id,
       description: "Mirror synchronisation (https://oliverbalfour.github.io/Mirror/)",
       files: compileEditSet(set)
-    });
+    })
   // If one of the actions failed, the whole request fails
   // To minimise collateral damage we repeat each action individually
   await update(editSet).catch(async e => {
@@ -221,10 +226,10 @@ async function get (filename, deserialize = true) {
 async function set (filename, content) {
   const files = { [filename]: { filename, content } };
   const gh = await getOctokit();
-  await gh.gists.update({
+  await gh.request('PATCH /gists/{gist_id}', {
     gist_id: config.gist_id,
     files
-  });
+  })
 }
 
 export async function load (namespace, id = null) {
@@ -237,7 +242,10 @@ export async function load (namespace, id = null) {
 
 export async function getLatestSHA () {
   const gh = await getOctokit();
-  const commits = await gh.gists.listCommits({ gist_id: config.gist_id, per_page: 1 });
+  const commits = await gh.request('GET /gists/{gist_id}/commits', {
+    gist_id: config.gist_id,
+    per_page: 1,
+  });
   return commits.data[0].version;
 }
 
@@ -254,7 +262,7 @@ export async function getNewCommitSHAs () {
   const SHAs = [];
   let page_no = 1;
   while (page_no < 100) {
-    const commits = (await gh.gists.listCommits({
+    const commits = (await gh.request('GET /gists/{gist_id}/commits', {
       gist_id: config.gist_id,
       per_page: 100,
       page: page_no,
@@ -273,7 +281,7 @@ export async function getNewCommitSHAs () {
 async function getGistRevision (sha) {
   // https://api.github.com/gists/:id/:sha has a files field
   const gh = await getOctokit();
-  const response = await gh.gists.getRevision({
+  const response = await gh.request('GET /gists/{gist_id}/{sha}', {
     gist_id: config.gist_id,
     sha
   });
@@ -312,4 +320,16 @@ function getDiffObject (files) {
     ptr[path[path.length - 1]] = object;
   }
   return diff;
+}
+
+export function logOut () {
+  const confirmed = window.confirm('Are you sure you want to log out? All your state will be saved locally and on GitHub, but it will no longer synchronise.');
+  if (!confirmed) return;
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key.startsWith('__GITHUB')) {
+      delete localStorage[key];
+    }
+  }
+  window.location.reload();
 }

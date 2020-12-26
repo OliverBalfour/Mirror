@@ -8,7 +8,7 @@
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/pickers": "^3.2.10",
-    "@octokit/rest": "^18.0.6",
+    "@octokit/core": "^3.2.4",
     "@reduxjs/toolkit": "^1.4.0",
     "@textcomplete/core": "^0.1.7",
     "@textcomplete/textarea": "^0.1.7",
