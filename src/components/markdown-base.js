@@ -5,7 +5,7 @@ import { RawHTMLString } from '../common';
 
 const PrismMarked = React.lazy(() => import('./markdown-prism'));
 
-export const MarkdownBase = ({ source, postprocess = x => x }) => {
+export const MarkdownBase = ({ source, postprocess = x => x, ...props }) => {
   try {
     if (source.indexOf('```') !== -1) {
       return (
@@ -16,7 +16,7 @@ export const MarkdownBase = ({ source, postprocess = x => x }) => {
     } else {
       // The RawHTMLString component internally uses DOMPurify to reduce the risk of XSS
       return (
-        <RawHTMLString source={postprocess(marked(source, { gfm: true }))} className='markdown' />
+        <RawHTMLString source={postprocess(marked(source, { gfm: true }))} className='markdown' {...props} />
       );
     }
   } catch (e) {
@@ -26,7 +26,7 @@ export const MarkdownBase = ({ source, postprocess = x => x }) => {
         <br />
         Try editing the note to ensure any LaTeX math equations and the Markdown syntax are valid.
         <br />
-        Error: {e}
+        Error: {e.toString()}
       </span>
     );
   }

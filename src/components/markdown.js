@@ -12,17 +12,16 @@ const KaTeXMarkdown = React.lazy(() => import('./markdown-katex'));
 export default props => {
   // Parse wikilinks if available
   let source = props.cards ? parseWikilinks(props.source, props.cards) : props.source;
-
   // Parse LaTeX formulae if present
   // As KaTeX is 250kB minified we dynamically import it only if we need to
   if (source.indexOf("$$") === -1) {
     return (
-      <MarkdownBase source={source} />
+      <MarkdownBase {...props} source={source} />
     );
   } else {
     return (
       <React.Suspense fallback={<span>Loading...</span>}>
-        <KaTeXMarkdown source={source} />
+        <KaTeXMarkdown {...props} source={source} />
       </React.Suspense>
     );
   }

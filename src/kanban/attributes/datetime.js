@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { Button, InputLabel } from '@material-ui/core';
+import { IconButton, InputLabel } from '@material-ui/core';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import { MuiPickersUtilsProvider, DateTimePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
@@ -8,6 +8,7 @@ import { format, startOfToday } from 'date-fns';
 import { enAU } from 'date-fns/locale';
 import { prettyPrintDate, timeUrgencyClassName } from '../../common';
 import { IndicatorBuilder, AttributeHeader } from '.';
+import CloseIcon from '@material-ui/icons/Close';
 
 enAU.weekStart = 1;
 
@@ -24,8 +25,10 @@ export const Edit = ({ card, setCard }) => {
           showTodayButton
           format="MMMM do hh:mm aaa" />
       </MuiPickersUtilsProvider>
-      <Button color="primary" variant="outlined" style={{float:'right',marginTop:12}}
-        onClick={() => setDateTime(null)}>Reset date</Button>
+      <IconButton size="small" style={{ marginLeft: 10 }}
+        onClick={() => setDateTime(null)}>
+        <CloseIcon />
+      </IconButton>
     </div>
   ) : (
     <AttributeHeader onClick={() => setDateTime(startOfToday().getTime())}>

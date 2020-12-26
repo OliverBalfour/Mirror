@@ -18,14 +18,49 @@ import * as duck from '../ducks/kanban.js';
 import './index.scss';
 
 export default ({ active }) => {
-  const [loc, setLoc, setLocNoHist] = useHashLocation();
+  const [loc] = useHashLocation();
   const dispatch = useDispatch();
   const cards = useSelector(selectors.boards.cards);
-  const starred = useSelector(selectors.boards.starredZettels);
+  const loadingZettel = useSelector(selectors.boards.loadingZettel);
 
   const currentCardID = loc.split('/')[2] || 'main'; //#/notes/ID
   // const setCurrentCardID = id => setLoc(`/notes/${id}`);
 
+  if (!Object.prototype.hasOwnProperty.call(cards, currentCardID)) {
+    // If card either does not exist, or is not loaded into memory
+    // but is in IndexedDB (assuming sync with remote server is complete)
+    dispatch(duck.loadZettel(currentCardID));
+    return <ZettelLoadingView />;
+  }
+
+  if (loadingZettel === true)
+    return <ZettelLoadingView />;
+
+  if (loadingZettel === currentCardID)
+    return <ZettelFailedLoadingView id={currentCardID} />;
+
+  return <ZettelView
+    active={active} dispatch={dispatch} cards={cards}
+    currentCardID={currentCardID} />
+}
+
+function ZettelLoadingView () {
+  return (
+    <span>Loading Zettel...</span>
+  );
+}
+
+function ZettelFailedLoadingView () {
+  return (
+    <span>Failed to load Zettel. Either synchronisation failed or it does not exist.</span>
+  );
+}
+
+function ZettelView ({
+  active, dispatch, cards, currentCardID
+}) {
+  const [loc, setLoc] = useHashLocation();
+  const starred = useSelector(selectors.boards.starredZettels);
   const card = cards[currentCardID];
   const [newCard, setNewCard] = React.useState({ ...card }); // assuming no deep nesting
   useTitle(() => active && newCard.content + " | Mirror");
@@ -35,8 +70,8 @@ export default ({ active }) => {
 
   const editing = loc.split('/')[3] === 'edit'; //#/notes/ID/edit
   const setEditing = yes => yes
-    ? setLocNoHist(`/notes/${currentCardID}/edit`)
-    : setLocNoHist(`/notes/${currentCardID}`);
+    ? setLoc(`/notes/${currentCardID}/edit`)
+    : setLoc(`/notes/${currentCardID}`);
   const cancelEditing = () => {
     setEditing(false);
     setNewCard({...card});
@@ -44,7 +79,7 @@ export default ({ active }) => {
 
   const deleteZettel = () => {
     dispatch(duck.deleteCard(currentCardID));
-    setLocNoHist('/notes/main');
+    setLoc('/notes/main');
   }
   const saveZettel = zettel => {
     dispatch(duck.editZettel({ zettel }));
@@ -59,7 +94,7 @@ export default ({ active }) => {
     // The only time a card is not saved is if you press cancel or delete
     dispatch(duck.editZettel({ zettel: newCard }));
     setNewCard({ ...card });
-  };
+  }
 
   const addZettel = id => {
     // create a new card and navigate to editing it
@@ -159,4 +194,4 @@ export default ({ active }) => {
       </div>
     </React.Fragment>
   );
-};
+}

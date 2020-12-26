@@ -1,13 +1,18 @@
 
 import { configureStore } from '@reduxjs/toolkit';
-import thunk from 'redux-thunk';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
-import boards, { selectors as boardSelectors } from './ducks/kanban';
-import { saveState, objectMap } from './common';
+import * as kanban from './ducks/kanban';
+import { objectMap } from './common';
+import { loadState } from './backends';
 
 const store = configureStore({
-  reducer: boards,
-  middleware: getDefault => getDefault().concat(thunk),
+  // DEBUG:
+  // reducer: (s, a) => { console.log(a); kanban.default(s, a) },
+  reducer: kanban.default,
+});
+
+loadState().then(state => {
+  store.dispatch(kanban.unsafeSetState(state));
 });
 
 // Undo/redo keyboard shortcuts if supported
@@ -29,12 +34,5 @@ export const globalSelectors = {
   boards: state => state.present
 }
 export const selectors = {
-  boards: objectMap(boardSelectors, localSelector => state => localSelector(globalSelectors.boards(state)))
+  boards: objectMap(kanban.selectors, localSelector => state => localSelector(globalSelectors.boards(state)))
 };
-
-// Save board state (excluding history)
-// to save history efficiently we would need to store a state 50 states ago, the 50 actions since,
-// and the current state; this would require a rewrite of redux-undo
-const localStorageSubscriber = () => saveState(globalSelectors.boards(store.getState()));
-store.subscribe(localStorageSubscriber);
-localStorageSubscriber(); // save data generated on first run

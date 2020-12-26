@@ -6,7 +6,7 @@ import '../../lib/prism.css';
 
 import { RawHTMLString } from '../common';
 
-export default ({ source, postprocess }) =>
+export default ({ source, postprocess, ...props }) =>
   <RawHTMLString source={postprocess(marked(source, {
     gfm: true,
     // This does not escape the code input if the language is unsupported,
@@ -16,4 +16,4 @@ export default ({ source, postprocess }) =>
       prism.languages[lang]
         ? prism.highlight(code, prism.languages[lang], lang)
         : code
-  }))} className='markdown' />;
+  }))} className='markdown' {...props} />;

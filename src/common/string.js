@@ -44,7 +44,6 @@ const countRegexOccurrences = (str, re) =>
 
 // Parse LaTeX math formulae using KaTeX
 export const parseLaTeX = (string, katex) => {
-  console.log(string);
   if (string.indexOf("$$") === -1) return string;
 
   const blockRegex = /<p>\$\$([^\n]+)\$\$<\/p>/m;
