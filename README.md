@@ -1,7 +1,7 @@
 
 # Mirror Project
 
-> *Mirror is a web-based app for task management and note taking. Your everyday tasks are a reflection of who you are, and you deserve high quality tools to stay on top of your workload.*
+> *Mirror is a mobile friendly web app for task management and note taking. Your everyday tasks are a reflection of who you are, and you deserve high quality tools to stay on top of your workload.*
 
 The app is available for free at [this link](https://oliverbalfour.github.io/Mirror/).
 
@@ -10,14 +10,13 @@ The app is available for free at [this link](https://oliverbalfour.github.io/Mir
 - Mobile friendly web app
 - Personal [Kanban](https://www.atlassian.com/agile/kanban/boards) boards
 - [Zettelkasten](https://writingcooperative.com/zettelkasten-how-one-german-scholar-was-so-freakishly-productive-997e4e0ca125) knowledge management / note taking tool
-- GitHub Gist synchronisation (single source of truth)
+- Cross device synchronisation (via the GitHub Gist API)
 - [Free and open source](https://github.com/OliverBalfour/Mirror)
 - Minimal, non-skeuomorphic design
-- [Evidence Based Scheduling](https://www.joelonsoftware.com/2007/10/26/evidence-based-scheduling/)
 
 **Implementation**
 
-Built with React, Redux, Material UI and [react-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd). The project was bootstrapped with Create React App. Synchronisation makes use of Redux state serialisation and the GitHub Gist API.
+Built with React, Redux and Material UI. The project was bootstrapped with Create React App. Synchronisation makes use of Redux state serialisation and the GitHub Gist API.
 
 **Possible future features**
 
@@ -35,14 +34,17 @@ Built with React, Redux, Material UI and [react-beautiful-dnd](https://github.co
 
 1. [x] Kanban boards
 1. [x] Zettelkasten
-1. [ ] Synchronisation
-1. [ ] Mobile friendly
+1. [x] Synchronisation
+1. [x] Mobile friendly
+1. [ ] Great user experience (good error messages, merge conflict resolution when editing on two devices, bug fixes, etc.)
 
 **Logging in**
 
-To log in via GitHub for synchronisation, [create a new token](https://github.com/settings/tokens/new) with the `gist` permission and save it somewhere safe. Then, go to [gist.github.com](https://gist.github.com) and create a new Gist with any title and add one file, `main.md`, with any contents. Then click "Create secret gist". Copy the ID from the URL. In the main popup menu (three dots in bottom right) select "Login via GitHub" and enter your token and the gist ID. You will need these two pieces of information on every new computer, so consider putting them in an encrypted text file in cloud storage.
+To log in via GitHub for synchronisation, [create a new token](https://github.com/settings/tokens/new) with the `gist` permission and save it somewhere safe. Then, go to [gist.github.com](https://gist.github.com) and create a new Gist with any title and add one file, `main.md`, with any contents. Then click "Create secret gist". Copy the ID from the URL. In the main popup menu (three dots in bottom right) select "Login via GitHub" and enter your token and the gist ID. You will need these two pieces of information on every new computer, so consider putting them in an encrypted text file in cloud storage. Note that the Gist ID can be used to read your notes without a token, so be extra careful with it!
 
-## Setup
+## Setup (for developers)
+
+If you just want to use the app, these steps are not necessary. Simply visit [this link](https://oliverbalfour.github.io/Mirror/) and start using the app!
 
 ### Installation
 
@@ -55,7 +57,7 @@ To log in via GitHub for synchronisation, [create a new token](https://github.co
 - `npm start`: run debug version
 - `npm run build`: build static version in `build` folder
 - `npm run deploy`: build and deploy to [GitHub Pages](https://oliverbalfour.github.io/Mirror/)
-- `npm run analyze`: analyze bundle size
+- `npm run analyze`: analyze bundle size, you must run `npm run build` first for an up to date analysis
 
 To force update to a new version in Chrome (without losing data) press Ctrl+F5. If that fails, open devtools, right click on browser refresh button, choose "Empty Cache & Hard Reload".
 
