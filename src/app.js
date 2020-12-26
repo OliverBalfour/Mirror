@@ -5,8 +5,10 @@
  */
 
 import React from 'react';
-import { Provider, useSelector } from 'react-redux';
-import { useHashLocation, Hidden } from './common';
+import { Provider, useSelector, useDispatch } from 'react-redux';
+import * as duck from './ducks/kanban';
+import { synchroniseState, loggedIn } from './backends/github';
+import { useHashLocation, useInterval, Hidden } from './common';
 
 import { MenuBar, LoadingScreen } from './components';
 import Kanban from './kanban';
@@ -35,6 +37,15 @@ const ComponentsContainer = ({ active, setActive }) => {
 };
 
 const Root = () => {
+  const dispatch = useDispatch();
+  // Update state cache every little while to support concurrent changes across devices
+  // It usually takes up to 30 seconds for the revisions to become available so
+  // more frequent querying is pointless
+  useInterval(() => {
+    if (loggedIn()) {
+      synchroniseState().then(diff => dispatch(duck.overwriteState(diff)));
+    }
+  }, 15000);
   const [loc, setLoc] = useHashLocation();
   const [tabURLs, setTabURLs] = React.useState([]);
   const [loading, setLoading] = React.useState(true);

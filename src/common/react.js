@@ -55,6 +55,13 @@ export const useTitle = title => {
   });
 }
 
+export const useInterval = (f, ms) => {
+  React.useEffect(() => {
+    const id = setInterval(f, ms);
+    return () => clearInterval(id);
+  }, [f, ms]);
+}
+
 // Note: ReloadProtect does not prevent hash changes. Be warned!
 export const ReloadProtect = ({ shouldProtect = true }) => {
   React.useEffect(() => {

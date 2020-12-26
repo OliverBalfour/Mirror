@@ -165,17 +165,16 @@ export async function postLogIn () {
 
   console.log('Logging in. Has ' + (hasLoggedInBefore ? '' : 'not ') + 'logged in before.');
 
+  let state = {};
   if (hasLoggedInBefore) {
-    const state = await synchroniseState();
+    state = await synchroniseState();
     console.log('Finished loading and caching remote state.');
-    return state;
   } else {
     await set('__logged_in', 'true');
-    // Updates SHAs
     await saveState(await idb.loadState());
     console.log('Finished writing local state to remote.');
-    return {};
   }
+  return state;
 }
 
 // Call on app initialisation and periodically thereafter

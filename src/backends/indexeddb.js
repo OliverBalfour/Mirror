@@ -12,14 +12,17 @@ import { generateInitialState, standaloneNamespaces, shallowNamespaces } from '.
 
 export async function loadState () {
   const initial = async () => {
-    const s = await generateInitialState();
-    await saveState(s);
-    return s;
+    const state = await generateInitialState();
+    await saveState(state);
+    return state;
   };
   const idbKeys = await keys();
   if (!idbKeys.length) {
-    let state = loadLegacyLocalStorageState();
-    if (state) return state;
+    const state = loadLegacyLocalStorageState();
+    if (state) {
+      await saveState(state);
+      return state;
+    }
     return await initial();
   }
   try {
