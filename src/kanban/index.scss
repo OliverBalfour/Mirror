@@ -16,6 +16,7 @@
 }
 .column-internals {
   width: $cardWidth;
+  max-width: calc(100vw - #{6*$gridSpacing});
   overflow-y: auto;
   overflow-x: hidden;
   height: calc(100% - 20px);
@@ -36,6 +37,9 @@
   flex-wrap: nowrap;
   padding: $gridSpacing;
   font-size: 14px;
+  box-sizing: border-box;
+  overflow: hidden;
+  overflow-x: auto;
 }
 .root * {
   flex-shrink: 0;
@@ -45,17 +49,24 @@
   padding: $gridSpacing;
   padding-bottom: 24px;
   width: $cardWidth;
+  max-width: calc(100vw - #{4*$gridSpacing});
   border: 1px solid #CCDCDC;
   border-radius: 4px;
-  margin: $gridSpacing;
-  margin-top: $gridSpacing + 4px;
   transition: border 0.2s;
-  height: calc(100vh - 156px);
+  box-sizing: border-box;
+  height: 100%;
   overflow: hidden;
+}
+.columnContainer {
+  transition: opacity 0.6s;
+  height: 100%;
+  padding: $gridSpacing;
+  box-sizing: border-box;
 }
 .addColumnContainer {
   width: $cardWidth + 5*$gridSpacing;
   margin-left: 0;
+  max-width: calc(100vw - #{$gridSpacing});
 }
 .addColumnContainer.hidden {
   margin-left: $cardWidth + 4*$gridSpacing + 2px;
@@ -70,10 +81,10 @@
   padding: $gridSpacing;
   padding-bottom: 24px;
   width: $cardWidth;
+  max-width: calc(100vw - #{6*$gridSpacing});
   border: 1px solid #CCDCDC;
   border-radius: 5px;
   margin: $gridSpacing;
-  margin-top: $gridSpacing + 4px;
 }
 .columnHeaderContainer {
   padding: 0;
@@ -114,9 +125,6 @@
 .draggingCard {
   opacity: 0.7;
   box-shadow: 0 1px 3px rgba(100, 100, 100, 0.3);
-}
-.columnContainer {
-  transition: opacity 0.6s;
 }
 .draggingColumn {
   opacity: 0.7;

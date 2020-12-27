@@ -107,41 +107,76 @@ function ZettelView ({
     addZettel(id);
   }
 
+  const ZettelButtons = () => (
+    <ButtonGroup variant='contained' color='primary'>
+      {!editing && (
+        <Button onClick={() => setEditing(true)} title="Edit note">
+          <EditIcon />
+        </Button>
+      )}
+      {card.id !== 'main' && (
+        <Button onClick={deleteZettel} title="Delete note">
+          <DeleteIcon />
+        </Button>
+      )}
+      {!editing && (
+        <Button onClick={() => addZettel(generateID())} title="Add note">
+          <AddIcon />
+        </Button>
+      )}
+      <Button onClick={() => alert('TODO')} title="Search notes">
+        <SearchIcon />
+      </Button>
+      {starred.indexOf(card.id) === -1 ? (
+        <Button onClick={starZettel} title="Star this note">
+          <StarBorderIcon />
+        </Button>
+      ) : (
+        <Button onClick={starZettel} title="Unstar this note">
+          <StarIcon />
+        </Button>
+      )}
+    </ButtonGroup>
+  );
+
+  // TODO: drawer
+  // Responsive: https://material-ui.com/components/drawers/#responsive-drawer
+  // Search bar: https://material-ui.com/components/text-fields/#icons
+  //   or https://material-ui.com/components/app-bar/#app-bar-with-a-primary-search-field
+  // Starred cards
+  // All notes button (navigate to #/notes/all and show a list of notes without contents)
+  // const Drawer = () => (
+  //   <Drawer
+  //     className='zettelDrawer'
+  //     variant="permanent"
+  //     classes={{
+  //       paper: 'zettelDrawerPaper',
+  //     }}
+  //   >
+  //     <div className='zettelDrawerContainer'>
+  //       <List>
+  //         {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+  //           <ListItem button key={text}>
+  //             <ListItemText primary={text} />
+  //           </ListItem>
+  //         ))}
+  //       </List>
+  //       <Divider />
+  //       <List>
+  //         {['All mail', 'Trash', 'Spam'].map((text, index) => (
+  //           <ListItem button key={text}>
+  //             <ListItemText primary={text} />
+  //           </ListItem>
+  //         ))}
+  //       </List>
+  //     </div>
+  //   </Drawer>
+  // );
+
   return (
-    // TODO: drawer
-    // Responsive: https://material-ui.com/components/drawers/#responsive-drawer
-    // Search bar: https://material-ui.com/components/text-fields/#icons
-    //   or https://material-ui.com/components/app-bar/#app-bar-with-a-primary-search-field
-    // Starred cards
-    // All notes button (navigate to #/notes/all and show a list of notes without contents)
     <React.Fragment>
       <ReloadProtect shouldProtect={JSON.stringify(newCard) !== JSON.stringify(card)} />
       <div className='zettelContainer'>
-        {/*<Drawer
-          className='zettelDrawer'
-          variant="permanent"
-          classes={{
-            paper: 'zettelDrawerPaper',
-          }}
-        >
-          <div className='zettelDrawerContainer'>
-            <List>
-              {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                <ListItem button key={text}>
-                  <ListItemText primary={text} />
-                </ListItem>
-              ))}
-            </List>
-            <Divider />
-            <List>
-              {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                <ListItem button key={text}>
-                  <ListItemText primary={text} />
-                </ListItem>
-              ))}
-            </List>
-          </div>
-        </Drawer>*/}
         {editing && (
           <div className='zettel'>
             <TextField margin="dense" autoFocus fullWidth
@@ -162,35 +197,7 @@ function ZettelView ({
         </div>
       </div>
       <div className='zettelButtons' id='zettel-buttons-container'>
-        <ButtonGroup variant='contained' color='primary'>
-          {!editing && (
-            <Button onClick={() => setEditing(true)} title="Edit note">
-              <EditIcon />
-            </Button>
-          )}
-          {card.id !== 'main' && (
-            <Button onClick={deleteZettel} title="Delete note">
-              <DeleteIcon />
-            </Button>
-          )}
-          {!editing && (
-            <Button onClick={() => addZettel(generateID())} title="Add note">
-              <AddIcon />
-            </Button>
-          )}
-          <Button onClick={() => alert('TODO')} title="Search notes">
-            <SearchIcon />
-          </Button>
-          {starred.indexOf(card.id) === -1 ? (
-            <Button onClick={starZettel} title="Star this note">
-              <StarBorderIcon />
-            </Button>
-          ) : (
-            <Button onClick={starZettel} title="Unstar this note">
-              <StarIcon />
-            </Button>
-          )}
-        </ButtonGroup>
+        <ZettelButtons />
       </div>
     </React.Fragment>
   );

@@ -14,12 +14,6 @@ import { AppBar, Tabs, Tab, IconButton } from '@material-ui/core';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import PopoverMenu from './popovermenu';
 
-const TabPanel = ({ show, children }) => (
-  <div hidden={!show} style={{ height: 'calc(100% - 48px)' }}>
-    {show && children}
-  </div>
-);
-
 export default ({
   tabs, render, index, setIndex,
   addTab, renameTab, deleteTab, moveTab
@@ -28,8 +22,8 @@ export default ({
   const Grow = () => <div style={{ flexGrow: 1 }} />;
 
   return (
-    <div style={{ flex: 1 }}>
-      <AppBar position="static" style={{
+    <div className='tab-bar-root'>
+      <AppBar className='tab-bar-header' position="static" style={{
           backgroundColor: "white",
           zIndex: 2, position: 'relative'
         }}>
@@ -53,9 +47,11 @@ export default ({
         </Tabs>
       </AppBar>
       {tabs.map((tab, i) => (
-        <TabPanel show={index === i} key={tab}>
-          {index === i && render(i)}
-        </TabPanel>
+        index === i && (
+          <div className='tab-bar-content' key={i}>
+            {render(i)}
+          </div>
+        )
       ))}
     </div>
   );

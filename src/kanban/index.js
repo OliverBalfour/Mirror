@@ -46,7 +46,7 @@ export default ({ active }) => {
     <React.Fragment>
       <TabView
         tabs={tabOrder.map(tabID => tabs[tabID].name)}
-        render={i => <BoardView tabInfo={{ tab: tabs[tabOrder[i]], index: i }} />}
+        render={i => <BoardView key={i} tabInfo={{ tab: tabs[tabOrder[i]], index: i }} />}
         addTab={() => setAddPromptOpen(true)}
         renameTab={() => setRenamePromptOpen(true)}
         deleteTab={() => Object.values(tabs).length > 1 ? setConfirmOpen(true) : alert("Cannot delete only tab")}

@@ -43,7 +43,7 @@ export default ({ active, setActive }) => {
 
   return (
     <React.Fragment>
-      <AppBar color="primary" style={{ top: 'auto', bottom: 0 }}>
+      <AppBar color="primary" className='menubar'>
         <Toolbar style={{ minHeight: 0 }}>
           <Tabs
             value={active} onChange={(e, val) => setActive(val)}

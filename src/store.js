@@ -4,11 +4,13 @@ import { ActionCreators as UndoActionCreators } from 'redux-undo';
 import * as kanban from './ducks/kanban';
 import { objectMap } from './common';
 import { loadState } from './backends';
+import thunk from 'redux-thunk';
 
 const store = configureStore({
   // DEBUG:
   // reducer: (s, a) => { console.log(a); kanban.default(s, a) },
   reducer: kanban.default,
+  middleware: [thunk],
 });
 
 // Load state. Ignore lazy loading for now.

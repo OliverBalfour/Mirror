@@ -26,10 +26,10 @@ const getScreenNames = () => ["/boards/", "/notes/main"];
 const ComponentsContainer = ({ active, setActive }) => {
   return (
     <React.Fragment>
-      <Hidden show={active === 0}>
+      <Hidden show={active === 0} className='app-section'>
         <Kanban active={active === 0} />
       </Hidden>
-      <Hidden show={active === 1}>
+      <Hidden show={active === 1} className='app-section'>
         <Zettelkasten active={active === 1} />
       </Hidden>
     </React.Fragment>
@@ -78,13 +78,9 @@ const Root = () => {
     }
   }
 
-  const style = { height: "calc(100% - 48px)" };
-
   return (
     <div id="jsx-root">
-      <div style={style}>
-        <ComponentsContainer active={active} setActive={setActive} />
-      </div>
+      <ComponentsContainer active={active} setActive={setActive} />
       <MenuBar active={active} setActive={setActive} />
     </div>
   );

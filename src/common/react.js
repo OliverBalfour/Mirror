@@ -74,8 +74,8 @@ export const ReloadProtect = ({ shouldProtect = true }) => {
   return null;
 }
 
-export const Hidden = ({ children, show }) =>
-  <div style={show ? {} : { display: "none" }}>
+export const Hidden = ({ children, show, ...props }) =>
+  <div style={show ? {} : { display: "none" }} {...props}>
     {children}
   </div>;
 
