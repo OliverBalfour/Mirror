@@ -63,7 +63,7 @@
   box-sizing: border-box;
 }
 .addColumnContainer {
-  padding-right: $gridSpacing;
+  padding-right: 2*$gridSpacing;
   box-sizing: content-box;
 }
 .addColumnContainer.hidden {
@@ -170,6 +170,11 @@
   }
 }
 
+@media only screen and (max-height: 800px) {
+  .descriptionEditor {
+    height: 120px;
+  }
+}
 .descriptionEditor {
   min-height: 120px;
 }

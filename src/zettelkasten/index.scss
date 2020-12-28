@@ -16,6 +16,7 @@
   width: 100vw;
   padding: 2*$gridSpacing;
   padding-left: 0;
+  padding-top: 0;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -78,11 +79,6 @@
   justify-content: space-between;
   margin-top: $gridSpacing;
 }
-@media only screen and (max-width: 800px) {
-  .zettel.currently-editing {
-    display: none;
-  }
-}
 .zettelButtons {
   margin: $gridSpacing * 3 0;
   left: 0; // left: $drawerWidth;
@@ -102,4 +98,18 @@
 }
 .zettelDrawerContainer {
   overflow: auto;
+}
+
+@media only screen and (max-width: 800px) {
+  .zettel.currently-editing {
+    display: none;
+  }
+}
+@media only screen and (max-height: 800px) {
+  .zettelButtons {
+    margin: $gridSpacing 0 2*$gridSpacing 0;
+  }
+  .zettel {
+    padding-top: 0;
+  }
 }
