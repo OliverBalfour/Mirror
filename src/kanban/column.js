@@ -104,9 +104,9 @@ const EditingCard = ({ value, setValue, add, cancel }) => {
 
 export const AddColumn = ({ add, hide }) => {
   return (
-    <div className={'addColumnContainer' + (hide ? ' hidden' : '')}>
-      <div className='addColumn'>
-        <IconButton onClick={add}>
+    <div className={'addColumnContainer columnContainer ' + (hide ? ' hidden' : '')}>
+      <div className='addColumn column'>
+        <IconButton onClick={add} variant='outlined'>
           <AddIcon />
         </IconButton>
       </div>

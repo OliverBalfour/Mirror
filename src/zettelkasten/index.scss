@@ -3,34 +3,38 @@
 
 .zettelContainer {
   background: #DFEEEE;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.zettelColumns {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 10px;
+  flex: 1 1 auto;
+  width: 100vw;
+  padding: 2*$gridSpacing;
+  padding-left: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .zettel {
+  box-sizing: border-box;
   background: white;
   border-radius: 5px;
   width: 650px;
-  margin: 10px;
-  margin-top: 70px;
+  margin-left: 2*$gridSpacing;
   box-shadow: 0 1px 3px rgba(100, 100, 100, 0.3);
-  padding: 16px;
-  padding-top: 8px;
-  padding-bottom: 12px;
-  max-height: calc(100% - 160px);
+  padding: 2*$gridSpacing;
   overflow-y: auto;
+  max-height: 100%;
   & > p {
     margin-top: 0
-  };
+  }
   & > p:last-child {
     margin-bottom: 0
-  };
+  }
 }
 .zettelTitle {
   margin-bottom: 8px;
@@ -39,17 +43,54 @@
   font-weight: 600;
   text-align: center;
 }
+.zettel.editing-pane {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 100%;
+}
+.zettelEditingTitle {
+  flex: 0 1 auto;
+}
+.zettelEditingContent {
+  flex: 1 1 auto;
+  overflow: hidden;
+  overflow-y: auto;
+  border: 1px solid #c4c4c4;
+  border-radius: 4px;
+  transition: border-color 0.1s;
+  box-sizing: border-box;
+  padding: 2px;
+  &:focus-within {
+    padding: 1px;
+    border: 2px solid #3f51b5;
+  }
+}
+.zettelEditingInput {
+  height: 100%;
+  // The border colour is placed on the parent
+  border: none !important;
+  padding: 6.5px 10px !important;
+}
 .zettelEditingButtons {
+  flex: 0 1 auto;
   display: flex;
   justify-content: space-between;
+  margin-top: $gridSpacing;
+}
+@media only screen and (max-width: 800px) {
+  .zettel.currently-editing {
+    display: none;
+  }
 }
 .zettelButtons {
-  position: absolute;
-  top: 15px;
+  margin: $gridSpacing * 3 0;
   left: 0; // left: $drawerWidth;
   right: 0;
   display: flex;
   justify-content: center;
+  width: 100%;
+  flex: 0 1 auto;
 }
 .zettelDrawer {
   width: $drawerWidth;

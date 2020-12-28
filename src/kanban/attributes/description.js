@@ -56,10 +56,9 @@ export const Edit = ({ card, setCard }) => {
     <React.Fragment>
       <InputLabel className="custom-label">Description</InputLabel>
       <ClickAwayListener onClickAway={() => setEditingDescription(false)}>
-        <div style={{width:'100%',height:'100%'}}
-          onKeyDown={handleKeyDown}>
+        <div onKeyDown={handleKeyDown}>
           <AutocompleteEditor value={card.description} setValue={setDescription}
-            autoFocus rows={6} rowsMax={24} />
+            className='descriptionEditor' offset={20} style={{ maxHeight: 300 }} />
         </div>
       </ClickAwayListener>
     </React.Fragment>

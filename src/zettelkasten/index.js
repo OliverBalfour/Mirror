@@ -177,27 +177,31 @@ function ZettelView ({
     <React.Fragment>
       <ReloadProtect shouldProtect={JSON.stringify(newCard) !== JSON.stringify(card)} />
       <div className='zettelContainer'>
-        {editing && (
-          <div className='zettel'>
-            <TextField margin="dense" autoFocus fullWidth
-              multiline rowsMax={3} value={newCard.content || ''} onChange={e => setCard({ content: e.target.value })} />
-            <AutocompleteEditor value={newCard.description || ''} setValue={description => setCard({ description })}
-              addNote={addNewNote} />
-            <div className='zettelEditingButtons'>
-              <Button onClick={cancelEditing} color="primary">Cancel</Button>
-              <Button onClick={() => saveZettel(newCard)} color="primary" variant="contained">Save</Button>
-            </div>
-          </div>
-        )}
-        <div className={'zettel' + (editing ? ' notes-editing' : '')}>
-          <div className='zettelTitle'>
-            {(editing ? newCard.content : card.content) || ''}
-          </div>
-          <Markdown source={(editing ? newCard.description : card.description) || ''} cards={cards} />
+        <div className='zettelButtons' id='zettel-buttons-container'>
+          <ZettelButtons />
         </div>
-      </div>
-      <div className='zettelButtons' id='zettel-buttons-container'>
-        <ZettelButtons />
+        <div className='zettelColumns'>
+          {editing && (
+            <div className={'zettel' + (editing ? ' editing-pane' : '')}>
+              <TextField margin="dense" autoFocus fullWidth className="zettelEditingTitle"
+                multiline rowsMax={3} value={newCard.content || ''} onChange={e => setCard({ content: e.target.value })} />
+              <div className="zettelEditingContent">
+                <AutocompleteEditor value={newCard.description || ''} setValue={description => setCard({ description })}
+                  addNote={addNewNote} className="zettelEditingInput" />
+              </div>
+              <div className='zettelEditingButtons'>
+                <Button onClick={cancelEditing} color="primary">Cancel</Button>
+                <Button onClick={() => saveZettel(newCard)} color="primary" variant="contained">Save</Button>
+              </div>
+            </div>
+          )}
+          <div className={'zettel' + (editing ? ' currently-editing' : '')}>
+            <div className='zettelTitle'>
+              {(editing ? newCard.content : card.content) || ''}
+            </div>
+            <Markdown source={(editing ? newCard.description : card.description) || ''} cards={cards} />
+          </div>
+        </div>
       </div>
     </React.Fragment>
   );

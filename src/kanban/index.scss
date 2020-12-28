@@ -15,8 +15,7 @@
   height: 100%;
 }
 .column-internals {
-  width: $cardWidth;
-  max-width: calc(100vw - #{6*$gridSpacing});
+  width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   height: calc(100% - 20px);
@@ -64,27 +63,19 @@
   box-sizing: border-box;
 }
 .addColumnContainer {
-  width: $cardWidth + 5*$gridSpacing;
-  margin-left: 0;
-  max-width: calc(100vw - #{$gridSpacing});
+  padding-right: $gridSpacing;
+  box-sizing: content-box;
 }
 .addColumnContainer.hidden {
-  margin-left: $cardWidth + 4*$gridSpacing + 2px;
+  margin-left: $cardWidth + 2*$gridSpacing;
 }
 .addColumn {
   /* we also apply a margin conditionally in the JSX when dragging columns */
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-bottom: $gridSpacing;
   height: 100px;
-  background: $columnBackground;
-  padding: $gridSpacing;
-  padding-bottom: 24px;
-  width: $cardWidth;
-  max-width: calc(100vw - #{6*$gridSpacing});
-  border: 1px solid #CCDCDC;
-  border-radius: 5px;
-  margin: $gridSpacing;
 }
 .columnHeaderContainer {
   padding: 0;
@@ -177,4 +168,8 @@
     border: 1px solid #3f51b5;
     padding: 3px;
   }
+}
+
+.descriptionEditor {
+  min-height: 120px;
 }

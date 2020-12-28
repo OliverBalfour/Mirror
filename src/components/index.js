@@ -6,4 +6,5 @@ export { default as UndoRedo    } from './undoredo';
 export { default as Markdown    } from './markdown';
 export { default as LoadingScreen } from './loading-screen';
 export { default as AutocompleteEditor } from './autocomplete-editor';
+export { default as AutoresizeTextarea } from './autoresize-textarea';
 export { ConfirmDialog, PromptDialog, CardEditDialog } from './dialogs';

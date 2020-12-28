@@ -62,6 +62,13 @@ export const useInterval = (f, ms) => {
   }, [f, ms]);
 }
 
+export const useEventListener = (elem, event, callback) => {
+  React.useEffect(() => {
+    elem.addEventListener(event, callback);
+    return () => elem.removeEventListener(event, callback);
+  });
+}
+
 // Note: ReloadProtect does not prevent hash changes. Be warned!
 export const ReloadProtect = ({ shouldProtect = true }) => {
   React.useEffect(() => {

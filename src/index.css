@@ -1,11 +1,18 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 html, body {
   width: 100%;
+  height: 100%;
   -webkit-overflow-scrolling: touch;
   margin: 0px;
   padding: 0px;
-  height: 100%;
   font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Droid Sans,Helvetica Neue,sans-serif;
   overflow: hidden;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 .tab-bar-root {
   display: flex;
@@ -19,11 +26,6 @@ html, body {
   flex: 1 1 auto;
   overflow: hidden;
 }
-html {
-  scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-  height: 100%;
-}
 body {
   display: flex;
   overflow-y: auto;
@@ -36,7 +38,7 @@ body {
 #jsx-root {
   top: 0;
   left: 0;
-  height: 100vh;
+  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -63,11 +65,6 @@ code {
   font-size: 16px !important;
   font-weight: 600 !important;
   /* font-style: italic !important; */
-}
-@media only screen and (max-width: 800px) {
-  .notes-editing {
-    display: none;
-  }
 }
 .MuiDialogTitle-root { padding-bottom: 4px !important; }
 .MuiButton-containedPrimary {
@@ -122,4 +119,39 @@ code {
   font-size: 2em;
   color: darkgrey;
   font-family: sans-serif;
+}
+/* Emulate styling of MUI's <TextField multiline /> */
+.custom-textarea {
+  width: 100%;
+  border: 1px solid #c4c4c4;
+  resize: none;
+  box-sizing: border-box;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.1s;
+  padding: 10.5px 14px;
+  font-family: inherit;
+  font-size: inherit;
+}
+.custom-textarea:focus {
+  border: 2px solid #3f51b5;
+  padding: 9.5px 13px;
+}
+/* Textareas resizing to fit contents */
+.autoresize-div {
+  display: none;
+}
+textarea.autoresize, .autoresize-div {
+  width: 100%;
+  min-height: 100px;
+  max-height: 100%;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  overflow: hidden;
+  line-height: 1.4;
+  resize: none;
+  padding: 10.5px 14px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }

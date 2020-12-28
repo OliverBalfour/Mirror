@@ -1,8 +1,8 @@
 
 import * as React from 'react';
-import { TextField } from '@material-ui/core';
 import { Textcomplete } from '@textcomplete/core';
 import { TextareaEditor } from '@textcomplete/textarea';
+import AutoresizeTextarea from './autoresize-textarea';
 import { selectors } from '../store';
 import { useSelector } from 'react-redux';
 import { searchCards, linkName, generateID } from '../common';
@@ -10,7 +10,7 @@ import { searchCards, linkName, generateID } from '../common';
 // If addNote is a function an 'Add note' option will appear
 // It inserts a link to a note with a generated ID, and invokes
 // addNote on the generated ID.
-export default ({ value, setValue, autoFocus = false, addNote, rows, rowsMax }) => {
+export default ({ value, setValue, addNote, className, ...props }) => {
 
   const inputRef = React.useRef(null);
   const cards = useSelector(selectors.boards.cards);
@@ -52,9 +52,10 @@ export default ({ value, setValue, autoFocus = false, addNote, rows, rowsMax }) 
     // eslint-disable-next-line
   }, []); // passing dependencies breaks it
 
+  // This textarea automatically resizes to the height of its contents
+  // It still supports min/max-height and a scrollbar appears past the limit
   return (
-    <TextField margin="dense" fullWidth variant="outlined" autoFocus={autoFocus}
-      multiline rows={rows} rowsMax={rowsMax} value={value} onChange={e => setValue(e.target.value)}
-      inputProps={{ ref: inputRef }} />
+    <AutoresizeTextarea {...props} ref={inputRef} value={value} setValue={setValue}
+      className={className} />
   );
 };

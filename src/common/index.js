@@ -1,6 +1,7 @@
 
 export { linkName, abbreviatedDescription, parseWikilinks, parseLaTeX } from './string';
-export { mergeRefs, useHashLocation, useTitle, useInterval, ReloadProtect, Hidden, RawHTMLElement, RawHTMLString } from './react';
+export { mergeRefs, useHashLocation, useTitle, useInterval, useEventListener,
+  ReloadProtect, Hidden, RawHTMLElement, RawHTMLString } from './react';
 export { prettyPrintDate, generateID, timeUrgencyClassName } from './time';
 
 // Source: https://stackoverflow.com/a/14810722/4642943
