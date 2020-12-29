@@ -313,9 +313,14 @@ async function getGistRevision (sha) {
 async function getAllModifiedFiles (SHAs = null) {
   if (!SHAs) SHAs = await getNewCommitSHAs();
   const files = {};
+  const promises = [];
+  for (let i = 0; i < SHAs.length; i++) {
+    promises.push(getGistRevision(SHAs[i]));
+  }
+  const revisions = await Promise.all(promises);
   let i = SHAs.length;
   while (i --> 0) {
-    const revision = await getGistRevision(SHAs[i]);
+    const revision = revisions[i];
     for (let file in revision) {
       if (file === '__logged_in') continue;
       files[file] = revision[file].content;
