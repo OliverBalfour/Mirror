@@ -10,13 +10,14 @@ export const MarkdownBase = ({ source, postprocess = x => x, ...props }) => {
     if (source.indexOf('```') !== -1) {
       return (
         <React.Suspense fallback={<span>Loading...</span>}>
-          <PrismMarked source={source} postprocess={postprocess} />
+          <PrismMarked source={source} postprocess={postprocess} {...props} />
         </React.Suspense>
       );
     } else {
       // The RawHTMLString component internally uses DOMPurify to reduce the risk of XSS
       return (
-        <RawHTMLString source={postprocess(marked(source, { gfm: true }))} className='markdown' {...props} />
+        <RawHTMLString source={postprocess(marked(source, { gfm: true }))}
+          {...props} className={'markdown ' + (props.className ? props.className : '')} />
       );
     }
   } catch (e) {

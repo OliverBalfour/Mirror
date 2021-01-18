@@ -21,7 +21,7 @@ export default React.memo(({ card, index, setEditingCard }) => {
             className={'card ' + (snapshot.isDragging ? " draggingCard" : "")}
             style={provided.draggableProps.style}
             onClick={() => setEditingCard(id)}>
-            <Markdown source={content} cards={cards} />
+            <Markdown source={content} cards={cards} className='compact' />
             <Description.Indicator card={card} />
             <DateTime.Indicator    card={card} />
             <Duration.Indicator    card={card} />

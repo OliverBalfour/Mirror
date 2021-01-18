@@ -62,7 +62,9 @@ export async function commit (editSet) {
       editSet.set.map(edit => update({ set: [edit] }))
     ).catch(console.error)
   });
-  await updateLatestSHA();
+  await updateLatestSHA().catch(e => {
+    console.error(`Commit of changes failed. State may no longer be reflected by online sync target. Error: ${e.toString()}`);
+  });
 }
 
 function compileEditSet (editSet) {
@@ -198,17 +200,21 @@ export const forcePull = async () => {
 
 // Call on app initialisation and periodically thereafter
 export const synchroniseState = async () => {
-  config.sha.latest = await getLatestSHA();
-  if (config.sha.latest === config.sha.current) {
-    console.log('No state updates required');
-    return {};
+  try {
+    config.sha.latest = await getLatestSHA();
+    if (config.sha.latest === config.sha.current) {
+      console.log('No state updates required');
+      return {};
+    }
+    const files = await getAllModifiedFiles();
+    const diff = getDiffObject(files);
+    await idb.saveState(diff);
+    console.log(`Updated local state: ${(config.sha.current || 'none').substring(0, 10)}..${config.sha.latest.substring(0, 10)}`);
+    config.sha.current = config.sha.latest;
+    return diff;
+  } catch (e) {
+    console.log(`Error occurred while synchronising state. Check network connection. Error: ${e.toString()}`);
   }
-  const files = await getAllModifiedFiles();
-  const diff = getDiffObject(files);
-  await idb.saveState(diff);
-  console.log(`Updated local state: ${(config.sha.current || 'none').substring(0, 10)}..${config.sha.latest.substring(0, 10)}`);
-  config.sha.current = config.sha.latest;
-  return diff;
 }
 
 // Save initial state, or save state after logging in

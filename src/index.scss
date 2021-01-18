@@ -89,26 +89,35 @@ code {
   font-size: 14px;
   padding: 2px 5px;
   cursor: pointer;
+  &:hover, &:active {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
 }
-.textcomplete-item:hover,
-.textcomplete-item.active {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-.markdown.compact p, .markdown.compact ul, .markdown.compact pre {
-  margin: 8px 0;
-}
-.markdown.compact ul {
-  padding-left: 24px;
-}
-.markdown.compact p:first-child, .markdown.compact ul:first-child {
-  margin-top: 0;
-}
-.markdown.compact p:last-child, .markdown.compact ul:last-child {
-  margin-bottom: 0;
-}
-.markdown input[type="checkbox"] {
-  margin: 0;
-  margin-left: -4px;
+.markdown {
+  & pre {
+    padding-left: 8px;
+  }
+  &.compact {
+    & p, & ul, & pre {
+      margin: 8px 0;
+    }
+    & pre {
+      padding: 0;
+    }
+    & ul {
+      padding-left: 24px;
+    }
+    p:first-child, ul:first-child, pre:first-child {
+      margin-top: 0;
+    }
+    p:last-child, ul:last-child, pre:last-child {
+      margin-bottom: 0;
+    }
+  }
+  & input[type="checkbox"] {
+    margin: 0;
+    margin-left: -4px;
+  }
 }
 .loading-screen-container {
   position: absolute;
@@ -119,8 +128,6 @@ code {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-.loading-screen-container {
   flex: 0 0 100px;
   font-size: 2em;
   color: darkgrey;
@@ -138,10 +145,10 @@ code {
   padding: 10.5px 14px;
   font-family: inherit;
   font-size: inherit;
-}
-.custom-textarea:focus {
-  border: 2px solid #3f51b5;
-  padding: 9.5px 13px;
+  &:focus {
+    border: 2px solid #3f51b5;
+    padding: 9.5px 13px;
+  }
 }
 /* Textareas resizing to fit contents */
 .autoresize-div {

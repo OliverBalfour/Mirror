@@ -49,7 +49,7 @@ export const Edit = ({ card, setCard }) => {
         Description</InputLabel>
       <Markdown source={card.description} cards={cards}
         tabIndex='0' onKeyDown={handleKeyDown}
-        className="markdown-selectable markdown"
+        className="markdown-selectable compact"
         onDoubleClick={() => setEditingDescription(true)} />
     </div>
   ) : (

@@ -16,4 +16,4 @@ export default ({ source, postprocess, ...props }) =>
       prism.languages[lang]
         ? prism.highlight(code, prism.languages[lang], lang)
         : code
-  }))} className='markdown' {...props} />;
+  }))} {...props} className={'markdown ' + (props.className ? props.className : '')} />;
