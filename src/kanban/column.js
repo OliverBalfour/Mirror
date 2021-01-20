@@ -86,7 +86,7 @@ const EditingCard = ({ value, setValue, add, cancel }) => {
   return (
     <div>
       <TextField
-        label="New Card"
+        label="New card"
         multiline
         autoFocus
         rowsMax={6}

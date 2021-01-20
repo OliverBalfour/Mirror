@@ -291,8 +291,9 @@ const reducer = createReducer(loadingState, {
   [deleteTab]: (ps, a) => {
     const tabIdx = a.payload;
     const cardIDs = [];
-    const tab = ps.tabs[ps.tabOrder[tabIdx]];
+    const tabID = ps.tabOrder[tabIdx];
     const ns = produce(ps, s => {
+      const tab = s.tabs[tabID];
       while (tab.columns.length) {
         const colID = tab.columns[0];
         cardIDs.push(...s.columns[colID].items);
@@ -303,10 +304,11 @@ const reducer = createReducer(loadingState, {
       delete s.tabs[tab.id];
       s.tabOrder.splice(tabIdx, 1);
     });
+    const tab = ps.tabs[tabID];
     new EditSet()
       .deleteAllByID(c.cards, cardIDs, ps.cards)
       .deleteAllByID(c.columns, tab.columns, ps.columns)
-      .delete(c.tabs, tab.id, tab)
+      .delete(c.tabs, tabID, tab)
       .param(c.tabOrder, ns.tabOrder, ps.tabOrder)
       .commit();
     return ns;
