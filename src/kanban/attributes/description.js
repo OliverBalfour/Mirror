@@ -58,7 +58,7 @@ export const Edit = ({ card, setCard }) => {
       <ClickAwayListener onClickAway={() => setEditingDescription(false)}>
         <div onKeyDown={handleKeyDown}>
           <AutocompleteEditor value={card.description} setValue={setDescription}
-            className='descriptionEditor' offset={20} />
+            className='descriptionEditor' offset={20} autoFocus />
         </div>
       </ClickAwayListener>
     </React.Fragment>

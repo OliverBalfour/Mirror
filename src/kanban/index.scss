@@ -14,20 +14,21 @@
   flex-grow: 1;
   height: 100%;
 }
-.column-internals {
+.column-internals-container {
+  flex: 1 0;
   width: 100%;
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  height: calc(100% - 20px);
-  padding-bottom: 0;
+  padding: 0;
+  padding-top: $gridSpacing;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
-.column-internals.dragging-over {
-  /* 1) height is -20px normally to avoid bottom being clipped off
-     2) 100px padding and -100px height while dragging to give a 100px buffer of
-     droppable space to avoid glitching due to dynamic resizing while moving
-     cards to the bottom */
-  height: calc(100% - 120px);
-  padding-bottom: 100px;
+.column-internals {
+  width: 100%;
+  flex: 1;
 }
 .root {
   height: 100%;
@@ -44,9 +45,11 @@
   flex-shrink: 0;
 }
 .column {
+  display: flex;
+  flex-direction: column;
   background: $columnBackground;
   padding: $gridSpacing;
-  padding-bottom: 24px;
+  padding-bottom: 0;
   width: $cardWidth;
   max-width: calc(100vw - #{4*$gridSpacing});
   border: 1px solid #CCDCDC;
@@ -97,6 +100,7 @@
   /* +1 is border */
   width: $cardWidth + $gridSpacing * 2 + 1px;
   margin-left: -$gridSpacing - 1px;
+  margin-bottom: 0;
 }
 .card {
   user-select: none;

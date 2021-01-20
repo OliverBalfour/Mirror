@@ -66,7 +66,9 @@ export default React.memo(({ col, index, setEditingCard }) => {
             <div {...provided.dragHandleProps}>
               <ColumnHeader col={col} add={addButton} />
             </div>
-            {internals}
+            <div className='column-internals-container'>
+              {internals}
+            </div>
           </div>
         </div>
       )}
