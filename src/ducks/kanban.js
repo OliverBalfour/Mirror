@@ -184,7 +184,7 @@ const reducer = createReducer(loadingState, {
   [deleteColumn]: (ps, a) => {
     const colID = a.payload;
     const ms = new Date().getTime();
-    const tabIdx = Object.values(ps.tabs).map(tab => tab.columns.indexOf(a.payload) !== -1).indexOf(true);
+    const tabIdx = ps.tabOrder.map(tabID => ps.tabs[tabID].columns.indexOf(colID) !== -1).indexOf(true);
     const ns = produce(ps, s => {
       if (tabIdx >= 0) s.tabs[s.tabOrder[tabIdx]].edited = ms;
       s.columns[colID].items.forEach(cardID => delete s.cards[cardID]);

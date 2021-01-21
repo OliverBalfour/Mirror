@@ -5,8 +5,9 @@ type EpochMS = Int -- epoch milliseconds via `new Date().getTime()`
 type State = {
   cards :: Map[CardID, Card],
   columns :: Map[Column, ColID],
+  -- Note that there may be more tabs than tabOrder contains
   tabs :: Map[TabID, Tab],
-  tabOrdr :: List[TabID],
+  tabOrder :: List[TabID],
 }
 
 type Zettel = {
