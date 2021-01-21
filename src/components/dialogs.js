@@ -7,10 +7,15 @@ import * as duck from '../ducks/kanban';
 import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { Description, DateTime, Duration } from '../kanban/attributes';
-import { ReloadProtect } from '../common';
+import { ReloadProtect, useEventListener } from '../common';
 import { MarkdownBase } from './markdown-base';
 
+const useCtrlEnter = callback =>
+  useEventListener(document, 'keydown', e =>
+    e.ctrlKey && e.which === 13 && callback());
+
 export const ConfirmDialog = ({ open, respond, title, subtitle, labels = ["Cancel", "OK"] }) => {
+  useCtrlEnter(() => open && respond(true));
   return (
     <Dialog open={open} onClose={() => respond(null)}>
       <DialogTitle>{title}</DialogTitle>
@@ -36,9 +41,9 @@ export const PromptDialog = ({
   label, inputType = "text", placeholder = "", buttons = null
 }) => {
   const [value, setValue] = React.useState(placeholder);
-  const done = x => { respond(x); setValue(placeholder) };
+  useCtrlEnter(() => open && respond(value));
   return (
-    <Dialog open={open} onClose={() => done(null)}>
+    <Dialog open={open} onClose={() => respond(null)}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         {typeof subtitle === "string" && (
@@ -51,10 +56,10 @@ export const PromptDialog = ({
       </DialogContent>
       <DialogActions>
         {buttons}
-        <Button onClick={() => done(false)} color="primary">
+        <Button onClick={() => respond(false)} color="primary">
           {labels[0]}
         </Button>
-        <Button onClick={() => done(value)} color="primary" variant="contained">
+        <Button onClick={() => respond(value)} color="primary" variant="contained">
           {labels[1]}
         </Button>
       </DialogActions>
@@ -90,6 +95,8 @@ export const CardEditDialog = ({ respond, card }) => {
     done();
   }
 
+  useCtrlEnter(editCard);
+
   return (
     <Dialog open onClose={() => done(null)} fullWidth maxWidth='md'
       disableBackdropClick={JSON.stringify(newCard) !== JSON.stringify(card)}>
@@ -124,6 +131,7 @@ export const CardEditDialog = ({ respond, card }) => {
 }
 
 export const AboutDialog = ({ open, respond }) => {
+  useCtrlEnter(() => open && respond());
   return (
     <Dialog open={open} onClose={respond} fullWidth>
       <DialogTitle>About Mirror</DialogTitle>
@@ -150,6 +158,8 @@ export const GitHubLoginDialog = ({ open, respond }) => {
   const [token, setToken] = React.useState("");
   const [gistID, setGistID] = React.useState("");
   const [username, setUsername] = React.useState("");
+  const done = () => respond(token, gistID, username);
+  useCtrlEnter(() => open && done());
   return (
     <Dialog open={open} onClose={respond} fullWidth>
       <DialogTitle>Log in via GitHub</DialogTitle>
@@ -180,7 +190,7 @@ export const GitHubLoginDialog = ({ open, respond }) => {
         <Button onClick={() => respond(false)} color="primary">
           Cancel
         </Button>
-        <Button onClick={() => respond(token, gistID, username)} color="primary" variant="contained">
+        <Button onClick={() => done()} color="primary" variant="contained">
           Log in
         </Button>
       </DialogActions>

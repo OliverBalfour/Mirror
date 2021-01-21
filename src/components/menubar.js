@@ -61,16 +61,18 @@ export default ({ active, setActive }) => {
           </PopoverMenu>
         </Toolbar>
       </AppBar>
-      <AboutDialog open={aboutOpen} respond={() => setAboutOpen(false)} />
-      <GitHubLoginDialog open={GHOpen} respond={(token, gist_id, username) => {
-        setGHOpen(false);
-        if (token !== false) {
-          config.token = token;
-          config.gist_id = gist_id;
-          config.username = username;
-          postLogIn().then(state => dispatch(duck.overwriteState(state)));
-        }
-      }} />
+      {aboutOpen && <AboutDialog open respond={() => setAboutOpen(false)} />}
+      {GHOpen &&
+        <GitHubLoginDialog open respond={(token, gist_id, username) => {
+          setGHOpen(false);
+          if (token !== false) {
+            config.token = token;
+            config.gist_id = gist_id;
+            config.username = username;
+            postLogIn().then(state => dispatch(duck.overwriteState(state)));
+          }
+        }} />
+      }
     </React.Fragment>
   );
 }
