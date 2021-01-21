@@ -16,7 +16,8 @@ import PopoverMenu from './popovermenu';
 
 export default ({
   tabs, render, index, setIndex,
-  addTab, renameTab, deleteTab, moveTab
+  addTab, renameTab, deleteTab, moveTab,
+  toggleAddColumn
 }) => {
   const handleChange = (event, newValue) => newValue >= 0 && newValue < tabs.length && setIndex(newValue);
   const Grow = () => <div style={{ flexGrow: 1 }} />;
@@ -39,6 +40,7 @@ export default ({
             "Delete tab": () => deleteTab(index),
             "Move tab left":  () => { moveTab([index, index-1]); handleChange(null, index-1) },
             "Move tab right": () => { moveTab([index, index+1]); handleChange(null, index+1) },
+            "Toggle add column view": () => toggleAddColumn(),
           }}>
             <IconButton>
               <MoreIcon />

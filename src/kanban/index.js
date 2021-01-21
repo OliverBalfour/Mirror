@@ -18,6 +18,8 @@ export default ({ active }) => {
   const setCurrentTab = num => setLoc("/boards/"+tabs[tabOrder[num]].name.toLowerCase());
   useTitle(() => active && currentTab >= 0 && tabs[tabOrder[currentTab]].name + " | Mirror");
   if (currentTab < 0) currentTab = 0;
+  const [addColumn, _setAddColumn] = React.useState(!localStorage.noAddColumn);
+  const setAddColumn = x => { localStorage.noAddColumn = !x; _setAddColumn(x) }
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmRespond = res => {
@@ -46,12 +48,18 @@ export default ({ active }) => {
     <React.Fragment>
       <TabView
         tabs={tabOrder.map(tabID => tabs[tabID].name)}
-        render={i => <BoardView key={i} tabInfo={{ tab: tabs[tabOrder[i]], index: i }} />}
+        render={i =>
+          <BoardView key={i}
+            tabInfo={{ tab: tabs[tabOrder[i]], index: i }}
+            addColumn={addColumn}
+          />
+        }
         addTab={() => setAddPromptOpen(true)}
         renameTab={() => setRenamePromptOpen(true)}
         deleteTab={() => Object.values(tabs).length > 1 ? setConfirmOpen(true) : alert("Cannot delete only tab")}
         moveTab={data => dispatch(duck.moveTab(data))}
         index={currentTab} setIndex={setCurrentTab}
+        toggleAddColumn={() => setAddColumn(!addColumn)}
       />
       {confirmOpen && (
         <ConfirmDialog open respond={confirmRespond}

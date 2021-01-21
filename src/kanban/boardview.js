@@ -9,7 +9,7 @@ import { useHashLocation } from '../common';
 import Column, { AddColumn } from './column';
 import './index.scss';
 
-export default ({ tabInfo }) => {
+export default ({ tabInfo, addColumn }) => {
   const tab = tabInfo.index;
   const tabObj = tabInfo.tab;
   const dispatch = useDispatch();
@@ -61,7 +61,7 @@ export default ({ tabInfo }) => {
               <div className='root' ref={provided.innerRef}>
                 {colIDs.map((colID, i) => <Column col={columns[i]} key={colID} index={i}
                   setEditingCard={setEditingCard} />)}
-                <AddColumn add={() => setPromptOpen(true)} hide={snapshot.isDraggingOver || snapshot.draggingFromThisWith} />
+                {addColumn && <AddColumn add={() => setPromptOpen(true)} hide={snapshot.isDraggingOver || snapshot.draggingFromThisWith} />}
               </div>
               {provided.placeholder}
             </React.Fragment>
