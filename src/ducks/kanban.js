@@ -314,8 +314,17 @@ const reducer = createReducer(loadingState, {
     return ns;
   },
   [addTab]: (ps, a) => {
-    const id = generateID();
     const name = a.payload;
+    if (!name.length) {
+      window.snackbar("Tab name cannot be empty", { variant: 'warning' });
+      return ps;
+    }
+    const tabNames = Object.values(ps.tabs).map(tab => tab.name.toLowerCase());
+    if (tabNames.indexOf(name.toLowerCase()) !== -1 || tabNames.map(encodeURIComponent).indexOf(encodeURIComponent(name.toLowerCase())) !== -1) {
+      window.snackbar("Tab name already exists", { variant: 'warning' });
+      return ps;
+    }
+    const id = generateID();
     const tab = { name, id, columns: [], created: new Date().getTime() };
     const ns = produce(ps, s => {
       s.tabs[id] = tab;

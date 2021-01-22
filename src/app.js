@@ -9,6 +9,7 @@ import { Provider, useSelector, useDispatch } from 'react-redux';
 import * as duck from './ducks/kanban';
 import { synchroniseState, loggedIn } from './backends/github';
 import { useHashLocation, useInterval, Hidden } from './common';
+import { SnackbarProvider, useSnackbar } from 'notistack';
 
 import { MenuBar, LoadingScreen } from './components';
 import Kanban from './kanban';
@@ -49,6 +50,8 @@ const Root = () => {
   const [loc, setLoc] = useHashLocation();
   const [tabURLs, setTabURLs] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const { enqueueSnackbar } = useSnackbar();
+  window.snackbar = enqueueSnackbar;
   // BUG: for some reason the intial state is not the loading state
   // in our createReducer shim and the prevState at first is the empty undoable state
   // The below `state.present === undefined` is a temporary workaround
@@ -88,5 +91,8 @@ const Root = () => {
 
 export default () =>
   <Provider store={store}>
-    <Root />
+    <SnackbarProvider maxSnack={3} autoHideDuration={3000}
+      classes={{ containerRoot: 'snackbar-root' }}>
+      <Root />
+    </SnackbarProvider>
   </Provider>

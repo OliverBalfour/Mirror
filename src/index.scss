@@ -177,3 +177,7 @@ textarea.autoresize, .autoresize-div {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+.snackbar-root {
+  left: 20px !important;
+  bottom: #{20 + 48}px !important;
+}
