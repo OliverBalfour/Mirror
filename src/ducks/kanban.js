@@ -11,7 +11,7 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import undoable, { ActionTypes } from 'redux-undo';
 import produce from 'immer';
 import { generateID, objectMap, deleteInList, createReducer, shallowEqual,
-  structuredClone, deepMerge } from '../common';
+  structuredClone, deepMerge, encURI } from '../common';
 import { EditSet, load, namespaceNames as c, hist, UNDO_LIMIT } from '../backends';
 
 // Action creators
@@ -320,7 +320,7 @@ const reducer = createReducer(loadingState, {
       return ps;
     }
     const tabNames = Object.values(ps.tabs).map(tab => tab.name.toLowerCase());
-    if (tabNames.indexOf(name.toLowerCase()) !== -1 || tabNames.map(encodeURIComponent).indexOf(encodeURIComponent(name.toLowerCase())) !== -1) {
+    if (tabNames.indexOf(name.toLowerCase()) !== -1 || tabNames.map(encURI).indexOf(encURI(name)) !== -1) {
       window.snackbar("Tab name already exists", { variant: 'warning' });
       return ps;
     }

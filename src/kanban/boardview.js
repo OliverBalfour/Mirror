@@ -5,7 +5,7 @@ import * as duck from '../ducks/kanban';
 import { selectors } from '../store';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { PromptDialog, CardEditDialog } from '../components';
-import { useHashLocation } from '../common';
+import { useHashLocation, encURI } from '../common';
 import Column, { AddColumn } from './column';
 import './index.scss';
 
@@ -49,7 +49,7 @@ export default ({ tabInfo, addColumn }) => {
   const cardsByTab = useSelector(selectors.boards.cardsByTab);
   const tabIDfromCardID = id => Object.keys(cardsByTab).filter(tabID => cardsByTab[tabID].indexOf(id) !== -1);
   const setEditingCard = id => id
-    ? setLoc(`/boards/${tabs[tabIDfromCardID(id)].name.toLowerCase()}/${id}/edit`)
+    ? setLoc(`/boards/${encURI(tabs[tabIDfromCardID(id)].name)}/${id}/edit`)
     : setLoc(`/boards/${loc.split("/")[2]}`);
 
   return (
@@ -61,7 +61,7 @@ export default ({ tabInfo, addColumn }) => {
               <div className='root' ref={provided.innerRef}>
                 {colIDs.map((colID, i) => <Column col={columns[i]} key={colID} index={i}
                   setEditingCard={setEditingCard} />)}
-                {addColumn && <AddColumn add={() => setPromptOpen(true)} hide={snapshot.isDraggingOver || snapshot.draggingFromThisWith} />}
+                {(addColumn || !colIDs.length) && <AddColumn add={() => setPromptOpen(true)} hide={snapshot.isDraggingOver || snapshot.draggingFromThisWith} />}
               </div>
               {provided.placeholder}
             </React.Fragment>

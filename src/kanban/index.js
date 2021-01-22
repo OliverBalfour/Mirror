@@ -6,7 +6,7 @@ import BoardView from './boardview';
 import * as duck from '../ducks/kanban';
 import { selectors } from '../store';
 import { ConfirmDialog, PromptDialog } from '../components';
-import { useHashLocation, useTitle } from '../common';
+import { useHashLocation, useTitle, encURI } from '../common';
 
 export default ({ active }) => {
   const dispatch = useDispatch();
@@ -14,8 +14,8 @@ export default ({ active }) => {
   // {id:{name, id, columns (ids)},...}
   const tabs = useSelector(selectors.boards.tabs);
   const tabOrder = useSelector(selectors.boards.tabOrder);
-  let currentTab = tabOrder.map(tabID => tabs[tabID].name.toLowerCase() === loc.split("/")[2]).indexOf(true);
-  const setCurrentTab = num => setLoc("/boards/"+tabs[tabOrder[num]].name.toLowerCase());
+  let currentTab = tabOrder.map(tabID => encURI(tabs[tabID].name) === loc.split("/")[2]).indexOf(true);
+  const setCurrentTab = num => setLoc("/boards/"+encURI(tabs[tabOrder[num]].name));
   useTitle(() => active && currentTab >= 0 && tabs[tabOrder[currentTab]].name + " | Mirror");
   if (currentTab < 0) currentTab = 0;
   const [addColumn, _setAddColumn] = React.useState(!localStorage.noAddColumn);

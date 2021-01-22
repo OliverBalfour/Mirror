@@ -78,3 +78,5 @@ export const parseLaTeX = (string, katex) => {
 
   return fmapRegexMatch(fmapRegexMatch(string, true), false);
 };
+
+export const encURI = x => encodeURIComponent(x.toLowerCase().replace(/ /g, '-'));
