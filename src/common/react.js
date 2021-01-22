@@ -69,6 +69,16 @@ export const useEventListener = (elem, event, callback) => {
   });
 }
 
+// Non atomic boolean flags scoped to a component's mount lifecycle
+export const flagSet = name => window['__flag_'+name];
+export const useFlag = name => {
+  React.useEffect(() => {
+    const flagName = '__flag_'+name;
+    window[flagName] = true;
+    return () => window[flagName] = false;
+  });
+}
+
 // Note: ReloadProtect does not prevent hash changes. Be warned!
 export const ReloadProtect = ({ shouldProtect = true }) => {
   React.useEffect(() => {

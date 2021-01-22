@@ -7,7 +7,7 @@ import { Button, IconButton, ButtonGroup, TextField,
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
-import { mergeRefs, useEventListener } from '../common';
+import { mergeRefs, useEventListener, flagSet } from '../common';
 import ColumnHeader from './column-header';
 import Card from './card';
 
@@ -78,8 +78,11 @@ export default React.memo(({ col, index, setEditingCard }) => {
 });
 
 const EditingCard = ({ value, setValue, add, cancel }) => {
-  // Pressing ESC cancels editing a card
-  useEventListener(document, 'keydown', e => e.which === 27 && cancel());
+  // Pressing ESC cancels editing a card, and Ctrl+Enter adds it
+  useEventListener(document, 'keydown', e => {
+    if (e.which === 27) cancel();
+    else if (e.ctrlKey && e.which === 13 && !flagSet('dialog')) add();
+  });
   return (
     // Clicking away while empty cancels editing a card
     <ClickAwayListener onClickAway={() => !value.length && cancel()}>

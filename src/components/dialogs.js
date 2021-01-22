@@ -7,7 +7,7 @@ import * as duck from '../ducks/kanban';
 import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { Description, DateTime, Duration } from '../kanban/attributes';
-import { ReloadProtect, useEventListener } from '../common';
+import { ReloadProtect, useEventListener, useFlag } from '../common';
 import { MarkdownBase } from './markdown-base';
 
 const useCtrlEnter = callback =>
@@ -15,6 +15,7 @@ const useCtrlEnter = callback =>
     e.ctrlKey && e.which === 13 && callback());
 
 export const ConfirmDialog = ({ open, respond, title, subtitle, labels = ["Cancel", "OK"] }) => {
+  useFlag('dialog');
   useCtrlEnter(() => open && respond(true));
   return (
     <Dialog open={open} onClose={() => respond(null)}>
@@ -40,6 +41,7 @@ export const PromptDialog = ({
   open, respond, title, subtitle, labels = ["Cancel", "OK"],
   label, inputType = "text", placeholder = "", buttons = null
 }) => {
+  useFlag('dialog');
   const [value, setValue] = React.useState(placeholder);
   useCtrlEnter(() => open && respond(value));
   return (
@@ -68,6 +70,7 @@ export const PromptDialog = ({
 }
 
 export const CardEditDialog = ({ respond, card }) => {
+  useFlag('dialog');
   const dispatch = useDispatch();
 
   const currentColID = useSelector(state => Object.values(sel.boards(state).columns)
@@ -131,6 +134,7 @@ export const CardEditDialog = ({ respond, card }) => {
 }
 
 export const AboutDialog = ({ open, respond }) => {
+  useFlag('dialog');
   useCtrlEnter(() => open && respond());
   return (
     <Dialog open={open} onClose={respond} fullWidth>
@@ -155,6 +159,7 @@ export const AboutDialog = ({ open, respond }) => {
 }
 
 export const GitHubLoginDialog = ({ open, respond }) => {
+  useFlag('dialog');
   const [token, setToken] = React.useState("");
   const [gistID, setGistID] = React.useState("");
   const [username, setUsername] = React.useState("");
