@@ -400,7 +400,7 @@ const reducer = createReducer(loadingState, {
       ...zettel
     };
     const ns = produce(ps, s => {
-      s.cards[ns] = fullZettel;
+      s.cards[id] = fullZettel;
     });
     new EditSet()
       .add(c.cards, fullZettel)
