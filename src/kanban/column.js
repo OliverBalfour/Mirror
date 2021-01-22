@@ -2,11 +2,12 @@
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import * as duck from '../ducks/kanban';
-import { Button, IconButton, ButtonGroup, TextField } from '@material-ui/core';
+import { Button, IconButton, ButtonGroup, TextField,
+  ClickAwayListener } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
-import { mergeRefs } from '../common';
+import { mergeRefs, useEventListener } from '../common';
 import ColumnHeader from './column-header';
 import Card from './card';
 
@@ -77,30 +78,29 @@ export default React.memo(({ col, index, setEditingCard }) => {
 });
 
 const EditingCard = ({ value, setValue, add, cancel }) => {
-  React.useEffect(() => {
-    // Pressing ESC cancels editing a card
-    const cb = e => e.which === 27 && cancel();
-    document.addEventListener('keydown', cb);
-    return () => document.removeEventListener('keydown', cb);
-  });
+  // Pressing ESC cancels editing a card
+  useEventListener(document, 'keydown', e => e.which === 27 && cancel());
   return (
-    <div>
-      <TextField
-        label="New card"
-        multiline
-        autoFocus
-        rowsMax={6}
-        value={value}
-        onChange={e => setValue(e.target.value)}
-        variant="filled"
-        style={{ width: "100%" }} />
-      <ButtonGroup variant="contained" size='small' className='editingCardButtons'>
-        <Button style={{flexGrow: 1}} variant='contained' onClick={add}>
-          Done
-        </Button>
-        <Button onClick={cancel}><DeleteIcon style={{color: '#555'}} /></Button>
-      </ButtonGroup>
-    </div>
+    // Clicking away while empty cancels editing a card
+    <ClickAwayListener onClickAway={() => !value.length && cancel()}>
+      <div>
+        <TextField
+          label="New card"
+          multiline
+          autoFocus
+          rowsMax={6}
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          variant="filled"
+          style={{ width: "100%" }} />
+        <ButtonGroup variant="contained" size='small' className='editingCardButtons'>
+          <Button style={{flexGrow: 1}} variant='contained' onClick={add}>
+            Done
+          </Button>
+          <Button onClick={cancel}><DeleteIcon style={{color: '#555'}} /></Button>
+        </ButtonGroup>
+      </div>
+    </ClickAwayListener>
   );
 };
 
