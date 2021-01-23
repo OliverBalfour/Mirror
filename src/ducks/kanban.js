@@ -96,6 +96,20 @@ const loadingState = {
   loading: true
 };
 
+// Helpers
+const validTabName = (name, state) => {
+  if (!name.length) {
+    window.snackbar("Tab name cannot be empty", { variant: 'warning' });
+    return false;
+  }
+  const tabNames = Object.values(state.tabs).map(tab => tab.name.toLowerCase());
+  if (tabNames.indexOf(name.toLowerCase()) !== -1 || tabNames.map(encURI).indexOf(encURI(name)) !== -1) {
+    window.snackbar("Tab name already exists", { variant: 'warning' });
+    return false;
+  }
+  return true;
+}
+
 // Use our version of createReducer that does not enable Immer by default
 // Note that these reducers are not pure, they commit changes to IndexedDB
 // and the GitHub Gist API. As the app cannot function without these features,
@@ -315,15 +329,7 @@ const reducer = createReducer(loadingState, {
   },
   [addTab]: (ps, a) => {
     const name = a.payload;
-    if (!name.length) {
-      window.snackbar("Tab name cannot be empty", { variant: 'warning' });
-      return ps;
-    }
-    const tabNames = Object.values(ps.tabs).map(tab => tab.name.toLowerCase());
-    if (tabNames.indexOf(name.toLowerCase()) !== -1 || tabNames.map(encURI).indexOf(encURI(name)) !== -1) {
-      window.snackbar("Tab name already exists", { variant: 'warning' });
-      return ps;
-    }
+    if (!validTabName(name, ps)) return ps;
     const id = generateID();
     const tab = { name, id, columns: [], created: new Date().getTime() };
     const ns = produce(ps, s => {
@@ -338,8 +344,9 @@ const reducer = createReducer(loadingState, {
   },
   [renameTab]: (ps, a) => {
     const { tabID, name } = a.payload;
-    if (ps.tabs[tabID].namd === name)
+    if (ps.tabs[tabID].name === name)
       return ps;
+    if (!validTabName(name, ps)) return ps;
     const ns = produce(ps, s => {
       s.tabs[tabID].name = name;
       s.tabs[tabID].edited = new Date().getTime();
@@ -509,11 +516,15 @@ const undoableReducer = undoable(reducer, {
 });
 
 export default (s, a) => {
-  if (a.type === ActionTypes.UNDO && !hist.undo.allowed())
+  if (a.type === ActionTypes.UNDO && !hist.undo.allowed()) {
+    window.snackbar('Cannot undo any further', { variant: 'warning' });
     return s;
+  }
 
-  if (a.type === ActionTypes.REDO && !hist.redo.allowed())
+  if (a.type === ActionTypes.REDO && !hist.redo.allowed()) {
+    window.snackbar('Cannot redo any further', { variant: 'warning' });
     return s;
+  }
 
   if (undoBlacklist.indexOf(a.type) !== -1) {
     // Simulate undoable reducer

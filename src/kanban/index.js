@@ -17,7 +17,8 @@ export default ({ active }) => {
   let currentTab = tabOrder.map(tabID => encURI(tabs[tabID].name) === loc.split("/")[2]).indexOf(true);
   const setCurrentTab = num => setLoc("/boards/"+encURI(tabs[tabOrder[num]].name));
   useTitle(() => active && currentTab >= 0 && tabs[tabOrder[currentTab]].name + " | Mirror");
-  if (currentTab < 0) currentTab = 0;
+  if (currentTab >= 0) window.__lastCurrentTab = currentTab;
+  if (currentTab < 0) currentTab = window.__lastCurrentTab || 0;
   const [addColumn, _setAddColumn] = React.useState(!localStorage.noAddColumn);
   const setAddColumn = x => { localStorage.noAddColumn = !x; _setAddColumn(x) }
 
@@ -42,7 +43,10 @@ export default ({ active }) => {
     setRenamePromptOpen(false);
     if (typeof res === "string" && res.length)
       dispatch(duck.renameTab({ tabID: tabOrder[currentTab], name: res }));
+    setLoc("/boards/"+encURI(res));
   }
+
+  const tabName = tabs[tabOrder[currentTab]].name;
 
   return (
     <React.Fragment>
@@ -70,7 +74,8 @@ export default ({ active }) => {
       )}
       {renamePromptOpen && (
         <PromptDialog open respond={renamePromptRespond}
-          title={`Rename tab ${tabs[tabOrder[currentTab]].name}`} label="Name" />
+          title={`Rename tab ${tabName}`} label="Name"
+          placeholder={tabName} />
       )}
     </React.Fragment>
   );
