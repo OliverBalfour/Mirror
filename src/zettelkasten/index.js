@@ -1,6 +1,7 @@
 
 import * as React from 'react';
-import { useHashLocation, useTitle, generateID, ReloadProtect } from '../common';
+import { useHashLocation, useTitle, generateID, ReloadProtect,
+  useEventListener } from '../common';
 import { selectors } from '../store';
 import { useSelector, useDispatch } from 'react-redux';
 import { Markdown, AutocompleteEditor } from '../components';
@@ -60,15 +61,21 @@ function ZettelView ({
   active, dispatch, cards, currentCardID
 }) {
   const [loc, setLoc] = useHashLocation();
+  const editing = loc.split('/')[3] === 'edit'; //#/notes/ID/edit
   const starred = useSelector(selectors.boards.starredZettels);
   const card = cards[currentCardID];
   const [newCard, setNewCard] = React.useState({ ...card }); // assuming no deep nesting
   useTitle(() => active && newCard.content + " | Mirror");
   const setCard = part => setNewCard({ ...newCard, ...part });
+  // Ctrl+Enter to save zettels
+  useEventListener(document, 'keydown', e => {
+    if (editing && e.which === 13 && e.ctrlKey) {
+      saveZettel(newCard);
+    }
+  });
 
   if (typeof card !== 'object') return null;
 
-  const editing = loc.split('/')[3] === 'edit'; //#/notes/ID/edit
   const setEditing = yes => yes
     ? setLoc(`/notes/${currentCardID}/edit`)
     : setLoc(`/notes/${currentCardID}`);
