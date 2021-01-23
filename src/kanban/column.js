@@ -86,7 +86,7 @@ const EditingCard = ({ value, setValue, add, cancel }) => {
   return (
     // Clicking away while empty cancels editing a card
     <ClickAwayListener onClickAway={() => !value.length && cancel()}>
-      <div>
+      <div className='new-card-sheet'>
         <TextField
           label="New card"
           multiline
