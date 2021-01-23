@@ -181,3 +181,9 @@ textarea.autoresize, .autoresize-div {
   left: 20px !important;
   bottom: #{20 + 48}px !important;
 }
+// External link icons
+// Source: https://electrictoolbox.com/add-offsite-link-icon-after-external-links-css/
+a[href^="http://"], a[href^="https://"] {
+    background: url(../public/external.png) center right no-repeat;
+    padding-right: 13px;
+}

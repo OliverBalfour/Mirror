@@ -106,4 +106,9 @@ export const RawHTMLElement = ({ source, ...props }) => {
 
 // DOMPurify reduces XSS risk
 export const RawHTMLString = ({ source, purify = true, ...props }) =>
-  <span dangerouslySetInnerHTML={{ __html: purify ? DOMPurify.sanitize(source) : source }} {...props} />;
+  <span dangerouslySetInnerHTML={{
+      __html: purify
+        ? DOMPurify.sanitize(source, { ADD_ATTR: ['target'] })
+        : source
+    }} {...props}
+  />;
