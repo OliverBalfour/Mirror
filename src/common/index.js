@@ -58,22 +58,26 @@ export const downloadData = (content, filename, type) => {
 }
 
 // Simple card search; searches titles then descriptions then IDs for case insensitive exact matches
-export const searchCards = (term, cards, limit=10) => {
+export const searchCards = (term, cards, limit=10, allowArchived=false) => {
+  let cardIDs = Object.keys(cards);
+  if (!allowArchived) {
+    cardIDs = cardIDs.filter(cardID => !cards[cardID].archived);
+  }
   let matches = [];
   let tl = term.toLowerCase();
-  for (const cardID in cards) {
+  for (const cardID of cardIDs) {
     if (cards[cardID].content.toLowerCase().includes(tl)) {
       matches.push(cardID);
       if (matches.length === limit) return matches;
     }
   }
-  for (const cardID in cards) {
+  for (const cardID of cardIDs) {
     if (cards[cardID].description && cards[cardID].description.toLowerCase().includes(tl)) {
       matches.push(cardID);
       if (matches.length === limit) return matches;
     }
   }
-  for (const cardID in cards) {
+  for (const cardID of cardIDs) {
     if (cardID.toLowerCase().includes(tl)) {
       matches.push(cardID);
       if (matches.length === limit) return matches;
