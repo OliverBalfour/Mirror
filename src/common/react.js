@@ -112,3 +112,22 @@ export const RawHTMLString = ({ source, purify = true, ...props }) =>
         : source
     }} {...props}
   />;
+
+// <ErrorBoundary fallback={<p>failed</p>}>
+//   <ComponentWhichCanThrow />
+// </ErrorBoundary>
+export class ErrorBoundary extends React.Component {
+  state = { hasError: false, error: null };
+  static getDerivedStateFromError(error) {
+    return {
+      hasError: true,
+      error
+    };
+  }
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}

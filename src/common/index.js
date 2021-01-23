@@ -1,10 +1,7 @@
 
-export { linkName, abbreviatedDescription, parseWikilinks, parseLaTeX,
-  encURI } from './string';
-export { mergeRefs, useHashLocation, useTitle, useInterval, useEventListener,
-  ReloadProtect, Hidden, RawHTMLElement, RawHTMLString, useFlag, flagSet
-  } from './react';
-export { prettyPrintDate, generateID, timeUrgencyClassName } from './time';
+export * from './string';
+export * from './react';
+export * from './time';
 
 // Source: https://stackoverflow.com/a/14810722/4642943
 // returns a new object with the values at each key mapped using mapFn(value)

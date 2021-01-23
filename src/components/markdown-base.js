@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import marked from 'marked';
-import { RawHTMLString } from '../common';
+import { RawHTMLString, ErrorBoundary } from '../common';
 
 const PrismMarked = React.lazy(() => import('./markdown-prism'));
 
@@ -21,18 +21,22 @@ marked.use({ renderer });
 
 export const MarkdownBase = ({ source, postprocess = x => x, ...props }) => {
   try {
-    if (source.indexOf('```') !== -1) {
+    // The RawHTMLString component internally uses DOMPurify to reduce the risk of XSS
+    const RawMarkdown = React.memo(() =>
+      <RawHTMLString source={postprocess(marked(source, { gfm: true }))}
+        {...props} className={'markdown ' + (props.className ? props.className : '')}
+      />
+    );
+    if (source.match(/```\w+/m) !== null) {
       return (
-        <React.Suspense fallback={<span>Loading...</span>}>
-          <PrismMarked source={source} postprocess={postprocess} {...props} />
-        </React.Suspense>
+        <ErrorBoundary fallback={<RawMarkdown />}>
+          <React.Suspense fallback={<span>Loading...</span>}>
+            <PrismMarked source={source} postprocess={postprocess} {...props} />
+          </React.Suspense>
+        </ErrorBoundary>
       );
     } else {
-      // The RawHTMLString component internally uses DOMPurify to reduce the risk of XSS
-      return (
-        <RawHTMLString source={postprocess(marked(source, { gfm: true }))}
-          {...props} className={'markdown ' + (props.className ? props.className : '')} />
-      );
+      return <RawMarkdown />;
     }
   } catch (e) {
     return (
