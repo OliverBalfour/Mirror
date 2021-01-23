@@ -1,21 +1,21 @@
 
 import { configureStore } from '@reduxjs/toolkit';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
-import * as kanban from './ducks/kanban';
+import * as core from './reducer';
 import { objectMap } from './common';
 import { loadState } from './backends';
 import thunk from 'redux-thunk';
 
 const store = configureStore({
   // DEBUG:
-  // reducer: (s, a) => { console.log(a); kanban.default(s, a) },
-  reducer: kanban.default,
+  // reducer: (s, a) => { console.log(a); core.default(s, a) },
+  reducer: core.default,
   middleware: [thunk],
 });
 
 // Load state. Ignore lazy loading for now.
 loadState(true).then(state => {
-  store.dispatch(kanban.unsafeSetState(state));
+  store.dispatch(core.unsafeSetState(state));
 });
 
 // Undo/redo keyboard shortcuts if supported
@@ -37,5 +37,5 @@ export const globalSelectors = {
   boards: state => state.present
 }
 export const selectors = {
-  boards: objectMap(kanban.selectors, localSelector => state => localSelector(globalSelectors.boards(state)))
+  boards: objectMap(core.selectors, localSelector => state => localSelector(globalSelectors.boards(state)))
 };

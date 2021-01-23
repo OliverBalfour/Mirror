@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import * as duck from '../ducks/kanban';
+import * as core from '../reducer';
 
 import { IconButton } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -15,20 +15,20 @@ export default ({ col, add }) => {
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmRespond = res => {
     setConfirmOpen(false);
-    if (res) dispatch(duck.deleteColumn(col.id))
+    if (res) dispatch(core.deleteColumn(col.id))
   }
 
   const [promptOpen, setPromptOpen] = React.useState(false);
   const promptRespond = res => {
     setPromptOpen(false);
     if (typeof res === "string" && res.length)
-      dispatch(duck.renameColumn({ colID: col.id, name: res }));
+      dispatch(core.renameColumn({ colID: col.id, name: res }));
   }
 
-  const archiveAll = () => dispatch(duck.archiveCardsInColumn(col.id));
+  const archiveAll = () => dispatch(core.archiveCardsInColumn(col.id));
 
   const dateTimeAttributeUsed = col.items.filter(card => ['string','number'].indexOf(typeof card.time) !== -1).length > 0;
-  const sortByDue = () => dispatch(duck.sortColByTime(col.id));
+  const sortByDue = () => dispatch(core.sortColByTime(col.id));
 
   return (
     <div>

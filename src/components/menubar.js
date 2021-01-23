@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import * as duck from '../ducks/kanban';
+import * as core from '../reducer';
 import { loggedIn, logOut, forcePush, forcePull } from '../backends/github';
 import { AppBar, Toolbar, IconButton, Tabs, Tab } from '@material-ui/core';
 import MoreIcon from '@material-ui/icons/MoreVert';
@@ -69,7 +69,7 @@ export default ({ active, setActive }) => {
             config.token = token;
             config.gist_id = gist_id;
             config.username = username;
-            postLogIn().then(state => dispatch(duck.overwriteState(state)));
+            postLogIn().then(state => dispatch(core.overwriteState(state)));
           }
         }} />
       }

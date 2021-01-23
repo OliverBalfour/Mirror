@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
-import * as duck from './ducks/kanban';
+import * as core from './reducer';
 import { synchroniseState, loggedIn } from './backends/github';
 import { useHashLocation, useInterval, Hidden } from './common';
 import { SnackbarProvider, useSnackbar } from 'notistack';
@@ -44,7 +44,7 @@ const Root = () => {
   // more frequent querying is pointless
   useInterval(() => {
     if (loggedIn()) {
-      synchroniseState().then(diff => dispatch(duck.overwriteState(diff)));
+      synchroniseState().then(diff => dispatch(core.overwriteState(diff)));
     }
   }, 15000);
   const [loc, setLoc] = useHashLocation();

@@ -15,7 +15,7 @@ import AddIcon from '@material-ui/icons/Add';
 import SearchIcon from '@material-ui/icons/Search';
 import StarIcon from '@material-ui/icons/Star';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
-import * as duck from '../ducks/kanban.js';
+import * as core from '../reducer';
 import './index.scss';
 
 export default ({ active }) => {
@@ -30,7 +30,7 @@ export default ({ active }) => {
   if (!Object.prototype.hasOwnProperty.call(cards, currentCardID)) {
     // If card either does not exist, or is not loaded into memory
     // but is in IndexedDB (assuming sync with remote server is complete)
-    dispatch(duck.loadZettel(currentCardID));
+    dispatch(core.loadZettel(currentCardID));
     return <ZettelLoadingView />;
   }
 
@@ -85,32 +85,32 @@ function ZettelView ({
   }
 
   const deleteZettel = () => {
-    dispatch(duck.deleteCard(currentCardID));
+    dispatch(core.deleteCard(currentCardID));
     setLoc('/notes/main');
   }
   const saveZettel = zettel => {
-    dispatch(duck.editZettel({ zettel }));
+    dispatch(core.editZettel({ zettel }));
     setEditing(false);
   }
   const starZettel = () =>
-    dispatch(duck.toggleZettelStarred(currentCardID));
+    dispatch(core.toggleZettelStarred(currentCardID));
 
   // update editing field on card change
   if (card.id !== newCard.id) {
     // We want to save the card if the 'Add note' button was pressed
     // The only time a card is not saved is if you press cancel or delete
-    dispatch(duck.editZettel({ zettel: newCard }));
+    dispatch(core.editZettel({ zettel: newCard }));
     setNewCard({ ...card });
   }
 
   const addZettel = id => {
     // create a new card and navigate to editing it
-    dispatch(duck.addZettel({ zettel: { content: 'New note', description: '...', id } }));
+    dispatch(core.addZettel({ zettel: { content: 'New note', description: '...', id } }));
     setLoc(`/notes/${id}/edit`);
   };
 
   const addNewNote = id => {
-    dispatch(duck.editZettel({ zettel: newCard }));
+    dispatch(core.editZettel({ zettel: newCard }));
     addZettel(id);
   }
 

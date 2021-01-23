@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import * as duck from '../ducks/kanban';
+import * as core from '../reducer';
 import { selectors } from '../store';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { PromptDialog, CardEditDialog } from '../components';
@@ -24,12 +24,12 @@ export default ({ tabInfo, addColumn }) => {
   const onDragEnd = res => {
     if (!res.destination) return;
     if (res.type === "card") {
-      dispatch(duck.moveCard([
+      dispatch(core.moveCard([
         res.source.droppableId, res.destination.droppableId,
         res.source.index, res.destination.index
       ]));
     } else if (res.type === "column") {
-      dispatch(duck.moveColumn([
+      dispatch(core.moveColumn([
         res.source.index, res.destination.index, tab
       ]));
     }
@@ -39,7 +39,7 @@ export default ({ tabInfo, addColumn }) => {
   const promptRespond = name => {
     setPromptOpen(false);
     if (typeof name === "string" && name.length)
-      dispatch(duck.addColumn({ tabID: tabObj.id, name }));
+      dispatch(core.addColumn({ tabID: tabObj.id, name }));
   }
 
   const [loc, setLoc] = useHashLocation();

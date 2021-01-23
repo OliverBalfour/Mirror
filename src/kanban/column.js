@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import * as duck from '../ducks/kanban';
+import * as core from '../reducer';
 import { Button, IconButton, ButtonGroup, TextField,
   ClickAwayListener } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
@@ -19,7 +19,7 @@ export default React.memo(({ col, index, setEditingCard }) => {
   const dispatch = useDispatch();
   const addCard = () => {
     if (editingValue.length)
-      dispatch(duck.addCard({
+      dispatch(core.addCard({
         content: editingValue,
         colID: id
       }));

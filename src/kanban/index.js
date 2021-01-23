@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { TabView } from '../components';
 import BoardView from './boardview';
-import * as duck from '../ducks/kanban';
+import * as core from '../reducer';
 import { selectors } from '../store';
 import { ConfirmDialog, PromptDialog } from '../components';
 import { useHashLocation, useTitle, encURI } from '../common';
@@ -26,7 +26,7 @@ export default ({ active }) => {
   const confirmRespond = res => {
     setConfirmOpen(false);
     if (res) {
-      dispatch(duck.deleteTab(currentTab));
+      dispatch(core.deleteTab(currentTab));
       setCurrentTab(Math.max(0,currentTab-1));
     }
   }
@@ -35,14 +35,14 @@ export default ({ active }) => {
   const addPromptRespond = res => {
     setAddPromptOpen(false);
     if (typeof res === "string" && res.length)
-      dispatch(duck.addTab(res));
+      dispatch(core.addTab(res));
   }
 
   const [renamePromptOpen, setRenamePromptOpen] = React.useState(false);
   const renamePromptRespond = res => {
     setRenamePromptOpen(false);
     if (typeof res === "string" && res.length)
-      dispatch(duck.renameTab({ tabID: tabOrder[currentTab], name: res }));
+      dispatch(core.renameTab({ tabID: tabOrder[currentTab], name: res }));
     setLoc("/boards/"+encURI(res));
   }
 
@@ -61,7 +61,7 @@ export default ({ active }) => {
         addTab={() => setAddPromptOpen(true)}
         renameTab={() => setRenamePromptOpen(true)}
         deleteTab={() => Object.values(tabs).length > 1 ? setConfirmOpen(true) : alert("Cannot delete only tab")}
-        moveTab={data => dispatch(duck.moveTab(data))}
+        moveTab={data => dispatch(core.moveTab(data))}
         index={currentTab} setIndex={setCurrentTab}
         toggleAddColumn={() => setAddColumn(!addColumn)}
       />

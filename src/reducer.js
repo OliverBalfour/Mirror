@@ -11,8 +11,8 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import undoable, { ActionTypes } from 'redux-undo';
 import produce from 'immer';
 import { generateID, objectMap, deleteInList, createReducer, shallowEqual,
-  structuredClone, deepMerge, encURI } from '../common';
-import { EditSet, load, namespaceNames as c, hist, UNDO_LIMIT } from '../backends';
+  structuredClone, deepMerge, encURI } from './common';
+import { EditSet, load, namespaceNames as c, hist, UNDO_LIMIT } from './backends';
 
 // Action creators
 

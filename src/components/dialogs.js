@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
          TextField, InputLabel, Select, MenuItem,
          ListSubheader } from '@material-ui/core';
-import * as duck from '../ducks/kanban';
+import * as core from '../reducer';
 import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import { Description, DateTime, Duration } from '../kanban/attributes';
@@ -89,12 +89,12 @@ export const CardEditDialog = ({ respond, card }) => {
   }
   // save and then delete so you can undo the delete without losing your unsaved draft of a card
   const deleteCard = () => {
-    dispatch(duck.editCard({ card: newCard, colID }));
-    dispatch(duck.deleteCard(card.id));
+    dispatch(core.editCard({ card: newCard, colID }));
+    dispatch(core.deleteCard(card.id));
     done();
   }
   const editCard = () => {
-    dispatch(duck.editCard({ card: newCard, colID }));
+    dispatch(core.editCard({ card: newCard, colID }));
     done();
   }
 
