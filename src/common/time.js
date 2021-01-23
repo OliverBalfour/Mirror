@@ -60,7 +60,7 @@ export const prettyPrintDate = epochMilliseconds => {
     // If it's this calendar week,
     // or during the weekend it is a weekday the next week
     if ((weekDiff === 0 && diff >= 0)
-     || (dayOfWeek >= 5 && diff >= 0 && diff < 5)) return day;
+     || (dayOfWeek >= 5 && diff >= 0 && (dayOfWeek + diff) - 7 < 5)) return day;
 
     if (diff >= -7 && diff <   0) return `Last ${day}`;
     if (diff >   0 && diff <=  7) return `Next ${day}`;
