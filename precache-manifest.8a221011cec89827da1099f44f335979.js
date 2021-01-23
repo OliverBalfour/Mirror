@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "377d3f62b4defed759cc515fedeaaf74",
+    "revision": "9f97f0323140aed56f983498cf476c35",
     "url": "/Mirror/index.html"
   },
   {
-    "revision": "4375e4048fb9d503748f",
+    "revision": "2b8cb4ac45f4e720630d",
     "url": "/Mirror/static/css/4.3f555519.chunk.css"
   },
   {
@@ -12,16 +12,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Mirror/static/css/5.38199b72.chunk.css"
   },
   {
-    "revision": "0b37f8e88c3a990e0590",
-    "url": "/Mirror/static/css/main.526ccc5f.chunk.css"
+    "revision": "8004b29f2430bfb2c259",
+    "url": "/Mirror/static/css/main.977c2195.chunk.css"
   },
   {
-    "revision": "3c8421f368abd84b623a",
-    "url": "/Mirror/static/js/2.a42c6f9c.chunk.js"
+    "revision": "27033aebdd8b81aab703",
+    "url": "/Mirror/static/js/2.ad7f5bdc.chunk.js"
   },
   {
     "revision": "3a1c0e4090f11f697bf12d2aadb470e8",
-    "url": "/Mirror/static/js/2.a42c6f9c.chunk.js.LICENSE.txt"
+    "url": "/Mirror/static/js/2.ad7f5bdc.chunk.js.LICENSE.txt"
   },
   {
     "revision": "686ab13576493a79fb44",
@@ -32,8 +32,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Mirror/static/js/3.52cc5bea.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "4375e4048fb9d503748f",
-    "url": "/Mirror/static/js/4.a047fd17.chunk.js"
+    "revision": "2b8cb4ac45f4e720630d",
+    "url": "/Mirror/static/js/4.b0d789bd.chunk.js"
   },
   {
     "revision": "df14663809202cb7c500",
@@ -44,12 +44,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Mirror/static/js/6.943e7cfd.chunk.js"
   },
   {
-    "revision": "0b37f8e88c3a990e0590",
-    "url": "/Mirror/static/js/main.78a22580.chunk.js"
+    "revision": "8004b29f2430bfb2c259",
+    "url": "/Mirror/static/js/main.0a1f270c.chunk.js"
   },
   {
-    "revision": "c7367ca9711b3638abff",
-    "url": "/Mirror/static/js/runtime-main.1cd0d8f6.js"
+    "revision": "07e7ff79b372bea9477a",
+    "url": "/Mirror/static/js/runtime-main.39f6769d.js"
   },
   {
     "revision": "2dbe16b4f4662798159f8d62c8d2509d",
