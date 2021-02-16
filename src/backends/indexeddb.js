@@ -180,7 +180,7 @@ window.importIDBState = async () => {
   const input = document.getElementById('fileinput');
   input.addEventListener("change", async () => {
     const reader = new FileReader();
-    reader.readAsBinaryString(input.files[0]);
+    reader.readAsText(input.files[0]);
     reader.onloadend = async () => {
       const obj = JSON.parse(reader.result);
       const promises = [];
