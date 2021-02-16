@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/Mirror/static/css/main.f2911fb4.chunk.css",
-    "main.js": "/Mirror/static/js/main.dfeac836.chunk.js",
-    "main.js.map": "/Mirror/static/js/main.dfeac836.chunk.js.map",
+    "main.js": "/Mirror/static/js/main.80860d9f.chunk.js",
+    "main.js.map": "/Mirror/static/js/main.80860d9f.chunk.js.map",
     "runtime-main.js": "/Mirror/static/js/runtime-main.b6c1acfd.js",
     "runtime-main.js.map": "/Mirror/static/js/runtime-main.b6c1acfd.js.map",
-    "static/js/2.5e08c25b.chunk.js": "/Mirror/static/js/2.5e08c25b.chunk.js",
-    "static/js/2.5e08c25b.chunk.js.map": "/Mirror/static/js/2.5e08c25b.chunk.js.map",
+    "static/js/2.baea7bfc.chunk.js": "/Mirror/static/js/2.baea7bfc.chunk.js",
+    "static/js/2.baea7bfc.chunk.js.map": "/Mirror/static/js/2.baea7bfc.chunk.js.map",
     "static/js/3.b3056fc7.chunk.js": "/Mirror/static/js/3.b3056fc7.chunk.js",
     "static/js/3.b3056fc7.chunk.js.map": "/Mirror/static/js/3.b3056fc7.chunk.js.map",
     "static/css/4.3f555519.chunk.css": "/Mirror/static/css/4.3f555519.chunk.css",
@@ -18,19 +18,19 @@
     "static/js/6.e43392c4.chunk.js": "/Mirror/static/js/6.e43392c4.chunk.js",
     "static/js/6.e43392c4.chunk.js.map": "/Mirror/static/js/6.e43392c4.chunk.js.map",
     "index.html": "/Mirror/index.html",
-    "precache-manifest.4b3ab1628b3ffeb40da0009872f86a66.js": "/Mirror/precache-manifest.4b3ab1628b3ffeb40da0009872f86a66.js",
+    "precache-manifest.ad0c1aa1dc9f202c6b746de3d0a9119b.js": "/Mirror/precache-manifest.ad0c1aa1dc9f202c6b746de3d0a9119b.js",
     "service-worker.js": "/Mirror/service-worker.js",
     "static/css/4.3f555519.chunk.css.map": "/Mirror/static/css/4.3f555519.chunk.css.map",
     "static/css/5.38199b72.chunk.css.map": "/Mirror/static/css/5.38199b72.chunk.css.map",
     "static/css/main.f2911fb4.chunk.css.map": "/Mirror/static/css/main.f2911fb4.chunk.css.map",
-    "static/js/2.5e08c25b.chunk.js.LICENSE.txt": "/Mirror/static/js/2.5e08c25b.chunk.js.LICENSE.txt",
+    "static/js/2.baea7bfc.chunk.js.LICENSE.txt": "/Mirror/static/js/2.baea7bfc.chunk.js.LICENSE.txt",
     "static/js/3.b3056fc7.chunk.js.LICENSE.txt": "/Mirror/static/js/3.b3056fc7.chunk.js.LICENSE.txt",
     "static/media/katex.min.css": "/Mirror/static/media/KaTeX_Typewriter-Regular.641339e2.woff2"
   },
   "entrypoints": [
     "static/js/runtime-main.b6c1acfd.js",
-    "static/js/2.5e08c25b.chunk.js",
+    "static/js/2.baea7bfc.chunk.js",
     "static/css/main.f2911fb4.chunk.css",
-    "static/js/main.dfeac836.chunk.js"
+    "static/js/main.80860d9f.chunk.js"
   ]
 }
