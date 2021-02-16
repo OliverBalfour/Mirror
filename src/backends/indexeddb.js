@@ -9,6 +9,7 @@
 // IndexedDB wrapper with a simple async key-value storage API
 import { get, set, keys, del } from 'idb-keyval';
 import { generateInitialState, standaloneNamespaces, shallowNamespaces } from './index';
+import { downloadData } from '../common';
 
 // If loadAll is false, zettels other than main are not loaded (need lazy loading)
 export async function loadState (loadAll = true) {
@@ -162,3 +163,32 @@ window.__idb = { get, set, keys, del };
 window.__idb.getAll = async () => Promise.all(
   (await window.__idb.keys()).map(async x => [x, await window.__idb.get(x)])
 );
+
+window.exportIDBState = async () => {
+  const obj = {};
+  const values = await window.__idb.getAll();
+  values.forEach(([key, val]) => obj[key] = val);
+  const json = JSON.stringify(obj);
+  downloadData(json, "mirror-backup.json", "application/json");
+};
+
+window.importIDBState = async () => {
+  // Temporary hack
+  // Long term solution is to write an imperative API for creating file upload dialogs
+  // on the fly and use that here
+  document.body.innerHTML = "Choose a file to upload, or reload to cancel.&nbsp;<input type='file' id='fileinput'/>";
+  const input = document.getElementById('fileinput');
+  input.addEventListener("change", async () => {
+    const reader = new FileReader();
+    reader.readAsBinaryString(input.files[0]);
+    reader.onloadend = async () => {
+      const obj = JSON.parse(reader.result);
+      const promises = [];
+      for (let key in obj) {
+        promises.push(set(key, obj[key]));
+      }
+      await Promise.all(promises);
+      window.location.reload();
+    }
+  });
+};

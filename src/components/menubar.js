@@ -39,6 +39,8 @@ export default ({ active, setActive }) => {
     "About": () => setAboutOpen(true),
     ...githubItem(),
     "Clear saved state": () => window.prompt("Delete all saved state? Pressing undo will fix this. Type YES to confirm", "NO") === "YES" && window.deleteAllState(),
+    "Import state": () => window.importIDBState(),
+    "Export state": () => window.exportIDBState(),
   };
 
   return (
