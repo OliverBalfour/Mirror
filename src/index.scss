@@ -36,6 +36,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -ms-overflow-style: scrollbar;
 }
+hr {
+  border: none;
+  border-bottom: 1px solid #999;
+}
 #jsx-root {
   top: 0;
   left: 0;
@@ -202,7 +206,7 @@ a[href^="http://"], a[href^="https://"] {
     color: #58a6ff;
   }
   * {
-    border-color: black;
+    border-color: $darkBorder;
   }
   .katex * {
     border-color: white;
@@ -212,7 +216,7 @@ a[href^="http://"], a[href^="https://"] {
     color: white;
   }
   .MuiTabs-root, .MuiToolbar-root {
-    background: $darkSecondary;
+    background: darken($darkSecondary, 4%);
   }
   code[class*="language-"], pre[class*="language-"] {
     color: white;
@@ -241,7 +245,7 @@ a[href^="http://"], a[href^="https://"] {
       background: $darkSecondary;
     }
     ::-webkit-scrollbar-thumb {
-      background: $darkMain;
+      background: lighten($darkMain, 5%);
     }
   }
 }

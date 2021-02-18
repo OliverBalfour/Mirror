@@ -7,6 +7,10 @@ $columnBackground: lighten(#DFEEEE, 4%);
 $colourOverdue: orange;
 $colourDue: #e0816f;
 $colourNotDueSoon: wheat;
+$darkColourOverdue: darken(wheat, 67%);
+$darkColourDue: desaturate(darken(tomato, 20%), 10%);
+$darkColourNotDueSoon: desaturate(darken(tomato, 30%), 70%);
 
 $darkMain: #323639;
 $darkSecondary: darken(#212225, 0%);
+$darkBorder: #141414;

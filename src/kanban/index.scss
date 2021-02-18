@@ -129,6 +129,11 @@
     box-shadow: 0 1px 3px rgba(100, 100, 100, 0.3);
   }
 }
+.theme-dark {
+  .card:hover, .card:focus {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+}
 .new-card-sheet {
   margin-right: $gridSpacing / 2;
 }
@@ -165,20 +170,39 @@
   background-color: $colour !important;
   border-color: darken($colour, 13%) !important;
 }
+@mixin chip-urgency-dark($colour) {
+  background-color: $colour !important;
+  border-color: desaturate(lighten($colour, 30%), 38%) !important;
+}
 .urgency-overdue {
   @include chip-urgency($colourOverdue);
+}
+.theme-dark .urgency-overdue {
+  @include chip-urgency-dark($darkColourOverdue);
 }
 .urgency-two-hours {
   @include chip-urgency($colourDue);
 }
+.theme-dark .urgency-two-hours {
+  @include chip-urgency-dark($darkColourDue);
+}
 .urgency-day {
   @include chip-urgency(mix($colourDue, $colourNotDueSoon, 75%));
+}
+.theme-dark .urgency-day {
+  @include chip-urgency-dark(mix($darkColourDue, $darkColourNotDueSoon, 75%));
 }
 .urgency-week {
   @include chip-urgency(mix($colourDue, $colourNotDueSoon, 33%));
 }
+.theme-dark .urgency-week {
+  @include chip-urgency-dark(mix($darkColourDue, $darkColourNotDueSoon, 33%));
+}
 .urgency-fortnight {
   @include chip-urgency($colourNotDueSoon);
+}
+.theme-dark .urgency-fortnight {
+  @include chip-urgency-dark($darkColourNotDueSoon);
 }
 
 .markdown-selectable {
@@ -209,7 +233,7 @@
     background: $darkMain;
   }
   .columnHeaderRule {
-    background: black;
+    background: $darkBorder;
   }
   .editingCardButtons button {
     background: $darkMain;
