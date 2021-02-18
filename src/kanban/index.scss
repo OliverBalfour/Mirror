@@ -47,6 +47,12 @@
   box-sizing: border-box;
   overflow: hidden;
   overflow-x: auto;
+  &::-webkit-scrollbar {
+    height: 10px;
+  }
+  &::-webkit-scrollbar-track {
+    border-radius: 0;
+  }
 }
 .root * {
   flex-shrink: 0;

@@ -92,13 +92,16 @@ code {
   margin: 0;
   z-index: 99999 !important; /* appear over MUI dialog */
 }
+.theme-dark .textcomplete-dropdown {
+  background-color: $darkMain;
+}
 .textcomplete-item {
   margin: 0;
   font-size: 14px;
   padding: 2px 5px;
   cursor: pointer;
-  &:hover, &:active {
-    background-color: rgba(0, 0, 0, 0.05);
+  &:hover, &:active, &.active {
+    background-color: rgba(0, 0, 0, 0.2);
   }
 }
 .markdown {
@@ -135,6 +138,22 @@ code {
       padding: 4px 10px;
     }
   }
+  pre {
+    overflow-y: auto;
+  }
+  &:not(.compact) {
+    pre {
+      background: darken($columnBackground, 5%);
+      border-radius: 4px;
+      padding: 6px 10px;
+      &::-webkit-scrollbar-track {
+        background: inherit !important;
+      }
+    }
+  }
+}
+.theme-dark .markdown pre:not(.compact) {
+  background: $darkMain;
 }
 .loading-screen-container {
   position: absolute;
@@ -202,7 +221,7 @@ a[href^="http://"], a[href^="https://"] {
     color: white;
   }
   background: $darkMain;
-  a {
+  a, a * {
     color: #58a6ff;
   }
   * {
@@ -224,13 +243,10 @@ a[href^="http://"], a[href^="https://"] {
 }
 
 // Scrollbars - Chrome
-* {
-  scrollbar-width: thin !important;
-}
 @media only screen and (min-height: 800px) {
   ::-webkit-scrollbar {
     width: 6px;
-    height: 10px;
+    height: 6px;
   }
   ::-webkit-scrollbar-thumb {
     border-radius: 5px;
@@ -250,6 +266,9 @@ a[href^="http://"], a[href^="https://"] {
   }
 }
 // Scrollbars - Firefox
+* {
+  scrollbar-width: thin !important;
+}
 .theme-dark {
   scrollbar-color: $darkMain $darkSecondary !important;
 }
