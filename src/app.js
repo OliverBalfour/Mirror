@@ -8,7 +8,7 @@ import React from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import * as core from './reducer';
 import { synchroniseState, loggedIn } from './backends/github';
-import { useHashLocation, useInterval, Hidden } from './common';
+import { useHashLocation, useInterval, Hidden, ThemeProvider } from './common';
 import { SnackbarProvider, useSnackbar } from 'notistack';
 
 import { MenuBar, LoadingScreen } from './components';
@@ -90,9 +90,11 @@ const Root = () => {
 }
 
 export default () =>
-  <Provider store={store}>
-    <SnackbarProvider maxSnack={3} autoHideDuration={3000}
-      classes={{ containerRoot: 'snackbar-root' }}>
-      <Root />
-    </SnackbarProvider>
-  </Provider>
+  <ThemeProvider id='theme-root'>  {/* Provides window.setTheme('light'|'dark') global function */}
+    <Provider store={store}>
+      <SnackbarProvider maxSnack={3} autoHideDuration={3000}
+        classes={{ containerRoot: 'snackbar-root' }}>
+        <Root />
+      </SnackbarProvider>
+    </Provider>
+  </ThemeProvider>

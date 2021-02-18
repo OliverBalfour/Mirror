@@ -119,7 +119,7 @@ export const CardEditDialog = ({ respond, card }) => {
         </Select>
         <InputLabel id="kanban/card-title" className="custom-label">Title</InputLabel>
         <TextField margin="dense" autoFocus fullWidth
-          multiline rowsMax={3} value={newCard.content} onChange={e => setContent(e.target.value)} />
+          multiline rowsMax={6} value={newCard.content} onChange={e => setContent(e.target.value)} />
         <Description.Edit card={newCard} setCard={setCard} />
         <DateTime.Edit    card={newCard} setCard={setCard} />
         <Duration.Edit    card={newCard} setCard={setCard} />

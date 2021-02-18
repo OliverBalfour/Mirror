@@ -34,6 +34,11 @@ export default ({ active, setActive }) => {
         "Force pull from GitHub": forcePull }
     : { "Log in via GitHub": () => setGHOpen(true) };
 
+  const toggleTheme = () =>
+    localStorage.theme === "light"
+      ? window.setTheme("dark")
+      : window.setTheme("light");
+
   const menuItems = {
     "Submit feedback": () => window.open(`mailto:${emailAddress}`, '_blank'),
     "About": () => setAboutOpen(true),
@@ -41,6 +46,7 @@ export default ({ active, setActive }) => {
     "Clear saved state": () => window.prompt("Delete all saved state? Pressing undo will fix this. Type YES to confirm", "NO") === "YES" && window.deleteAllState(),
     "Import state": () => window.importIDBState(),
     "Export state": () => window.exportIDBState(),
+    "Toggle light/dark theme": () => toggleTheme(),
   };
 
   return (

@@ -1,3 +1,4 @@
+@import "./common/variables";
 *,
 *::before,
 *::after {
@@ -65,6 +66,9 @@ code {
   font-size: 16px !important;
   font-weight: 600 !important;
   /* font-style: italic !important; */
+}
+.theme-dark .custom-label {
+  color: white !important;
 }
 .MuiDialogTitle-root { padding-bottom: 4px !important; }
 .MuiButton-containedPrimary {
@@ -186,4 +190,62 @@ textarea.autoresize, .autoresize-div {
 a[href^="http://"], a[href^="https://"] {
     background: url(../public/external.png) center right no-repeat;
     padding-right: 13px;
+}
+
+// Dark theme
+.theme-dark {
+  * {
+    color: white;
+  }
+  background: $darkMain;
+  a {
+    color: #58a6ff;
+  }
+  * {
+    border-color: black;
+  }
+  .katex * {
+    border-color: white;
+  }
+  .custom-textarea {
+    background-color: $darkMain;
+    color: white;
+  }
+  .MuiTabs-root, .MuiToolbar-root {
+    background: $darkSecondary;
+  }
+  code[class*="language-"], pre[class*="language-"] {
+    color: white;
+  }
+}
+
+// Scrollbars - Chrome
+* {
+  scrollbar-width: thin !important;
+}
+@media only screen and (min-height: 800px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: darken($columnBackground, 10%);
+  }
+  ::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background: $columnBackground;
+  }
+  :root.theme-dark {
+    ::-webkit-scrollbar-track {
+      background: $darkSecondary;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: $darkMain;
+    }
+  }
+}
+// Scrollbars - Firefox
+.theme-dark {
+  scrollbar-color: $darkMain $darkSecondary !important;
 }

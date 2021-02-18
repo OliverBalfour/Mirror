@@ -1,5 +1,4 @@
 @import "../common/variables";
-.testtt{color:red !important}
 
 .zettelContainer {
   background: #DFEEEE;
@@ -111,5 +110,17 @@
   }
   .zettel {
     padding-top: 0;
+  }
+}
+
+.theme-dark {
+  .zettelContainer {
+    background: $darkMain;
+  }
+  .zettel {
+    background: $darkSecondary;
+  }
+  .zettelEditingContent {
+    background: $darkMain;
   }
 }

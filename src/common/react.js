@@ -1,6 +1,7 @@
 
 import * as React from 'react';
 import DOMPurify from 'dompurify';
+import { ThemeProvider as MUIThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 // Source: https://www.davedrinks.coffee/how-do-i-use-two-react-refs/
 export const mergeRefs = (...refs) => {
@@ -129,5 +130,57 @@ export class ErrorBoundary extends React.Component {
       return this.props.fallback;
     }
     return this.props.children;
+  }
+}
+
+// useGlobal hook can be used as follows:
+// In a component:
+//   useGlobal('setTheme', function (args) {...});
+// Anywhere else in the app:
+//   window.setTheme(args);
+// It allows an imperative API which despite being against
+// React's design principles is often very useful.
+// Note that this should only be called once per name and the lifecycle
+// of the component should always exceed that of the users
+export function useGlobal(name, value) {
+  React.useEffect(() => {
+    window[name] = value;
+    return () => delete window[name];
+  });
+}
+
+// <ThemeProvider mode="dark">
+//   <App />
+// </ThemeProvider>
+// Provides a container with a class on the child element, eg "div.theme-dark"
+export class ThemeProvider extends React.Component {
+  state = { theme: localStorage.theme || "light" };
+  constructor (props) {
+    super(props);
+    this.themes = {
+      dark: createMuiTheme({
+        palette: {
+          type: "dark",
+          primary:   { main: "#90caf9" },
+          secondary: { main: "#f48fb1" },
+          error:     { main: "#f44336" },
+          warning:   { main: "#ff9800" },
+          info:      { main: "#2196f3" },
+          success:   { main: "#4caf50" },
+        }
+      }),
+      light: createMuiTheme({ palette: { type: "light" } })
+    }
+  }
+  componentDidMount () {
+    window.setTheme = theme => this.setState({ theme }, () => localStorage.theme = theme);
+  }
+  render () {
+    document.documentElement.className = 'theme-' + this.state.theme;
+    return (
+      <MUIThemeProvider theme={this.themes[this.state.theme]}>
+        {this.props.children}
+      </MUIThemeProvider>
+    );
   }
 }
