@@ -35,9 +35,9 @@ export default ({ active, setActive }) => {
     : { "Log in via GitHub": () => setGHOpen(true) };
 
   const toggleTheme = () =>
-    localStorage.theme === "light"
-      ? window.setTheme("dark")
-      : window.setTheme("light");
+    localStorage.theme === "dark"
+      ? window.setTheme("light")
+      : window.setTheme("dark");
 
   const menuItems = {
     "Submit feedback": () => window.open(`mailto:${emailAddress}`, '_blank'),
