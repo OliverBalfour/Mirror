@@ -49,13 +49,13 @@ export const Edit = ({ card, setCard }) => {
         Description</InputLabel>
       <Markdown source={card.description} cards={cards}
         tabIndex='0' onKeyDown={handleKeyDown}
-        className="markdown-selectable compact"
+        className="markdown-selectable"
         onDoubleClick={() => setEditingDescription(true)} />
     </div>
   ) : (
     <React.Fragment>
       <InputLabel className="custom-label">Description</InputLabel>
-      <ClickAwayListener onClickAway={() => setEditingDescription(false)}>
+      <ClickAwayListener onClickAway={() => setEditingDescription(false)} mouseEvent="onMouseDown">
         <div onKeyDown={handleKeyDown}>
           <AutocompleteEditor value={card.description} setValue={setDescription}
             className='descriptionEditor' offset={20} autoFocus />

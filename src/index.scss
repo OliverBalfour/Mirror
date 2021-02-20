@@ -36,13 +36,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -ms-overflow-style: scrollbar;
 }
-hr {
-  border: none;
-  border-bottom: 1px solid #999;
-}
-.theme-dark hr {
-  border-bottom: 1px solid #CCC;
-}
 #jsx-root {
   top: 0;
   left: 0;
@@ -144,6 +137,13 @@ code {
   pre {
     overflow-y: auto;
   }
+  hr {
+    border: none;
+    border-bottom: 1px dashed #999 !important;
+  }
+  &.compact hr {
+    margin: 4px 12px;
+  }
   &:not(.compact) {
     pre {
       background: darken($columnBackground, 5%);
@@ -153,9 +153,12 @@ code {
         background: inherit !important;
       }
     }
+    hr {
+      margin: 20px 50px;
+    }
   }
 }
-.theme-dark .markdown pre:not(.compact) {
+.theme-dark .markdown:not(.compact) pre {
   background: $darkMain;
 }
 .loading-screen-container {
@@ -242,6 +245,9 @@ a[href^="http://"], a[href^="https://"] {
   }
   code[class*="language-"], pre[class*="language-"] {
     color: white;
+  }
+  .MuiButton-containedPrimary {
+    background-color: desaturate(#1976d2, 20%) !important;
   }
 }
 

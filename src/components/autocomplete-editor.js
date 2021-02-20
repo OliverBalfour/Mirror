@@ -22,14 +22,17 @@ export default ({ value, setValue, addNote, className, ...props }) => {
     const strategy = {
       // String -> Bool -- whether to proceed to matching phase
       context: beforeCursor => beforeCursor.indexOf('[[') >= 0,
-      match: /\[\[([A-Za-z0-9_ -]+)$/, // captures the X in "abc [[X"
+      match: /\[\[([^\]]+)$/, // captures the X in "abc [[X"
       // term is captured substring; can use async (t, cb) => cb(await something(term));
       // This returns a list of card IDs followed by '0' for the addNote option
       // The Add note option is always displayed
-      search: (term, callback /*, match*/) => callback([...searchCards(term, cards).slice(0, maxCount - 1), 0]),
+      search: (term, callback /*, match*/) => callback([
+        ...searchCards(term, cards).slice(0, maxCount - 1),
+        ...(addNote ? [0] : [])
+      ]),
       cache: true,
       // these take the input to the search callback
-      template: cardID => cardID === 0 ? (addNote ? `<em>Add note</em>` : '') : linkName(cards[cardID]),
+      template: cardID => cardID === 0 ? "<em>Add note</em>" : linkName(cards[cardID]),
       replace: cardID => {
         if (cardID === 0 && addNote) {
           const id = generateID();
