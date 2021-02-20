@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/Mirror/static/css/main.bec1c627.chunk.css",
-    "main.js": "/Mirror/static/js/main.ddc5d04c.chunk.js",
-    "main.js.map": "/Mirror/static/js/main.ddc5d04c.chunk.js.map",
+    "main.js": "/Mirror/static/js/main.9adaef3f.chunk.js",
+    "main.js.map": "/Mirror/static/js/main.9adaef3f.chunk.js.map",
     "runtime-main.js": "/Mirror/static/js/runtime-main.b6585083.js",
     "runtime-main.js.map": "/Mirror/static/js/runtime-main.b6585083.js.map",
     "static/js/2.d5458db6.chunk.js": "/Mirror/static/js/2.d5458db6.chunk.js",
@@ -18,7 +18,7 @@
     "static/js/6.29d643a1.chunk.js": "/Mirror/static/js/6.29d643a1.chunk.js",
     "static/js/6.29d643a1.chunk.js.map": "/Mirror/static/js/6.29d643a1.chunk.js.map",
     "index.html": "/Mirror/index.html",
-    "precache-manifest.1c0879d1300bfcb132e8fb529b344ca8.js": "/Mirror/precache-manifest.1c0879d1300bfcb132e8fb529b344ca8.js",
+    "precache-manifest.57537dac525f4e9360e8f94f2e22c8c7.js": "/Mirror/precache-manifest.57537dac525f4e9360e8f94f2e22c8c7.js",
     "service-worker.js": "/Mirror/service-worker.js",
     "static/css/4.b96165a4.chunk.css.map": "/Mirror/static/css/4.b96165a4.chunk.css.map",
     "static/css/5.38199b72.chunk.css.map": "/Mirror/static/css/5.38199b72.chunk.css.map",
@@ -31,6 +31,6 @@
     "static/js/runtime-main.b6585083.js",
     "static/js/2.d5458db6.chunk.js",
     "static/css/main.bec1c627.chunk.css",
-    "static/js/main.ddc5d04c.chunk.js"
+    "static/js/main.9adaef3f.chunk.js"
   ]
 }
