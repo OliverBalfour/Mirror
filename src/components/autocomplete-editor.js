@@ -15,6 +15,8 @@ export default ({ value, setValue, addNote, className, ...props }) => {
   const inputRef = React.useRef(null);
   const cards = useSelector(selectors.boards.cards);
 
+  const maxCount = 10;
+
   React.useEffect(() => {
     const editor = new TextareaEditor(inputRef.current);
     const strategy = {
@@ -22,7 +24,9 @@ export default ({ value, setValue, addNote, className, ...props }) => {
       context: beforeCursor => beforeCursor.indexOf('[[') >= 0,
       match: /\[\[([A-Za-z0-9_ -]+)$/, // captures the X in "abc [[X"
       // term is captured substring; can use async (t, cb) => cb(await something(term));
-      search: (term, callback /*, match*/) => callback([...searchCards(term, cards), 0]),
+      // This returns a list of card IDs followed by '0' for the addNote option
+      // The Add note option is always displayed
+      search: (term, callback /*, match*/) => callback([...searchCards(term, cards).slice(0, maxCount - 1), 0]),
       cache: true,
       // these take the input to the search callback
       template: cardID => cardID === 0 ? (addNote ? `<em>Add note</em>` : '') : linkName(cards[cardID]),
@@ -40,7 +44,7 @@ export default ({ value, setValue, addNote, className, ...props }) => {
     const options = {
       dropdown: {
         rotate: true, // this means vertical wrapping under up/down arrows
-        maxCount: 10,
+        maxCount,
       }
     };
     const textcomplete = new Textcomplete(editor, [strategy], options);

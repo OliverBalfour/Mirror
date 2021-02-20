@@ -46,10 +46,10 @@ export default ({ col, add }) => {
             <AddIcon />
           </IconButton>
           <PopoverMenu map={{
-            "Archive all": () => archiveAll(),
             ...(dateTimeAttributeUsed ? {
               "Sort by due": () => sortByDue(),
             } : {}),
+            "Archive all": () => archiveAll(),
             "Rename": () => setPromptOpen(true),
             "Delete": () => setConfirmOpen(true),
           }}>

@@ -124,10 +124,11 @@ export const CardEditDialog = ({ respond, card }) => {
         <DateTime.Edit    card={newCard} setCard={setCard} />
         <Duration.Edit    card={newCard} setCard={setCard} />
       </DialogContent>
-      <DialogActions>
-        <Button onClick={deleteCard}>Delete</Button>
-        <Button onClick={done} color="primary">Cancel</Button>
+      <DialogActions style={{ flexDirection: "row-reverse" }}>
         <Button onClick={editCard} color="primary" variant="contained">OK</Button>
+        <div style={{ flexGrow: 1 }} />
+        <Button onClick={done} color="primary">Cancel</Button>
+        <Button onClick={deleteCard}>Delete</Button>
       </DialogActions>
     </Dialog>
   );

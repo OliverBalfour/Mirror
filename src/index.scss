@@ -40,6 +40,9 @@ hr {
   border: none;
   border-bottom: 1px solid #999;
 }
+.theme-dark hr {
+  border-bottom: 1px solid #CCC;
+}
 #jsx-root {
   top: 0;
   left: 0;

@@ -121,11 +121,6 @@ function ZettelView ({
           <EditIcon />
         </Button>
       )}
-      {card.id !== 'main' && (
-        <Button onClick={deleteZettel} title="Delete note">
-          <DeleteIcon />
-        </Button>
-      )}
       {!editing && (
         <Button onClick={() => addZettel(generateID())} title="Add note">
           <AddIcon />
@@ -141,6 +136,11 @@ function ZettelView ({
       ) : (
         <Button onClick={starZettel} title="Unstar this note">
           <StarIcon />
+        </Button>
+      )}
+      {card.id !== 'main' && (
+        <Button onClick={deleteZettel} title="Delete note">
+          <DeleteIcon />
         </Button>
       )}
     </ButtonGroup>
@@ -197,8 +197,8 @@ function ZettelView ({
                   addNote={addNewNote} className="zettelEditingInput" />
               </div>
               <div className='zettelEditingButtons'>
-                <Button onClick={cancelEditing} color="primary">Cancel</Button>
                 <Button onClick={() => saveZettel(newCard)} color="primary" variant="contained">Save</Button>
+                <Button onClick={cancelEditing} color="primary">Cancel</Button>
               </div>
             </div>
           )}

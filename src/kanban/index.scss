@@ -62,7 +62,7 @@
   flex-direction: column;
   background: $columnBackground;
   padding: $gridSpacing;
-  padding-right: $gridSpacing / 2;
+  padding-right: 0;
   padding-bottom: 0;
   width: $cardWidth + $gridSpacing * 2 + 2; // add padding and border
   max-width: calc(100vw - #{4*$gridSpacing});
@@ -95,7 +95,7 @@
 }
 .columnHeaderContainer {
   padding: 0;
-  padding-right: $gridSpacing / 2;
+  padding-right: $gridSpacing;
   display: flex;
   justify-content: space-between;
 }
@@ -108,7 +108,7 @@
 }
 .columnHeaderRule {
   overflow: hidden;
-  border: none;
+  border: none !important;
   color: #CCDCDC;
   background-color: #CCDCDC;
   height: 1px;
@@ -122,8 +122,7 @@
   padding: 10px 13px;
   margin: 0;
   margin-bottom: $gridSpacing;
-  // half of the padding is on either side of the scrollbar
-  margin-right: $gridSpacing / 2;
+  margin-right: $gridSpacing;
   background: white;
   border-radius: 3px;
   transition: opacity 0.2s, box-shadow 0.2s;

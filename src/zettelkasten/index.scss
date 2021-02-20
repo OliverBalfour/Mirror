@@ -77,6 +77,9 @@
   display: flex;
   justify-content: space-between;
   margin-top: $gridSpacing;
+  // This means the OK button is before Cancel in the tab index list
+  // While still being on the right hand side
+  flex-direction: row-reverse;
 }
 .zettelButtons {
   margin: $gridSpacing * 3 0;
