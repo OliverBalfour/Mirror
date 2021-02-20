@@ -26,7 +26,8 @@ export default React.forwardRef(({ value, setValue, className, offset = 5, ...pr
 
     // Set the div's contents to the same value and calculate the new height
     // The <br> fixes the way the textarea grows if line-height isn't included
-    hiddenDiv.innerHTML = inputRef.current.value + '<br style="line-height: 3px;">';
+    hiddenDiv.innerText = inputRef.current.value;
+    hiddenDiv.innerHTML += '<br style="line-height: 3px;">';
 
     // Briefly make the hidden div block but invisible to read the height
     let height = 0;
