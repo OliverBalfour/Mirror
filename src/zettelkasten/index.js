@@ -1,12 +1,12 @@
 
 import * as React from 'react';
 import { useHashLocation, useTitle, generateID, ReloadProtect,
-  useEventListener } from '../common';
+  useEventListener, searchCards } from '../common';
 import { selectors } from '../store';
 import { useSelector, useDispatch } from 'react-redux';
 import { Markdown, AutocompleteEditor } from '../components';
 import {
-  TextField, Button, ButtonGroup,
+  TextField, Button, ButtonGroup, Input, InputAdornment,
   Divider, ListItem, ListItemText
 } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
@@ -57,6 +57,48 @@ function ZettelFailedLoadingView () {
   );
 }
 
+function DrawerItemCard ({ card }) {
+  return (
+    <ListItem button key={card.id} className='zettelSearchResults'
+      onClick={() => window.location.hash = '/notes/' + card.id}>
+      <ListItemText primary={card.content} />
+    </ListItem>
+  );
+}
+
+function SearchBar ({ cards }) {
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [searchResults, setSearchResults] = React.useState([]);
+  return (
+    <React.Fragment>
+      <Input
+        className='zettelSearchBar'
+        fullWidth disableUnderline
+        value={searchTerm} onChange={e => {
+          setSearchTerm(e.target.value);
+          setSearchResults(searchCards(e.target.value, cards, 3));
+        }}
+        startAdornment={
+          <InputAdornment position="start">
+            <SearchIcon />
+          </InputAdornment>
+        }
+        placeholder='Search zettels...'
+      />
+      {searchResults.length > 0 && (
+        <React.Fragment>
+          <Divider />
+          <ListItem key='results'>
+            <ListItemText>Search results</ListItemText>
+          </ListItem>
+          {searchResults.map(cardID => <DrawerItemCard card={cards[cardID]} />)}
+        </React.Fragment>
+      )}
+      <Divider/>
+    </React.Fragment>
+  );
+}
+
 function ZettelView ({
   active, dispatch, cards, currentCardID
 }) {
@@ -67,6 +109,7 @@ function ZettelView ({
   const [newCard, setNewCard] = React.useState({ ...card }); // assuming no deep nesting
   useTitle(() => active && newCard.content + " | Mirror");
   const setCard = part => setNewCard({ ...newCard, ...part });
+
   // Ctrl+Enter to save zettels
   useEventListener(document, 'keydown', e => {
     if (editing && e.which === 13 && e.ctrlKey) {
@@ -154,25 +197,24 @@ function ZettelView ({
   // All notes button (navigate to #/notes/all and show a list of notes without contents)
   const ZettelDrawer = () => (
     <div className='zettelDrawer'>
-      {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-        <ListItem button key={text}>
-          <ListItemText primary={text} />
-        </ListItem>
-      ))}
+      <SearchBar cards={cards}/>
+      <ListItem button key='main'
+        onClick={() => setLoc('/notes/main')}>
+        <ListItemText primary="Home" />
+      </ListItem>
+      <ListItem key='starred'>
+        <ListItemText>Starred zettels</ListItemText>
+      </ListItem>
+      {starred.map(cardID => <DrawerItemCard card={cards[cardID]} />)}
       <Divider />
-      {['All mail', 'Trash', 'Spam'].map((text, index) => (
-        <ListItem button key={text}>
-          <ListItemText primary={text} />
-        </ListItem>
-      ))}
     </div>
   );
 
   return (
-    <React.Fragment>
+    <div className='zettelRoot'>
       <ReloadProtect shouldProtect={JSON.stringify(newCard) !== JSON.stringify(card)} />
+      <ZettelDrawer />
       <div className='zettelContainer'>
-        <ZettelDrawer />
         <div className='zettelButtons' id='zettel-buttons-container'>
           <ZettelButtons />
         </div>
@@ -199,6 +241,6 @@ function ZettelView ({
           </div>
         </div>
       </div>
-    </React.Fragment>
+    </div>
   );
 }

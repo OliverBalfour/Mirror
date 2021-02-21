@@ -1,9 +1,15 @@
 @import "../common/variables";
 
-.zettelContainer {
+.zettelRoot {
   background: #DFEEEE;
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+.zettelContainer {
+  height: 100%;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
 }
@@ -12,7 +18,7 @@
   justify-content: center;
   align-items: flex-start;
   flex: 1 1 auto;
-  width: 100vw;
+  width: 100%;
   padding: 2*$gridSpacing;
   padding-left: 0;
   padding-top: 6px; // allow room for zettel box shadow
@@ -23,7 +29,7 @@
   box-sizing: border-box;
   background: white;
   border-radius: 5px;
-  width: 650px;
+  width: $zettelWidth;
   margin-left: 2*$gridSpacing;
   box-shadow: 0 1px 4px rgba(100, 100, 100, 0.3);
   padding: 12px 20px;
@@ -92,12 +98,31 @@
   flex: 0 1 auto;
 }
 .zettelDrawer {
-  position: absolute;
   width: $drawerWidth;
   overflow-y: auto;
   overflow-x: hidden;
   background: $columnBackground;
-  height: calc(100% - 48px);
+  height: 100%;
+  flex: 0 0 $drawerWidth;
+}
+.zettelSearchBar {
+  padding: 6px 10px;
+  margin-bottom: 1px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  border-color: transparent !important;
+  &:focus-within {
+    border-color: #3f51b5 !important;
+  }
+}
+.zettelSearchResults {
+  padding: 0 1em !important;
+  background-color: white !important;
+  & * {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
 }
 
 @media only screen and (max-width: 800px) {
@@ -115,7 +140,7 @@
 }
 
 .theme-dark {
-  .zettelContainer {
+  .zettelRoot {
     background: $darkSecondary;
   }
   .zettel {
@@ -127,5 +152,11 @@
   }
   .zettelDrawer {
     background: $darkMain;
+  }
+  .zettelSearchResults {
+    background-color: darken($darkMain, 3%) !important;
+    &:hover {
+      background-color: lighten($darkMain, 2%) !important;
+    }
   }
 }
