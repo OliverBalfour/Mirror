@@ -51,7 +51,7 @@ const getAllInNamespace = async (state, namespace, whitelist = null) => {
   return state;
 }
 
-async function loadIDBState (loadAll = true) {
+export async function loadIDBState (loadAll = true) {
   const state = {
     cards: {},
     columns: {},
@@ -157,6 +157,82 @@ window.deleteAllState = async () => {
     }
   }
   return res;
+};
+
+// Deletes all invisible Kanban tabs/columns/cards (IDB stuff isn't ever deleted, only no longer linked to)
+// To delete orphaned zettels (ie not accessible via links from the main card) supply deleteOrphaned = true
+// This is useful for pruning indirectly accessible sensitive information from a state snapshot
+//  which needs to be publicly shared (eg the initial state JSON file)
+// This is far from optimized and should only be used in development with small amounts of data
+// **NOT WELL TESTED, MAKE A BACKUP FIRST**
+// It will delete notes only linked to by Kanban cards, for instance.
+window.pruneUnusedState = async (deleteOrphaned = false) => {
+  const state = await loadState();
+
+  const KANBAN_CARD_TYPE = 0;  // From reducers.js
+  const ZETTEL_NOTE_TYPE = 1;  // From reducers.js
+
+  // Find invisible Kanban tabs/columns/cards
+  const deletedTabs = Object.keys(state.tabs);
+  for (let tab of state.tabOrder) {
+    deletedTabs.splice(deletedTabs.indexOf(tab), 1);
+  }
+  const notDeletedTabs = Object.keys(state.tabs).filter(x => !deletedTabs.includes(x));
+
+  const notDeletedColumns = [];
+  for (let colID of Object.keys(state.columns)) {
+    for (let tabID of notDeletedTabs) {
+      if (state.tabs[tabID].columns.indexOf(colID) !== -1) {
+        notDeletedColumns.push(colID);
+      }
+    }
+  }
+  const deletedColumns = Object.keys(state.columns).filter(x => !notDeletedColumns.includes(x));
+
+  const notDeletedCards = [];
+  for (let cardID of Object.keys(state.cards)) {
+    for (let colID of notDeletedColumns) {
+      if (state.columns[colID].items.indexOf(cardID) !== -1) {
+        notDeletedCards.push(cardID);
+      }
+    }
+  }
+  const deletedCards = Object.keys(state.cards).filter(x => state.cards[x].type === KANBAN_CARD_TYPE && !notDeletedCards.includes(x));
+
+  if (deleteOrphaned) {
+    // Find inaccessible zettels
+    const stack = ['main'];
+    const accessible = [];
+    while (stack.length) {
+      const node = stack.pop();
+      accessible.push(node);
+      // Search content and description fields for note IDs
+      let string = state.cards[node].content + state.cards[node].description;
+      // Remove any substrings with ```any characters``` or `non newline chars`
+      // because wikilinks in these are ignored
+      string = string.replace(/```[^`]*```/gm, '').replace(/`[^`\n]`/gm, '');
+      // Find all links (assumes [[note id]] format)
+      const matches = string.match(/(\[\[[A-Za-z0-9_-]+\]\])/gm);
+      const linked = matches ? matches.map(x => x.substring(2, x.length - 2)) : [];
+      // Push them to the stack if they haven't already been traversed 
+      stack.push(...linked.filter(cardID => state.cards[cardID].type === ZETTEL_NOTE_TYPE && accessible.indexOf(cardID) === -1));
+    }
+    deletedCards.push(...Object.keys(state.cards).filter(cardID => state.cards[cardID].type === ZETTEL_NOTE_TYPE && accessible.indexOf(cardID) === -1));
+  }
+
+  // Do the deletion
+  while (deletedCards.length)
+    delete state.cards[deletedCards.pop()];
+  while (deletedColumns.length)
+    delete state.columns[deletedColumns.pop()];
+  while (deletedTabs.length)
+    delete state.tabs[deletedTabs.pop()];
+
+  // Delete all IDB keys and save only the pruned data
+  for (let key of await keys())
+    await del(key);
+  await saveState(state);
+  window.location.reload();
 };
 
 window.__idb = { get, set, keys, del };

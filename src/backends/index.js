@@ -1,6 +1,7 @@
 
 import * as ghb from './github';
 import * as idb from './indexeddb';
+import { set } from 'idb-keyval';
 
 import EditSet from './edit-set';
 export const UNDO_LIMIT = 20;
@@ -118,4 +119,12 @@ const commit = editSet => new Promise((resolve, reject) => {
 export const generateInitialState = () =>
   fetch("./initial-state.json")
     .then(res => res.json())
+    .then(obj => {
+      const promises = [];
+      for (let key in obj) {
+        promises.push(set(key, obj[key]));
+      }
+      return Promise.all(promises);
+    })
+    .then(x => idb.loadIDBState(true))
     .catch(e => alert("Could not load initial state. Perhaps you forgot a trailing slash in the URL? Error: " + e));
