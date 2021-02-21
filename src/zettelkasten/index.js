@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Markdown, AutocompleteEditor } from '../components';
 import {
   TextField, Button, ButtonGroup,
-  // Drawer, List, Divider, ListItem, ListItemText
+  Divider, ListItem, ListItemText
 } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -152,38 +152,27 @@ function ZettelView ({
   //   or https://material-ui.com/components/app-bar/#app-bar-with-a-primary-search-field
   // Starred cards
   // All notes button (navigate to #/notes/all and show a list of notes without contents)
-  // const Drawer = () => (
-  //   <Drawer
-  //     className='zettelDrawer'
-  //     variant="permanent"
-  //     classes={{
-  //       paper: 'zettelDrawerPaper',
-  //     }}
-  //   >
-  //     <div className='zettelDrawerContainer'>
-  //       <List>
-  //         {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-  //           <ListItem button key={text}>
-  //             <ListItemText primary={text} />
-  //           </ListItem>
-  //         ))}
-  //       </List>
-  //       <Divider />
-  //       <List>
-  //         {['All mail', 'Trash', 'Spam'].map((text, index) => (
-  //           <ListItem button key={text}>
-  //             <ListItemText primary={text} />
-  //           </ListItem>
-  //         ))}
-  //       </List>
-  //     </div>
-  //   </Drawer>
-  // );
+  const ZettelDrawer = () => (
+    <div className='zettelDrawer'>
+      {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+        <ListItem button key={text}>
+          <ListItemText primary={text} />
+        </ListItem>
+      ))}
+      <Divider />
+      {['All mail', 'Trash', 'Spam'].map((text, index) => (
+        <ListItem button key={text}>
+          <ListItemText primary={text} />
+        </ListItem>
+      ))}
+    </div>
+  );
 
   return (
     <React.Fragment>
       <ReloadProtect shouldProtect={JSON.stringify(newCard) !== JSON.stringify(card)} />
       <div className='zettelContainer'>
+        <ZettelDrawer />
         <div className='zettelButtons' id='zettel-buttons-container'>
           <ZettelButtons />
         </div>

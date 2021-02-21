@@ -92,15 +92,12 @@
   flex: 0 1 auto;
 }
 .zettelDrawer {
+  position: absolute;
   width: $drawerWidth;
-  flex-shrink: 0;
-}
-.zettelDrawerPaper {
-  width: $drawerWidth;
-  z-index: 0;
-}
-.zettelDrawerContainer {
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: $columnBackground;
+  height: calc(100% - 48px);
 }
 
 @media only screen and (max-width: 800px) {
@@ -126,6 +123,9 @@
     box-shadow: 0 1px 4px #151515;
   }
   .zettelEditingContent {
+    background: $darkMain;
+  }
+  .zettelDrawer {
     background: $darkMain;
   }
 }
