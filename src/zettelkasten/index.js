@@ -15,6 +15,8 @@ import AddIcon from '@material-ui/icons/Add';
 import SearchIcon from '@material-ui/icons/Search';
 import StarIcon from '@material-ui/icons/Star';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import * as core from '../reducer';
 import './index.scss';
 
@@ -76,7 +78,7 @@ function SearchBar ({ cards }) {
         fullWidth disableUnderline
         value={searchTerm} onChange={e => {
           setSearchTerm(e.target.value);
-          setSearchResults(searchCards(e.target.value, cards, 3));
+          setSearchResults(searchCards(e.target.value, cards, 6));
         }}
         startAdornment={
           <InputAdornment position="start">
@@ -84,17 +86,19 @@ function SearchBar ({ cards }) {
           </InputAdornment>
         }
         placeholder='Search zettels...'
+        key='searchbar'
       />
       {searchResults.length > 0 && (
         <React.Fragment>
-          <Divider />
+          {/* <Divider key='div2' />
           <ListItem key='results'>
             <ListItemText>Search results</ListItemText>
-          </ListItem>
-          {searchResults.map(cardID => <DrawerItemCard card={cards[cardID]} />)}
+          </ListItem> */}
+          <Divider light key='div3' />
+          {searchResults.map(cardID => <DrawerItemCard key={cardID} card={cards[cardID]} />)}
         </React.Fragment>
       )}
-      <Divider/>
+      <Divider key='div4' />
     </React.Fragment>
   );
 }
@@ -109,6 +113,11 @@ function ZettelView ({
   const [newCard, setNewCard] = React.useState({ ...card }); // assuming no deep nesting
   useTitle(() => active && newCard.content + " | Mirror");
   const setCard = part => setNewCard({ ...newCard, ...part });
+  const [showingStarred, _setShowingStarred] = React.useState(localStorage.showingStarred && JSON.parse(localStorage.showingStarred));
+  const setShowingStarred = x => {
+    localStorage.showingStarred = x;
+    _setShowingStarred(x);
+  }
 
   // Ctrl+Enter to save zettels
   useEventListener(document, 'keydown', e => {
@@ -197,16 +206,23 @@ function ZettelView ({
   // All notes button (navigate to #/notes/all and show a list of notes without contents)
   const ZettelDrawer = () => (
     <div className='zettelDrawer'>
-      <SearchBar cards={cards}/>
+      <SearchBar cards={cards} key='bar' />
       <ListItem button key='main'
+        disabled={loc.startsWith('/notes/main')}
         onClick={() => setLoc('/notes/main')}>
         <ListItemText primary="Home" />
       </ListItem>
-      <ListItem key='starred'>
+      <ListItem key='starred' button onClick={() => setShowingStarred(!showingStarred)}>
         <ListItemText>Starred zettels</ListItemText>
+        {showingStarred ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
-      {starred.map(cardID => <DrawerItemCard card={cards[cardID]} />)}
-      <Divider />
+      {showingStarred && (
+        <React.Fragment>
+          <Divider light key='light-div' />
+          {starred.map(cardID => <DrawerItemCard key={cardID} card={cards[cardID]} />)}
+        </React.Fragment>
+      )}
+      <Divider key='dark-div' />
     </div>
   );
 

@@ -282,3 +282,6 @@ a[href^="http://"], a[href^="https://"] {
 .theme-dark {
   scrollbar-color: $darkMain $darkSecondary !important;
 }
+.theme-dark .MuiDivider-light {
+  background-color: rgba(0, 0, 0, 0.4);
+}
