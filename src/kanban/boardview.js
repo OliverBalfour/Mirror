@@ -9,7 +9,7 @@ import { useHashLocation, encURI } from '../common';
 import Column, { AddColumn } from './column';
 import './index.scss';
 
-export default ({ tabInfo, addColumn }) => {
+export default ({ tabInfo, columnsLocked }) => {
   const tab = tabInfo.index;
   const tabObj = tabInfo.tab;
   const dispatch = useDispatch();
@@ -60,8 +60,15 @@ export default ({ tabInfo, addColumn }) => {
             <React.Fragment>
               <div className='root' ref={provided.innerRef}>
                 {colIDs.map((colID, i) => <Column col={columns[i]} key={colID} index={i}
-                  setEditingCard={setEditingCard} />)}
-                {(addColumn || !colIDs.length) && <AddColumn add={() => setPromptOpen(true)} hide={snapshot.isDraggingOver || snapshot.draggingFromThisWith} />}
+                  setEditingCard={setEditingCard} locked={columnsLocked} />)}
+                {!columnsLocked && <AddColumn add={() => setPromptOpen(true)} hide={snapshot.isDraggingOver || snapshot.draggingFromThisWith} />}
+                {!colIDs.length && columnsLocked && (
+                  <div className="loading-screen-container">
+                    <span className="loading-screen-contents">
+                      <em>Choose "Unlock columns" in the top right menu to add a column</em>
+                    </span>
+                  </div>
+                )}
               </div>
               {provided.placeholder}
             </React.Fragment>

@@ -6,10 +6,11 @@ import * as core from '../reducer';
 import { IconButton } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AddIcon from '@material-ui/icons/Add';
+import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import { PopoverMenu, ConfirmDialog, PromptDialog } from '../components';
 
 // header name, add button, chips for each addon (WIP limit, EBS time estimate, etc)
-export default ({ col, add }) => {
+export default ({ col, add, locked, handleProps }) => {
   const dispatch = useDispatch();
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
@@ -33,9 +34,15 @@ export default ({ col, add }) => {
   return (
     <div>
       <div className='columnHeaderContainer'>
+        {!locked && (
+          <IconButton size='small' {...handleProps}>
+            <DragIndicatorIcon />
+          </IconButton>
+        )}
         <div className='columnHeaderText'>
           {col.name}
         </div>
+        <div style={{ flexGrow: 1 }} />
         <div>
           {/*
             // TODO: column powerup API with Chip indicators
@@ -50,8 +57,10 @@ export default ({ col, add }) => {
               "Sort by due": () => sortByDue(),
             } : {}),
             "Archive all": () => archiveAll(),
-            "Rename": () => setPromptOpen(true),
-            "Delete": () => setConfirmOpen(true),
+            ...(locked ? {} : {
+              "Rename": () => setPromptOpen(true),
+              "Delete": () => setConfirmOpen(true),
+            })
           }}>
             <IconButton size='small'>
               <MoreVertIcon />

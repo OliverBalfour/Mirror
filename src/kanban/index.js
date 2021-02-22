@@ -19,8 +19,8 @@ export default ({ active }) => {
   useTitle(() => active && currentTab >= 0 && tabs[tabOrder[currentTab]].name + " | Mirror");
   if (currentTab >= 0) window.__lastCurrentTab = currentTab;
   if (currentTab < 0) currentTab = window.__lastCurrentTab || 0;
-  const [addColumn, _setAddColumn] = React.useState(!localStorage.noAddColumn);
-  const setAddColumn = x => { localStorage.noAddColumn = !x; _setAddColumn(x) }
+  const [columnsLocked, _setColumnsLocked] = React.useState(!localStorage.columnsLocked);
+  const setColumnsLocked = x => { localStorage.columnsLocked = !x; _setColumnsLocked(x) }
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmRespond = res => {
@@ -55,7 +55,7 @@ export default ({ active }) => {
         render={i =>
           <BoardView key={i}
             tabInfo={{ tab: tabs[tabOrder[i]], index: i }}
-            addColumn={addColumn}
+            columnsLocked={columnsLocked}
           />
         }
         addTab={() => setAddPromptOpen(true)}
@@ -63,7 +63,8 @@ export default ({ active }) => {
         deleteTab={() => Object.values(tabs).length > 1 ? setConfirmOpen(true) : alert("Cannot delete only tab")}
         moveTab={data => dispatch(core.moveTab(data))}
         index={currentTab} setIndex={setCurrentTab}
-        toggleAddColumn={() => setAddColumn(!addColumn)}
+        columnsLocked={columnsLocked}
+        toggleColumnsLocked={() => setColumnsLocked(!columnsLocked)}
       />
       {confirmOpen && (
         <ConfirmDialog open respond={confirmRespond}

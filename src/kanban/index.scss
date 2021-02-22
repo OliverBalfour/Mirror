@@ -97,7 +97,6 @@
   padding: 0;
   padding-right: $gridSpacing;
   display: flex;
-  justify-content: space-between;
 }
 .columnHeaderText {
   padding-left: 8px;
@@ -244,4 +243,7 @@
     background: $darkMain;
     color: white;
   }
+}
+del {
+  color: #808080 !important;
 }

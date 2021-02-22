@@ -11,7 +11,7 @@ import { mergeRefs, useEventListener, flagSet } from '../common';
 import ColumnHeader from './column-header';
 import Card from './card';
 
-export default React.memo(({ col, index, setEditingCard }) => {
+export default React.memo(({ col, index, setEditingCard, locked }) => {
   const { id, items } = col;
 
   const [editingNew, setEditingNew] = React.useState(false);
@@ -57,15 +57,15 @@ export default React.memo(({ col, index, setEditingCard }) => {
   );
 
   return (
-    <Draggable draggableId={id} index={index}>
+    <Draggable draggableId={id} index={index} isDragDisabled={locked}>
       {(provided, snapshot) => (
         <div ref={provided.innerRef}
           {...provided.draggableProps}
           className={"columnContainer" + (snapshot.isDragging ? " draggingColumn" : "")}
           style={provided.draggableProps.style}>
           <div className="column">
-            <div {...provided.dragHandleProps}>
-              <ColumnHeader col={col} add={addButton} />
+            <div>
+              <ColumnHeader col={col} add={addButton} locked={locked} handleProps={provided.dragHandleProps} />
             </div>
             <div className='column-internals-container'>
               {internals}
