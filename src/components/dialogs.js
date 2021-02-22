@@ -6,7 +6,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import * as core from '../reducer';
 import { globalSelectors as sel, selectors } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
-import { Description, DateTime, Duration } from '../kanban/attributes';
+import { AttributeEditingFields } from '../kanban/attributes';
 import { ReloadProtect, useEventListener, useFlag } from '../common';
 import { MarkdownBase } from './markdown-base';
 
@@ -120,9 +120,7 @@ export const CardEditDialog = ({ respond, card }) => {
         <InputLabel id="kanban/card-title" className="custom-label">Title</InputLabel>
         <TextField margin="dense" autoFocus fullWidth
           multiline rowsMax={6} value={newCard.content} onChange={e => setContent(e.target.value)} />
-        <Description.Edit card={newCard} setCard={setCard} />
-        <DateTime.Edit    card={newCard} setCard={setCard} />
-        <Duration.Edit    card={newCard} setCard={setCard} />
+        <AttributeEditingFields card={newCard} setCard={setCard} />
       </DialogContent>
       <DialogActions style={{ flexDirection: "row-reverse" }}>
         <Button onClick={editCard} color="primary" variant="contained">OK</Button>
