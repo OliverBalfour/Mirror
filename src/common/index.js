@@ -97,3 +97,11 @@ export function createReducer (initialState, actionMap) {
     }
   }
 }
+
+export function pushNotification (message) {
+  if (Notification.permission === 'granted') {
+    new Notification(message);
+    return true;
+  }
+  return false;
+}

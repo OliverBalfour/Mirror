@@ -13,6 +13,7 @@ import produce from 'immer';
 import { generateID, objectMap, deleteInList, createReducer, shallowEqual,
   structuredClone, deepMerge, encURI } from './common';
 import { EditSet, load, namespaceNames as c, hist, UNDO_LIMIT } from './backends';
+import { handleEventReminderForCard } from './kanban/utils';
 
 // Action creators
 
@@ -110,6 +111,12 @@ const validTabName = (name, state) => {
   return true;
 }
 
+// Called whenever a card/zettel's contents or attributes have changed (except timestamps)
+// After deletion card is null
+function eventCardChanged (id, card) {
+  handleEventReminderForCard(id, card);
+}
+
 // Use our version of createReducer that does not enable Immer by default
 // Note that these reducers are not pure, they commit changes to IndexedDB
 // and the GitHub Gist API. As the app cannot function without these features,
@@ -193,6 +200,7 @@ const reducer = createReducer(loadingState, {
       .add(c.cards, card)
       .edit(c.columns, ns.columns[colID], ps.columns[colID])
       .commit();
+    eventCardChanged(id, card);
     return ns;
   },
   [deleteColumn]: (ps, a) => {
@@ -235,6 +243,7 @@ const reducer = createReducer(loadingState, {
     new EditSet()
       .edit(c.cards, ns.cards[cardID], ps.cards[cardID])
       .commit();
+    eventCardChanged(cardID, ns.cards[cardID]);
     return ns;
   },
   [deleteCard]: (ps, a) => {
@@ -254,6 +263,7 @@ const reducer = createReducer(loadingState, {
       .delete(c.cards, cardID, ps.cards[cardID])
       .editAllByID(c.columns, ns.columns, colIDs, ps.columns)
       .commit();
+    eventCardChanged(cardID, null);
     return ns;
   },
   [addColumn]: (ps, a) => {
@@ -300,6 +310,7 @@ const reducer = createReducer(loadingState, {
         return set;
       })())
       .commit();
+    eventCardChanged(card.id, card);
     return ns;
   },
   [deleteTab]: (ps, a) => {
@@ -421,6 +432,7 @@ const reducer = createReducer(loadingState, {
     new EditSet()
       .add(c.cards, fullZettel)
       .commit();
+    eventCardChanged(id, zettel);
     return ns;
   },
   [editZettel]: (ps, a) => {
@@ -436,6 +448,7 @@ const reducer = createReducer(loadingState, {
     new EditSet()
       .edit(c.cards, zettel, ps.cards[zettel.id])
       .commit();
+    eventCardChanged(zettel.id, zettel);
     return ns;
   },
   [deleteZettel]: (ps, a) => {
@@ -448,6 +461,7 @@ const reducer = createReducer(loadingState, {
       .param(c.starredZettels, ns.starredZettels, ps.starredZettels)
       .delete(c.cards, cardID, ps.cards[cardID])
       .commit();
+    eventCardChanged(cardID, null);
     return ns;
   },
   [toggleZettelStarred]: (ps, a) => {
@@ -462,6 +476,7 @@ const reducer = createReducer(loadingState, {
     new EditSet()
       .param(c.starredZettels, ns.starredZettels, ps.starredZettels)
       .commit();
+    eventCardChanged(cardID, ns.cards[cardID]);
     return ns;
   },
   [sortColByTime]: (ps, a) => {

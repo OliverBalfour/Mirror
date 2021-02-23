@@ -46,6 +46,10 @@ export default ({ active, setActive }) => {
     "Clear saved state": () => window.prompt("Delete all saved state? Pressing undo will fix this. Type YES to confirm", "NO") === "YES" && window.deleteAllState(),
     "Import state": () => window.importIDBState(),
     "Export state": () => window.exportIDBState(),
+    "Enable notifications": () => Notification.requestPermission().then(permission => {
+      if (permission === "granted")
+        new Notification("You'll now see notifications about event deadlines here");
+    }),
     "Toggle light/dark theme": () => toggleTheme(),
   };
 
