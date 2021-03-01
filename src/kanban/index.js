@@ -19,8 +19,8 @@ export default ({ active }) => {
   useTitle(() => active && currentTab >= 0 && tabs[tabOrder[currentTab]].name + " | Mirror");
   if (currentTab >= 0) window.__lastCurrentTab = currentTab;
   if (currentTab < 0) currentTab = window.__lastCurrentTab || 0;
-  const [columnsLocked, _setColumnsLocked] = React.useState(!localStorage.columnsLocked);
-  const setColumnsLocked = x => { localStorage.columnsLocked = !x; _setColumnsLocked(x) }
+  const [columnsLocked, _setColumnsLocked] = React.useState(localStorage.columnsLocked === "false");
+  const setColumnsLocked = x => { localStorage.columnsLocked = JSON.stringify(!x); _setColumnsLocked(x) }
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const confirmRespond = res => {

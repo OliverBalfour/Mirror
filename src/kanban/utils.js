@@ -9,6 +9,8 @@ const intervals = [  // intervals before the event that reminders happen at
     [60 * minute, "1 hour"],
     [60 * minute * 6, "6 hours"],
 ];
+
+// BUG: this should be called when the initial state is loaded and synchronisestate is called too!!!
 export function handleEventReminderForCard (id, card) {
   if (id in handles) {
     for (const x of handles[id]) {
