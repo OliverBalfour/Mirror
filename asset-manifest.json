@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/Mirror/static/css/main.1076d2ec.chunk.css",
-    "main.js": "/Mirror/static/js/main.94694ee2.chunk.js",
-    "main.js.map": "/Mirror/static/js/main.94694ee2.chunk.js.map",
-    "runtime-main.js": "/Mirror/static/js/runtime-main.ddd12394.js",
-    "runtime-main.js.map": "/Mirror/static/js/runtime-main.ddd12394.js.map",
-    "static/js/2.b56b0c63.chunk.js": "/Mirror/static/js/2.b56b0c63.chunk.js",
-    "static/js/2.b56b0c63.chunk.js.map": "/Mirror/static/js/2.b56b0c63.chunk.js.map",
-    "static/js/3.66148016.chunk.js": "/Mirror/static/js/3.66148016.chunk.js",
-    "static/js/3.66148016.chunk.js.map": "/Mirror/static/js/3.66148016.chunk.js.map",
+    "main.js": "/Mirror/static/js/main.9aef338c.chunk.js",
+    "main.js.map": "/Mirror/static/js/main.9aef338c.chunk.js.map",
+    "runtime-main.js": "/Mirror/static/js/runtime-main.accbf8e1.js",
+    "runtime-main.js.map": "/Mirror/static/js/runtime-main.accbf8e1.js.map",
+    "static/js/2.353ddbc4.chunk.js": "/Mirror/static/js/2.353ddbc4.chunk.js",
+    "static/js/2.353ddbc4.chunk.js.map": "/Mirror/static/js/2.353ddbc4.chunk.js.map",
+    "static/js/3.591af26a.chunk.js": "/Mirror/static/js/3.591af26a.chunk.js",
+    "static/js/3.591af26a.chunk.js.map": "/Mirror/static/js/3.591af26a.chunk.js.map",
     "static/css/4.b96165a4.chunk.css": "/Mirror/static/css/4.b96165a4.chunk.css",
     "static/js/4.3ad6ea73.chunk.js": "/Mirror/static/js/4.3ad6ea73.chunk.js",
     "static/js/4.3ad6ea73.chunk.js.map": "/Mirror/static/js/4.3ad6ea73.chunk.js.map",
@@ -18,19 +18,19 @@
     "static/js/6.12b5bfcb.chunk.js": "/Mirror/static/js/6.12b5bfcb.chunk.js",
     "static/js/6.12b5bfcb.chunk.js.map": "/Mirror/static/js/6.12b5bfcb.chunk.js.map",
     "index.html": "/Mirror/index.html",
-    "precache-manifest.ad8177076d0c2826938cc954af26cafd.js": "/Mirror/precache-manifest.ad8177076d0c2826938cc954af26cafd.js",
+    "precache-manifest.1d62a4036eb1eb23993ec7d5467a04b0.js": "/Mirror/precache-manifest.1d62a4036eb1eb23993ec7d5467a04b0.js",
     "service-worker.js": "/Mirror/service-worker.js",
     "static/css/4.b96165a4.chunk.css.map": "/Mirror/static/css/4.b96165a4.chunk.css.map",
     "static/css/5.38199b72.chunk.css.map": "/Mirror/static/css/5.38199b72.chunk.css.map",
     "static/css/main.1076d2ec.chunk.css.map": "/Mirror/static/css/main.1076d2ec.chunk.css.map",
-    "static/js/2.b56b0c63.chunk.js.LICENSE.txt": "/Mirror/static/js/2.b56b0c63.chunk.js.LICENSE.txt",
-    "static/js/3.66148016.chunk.js.LICENSE.txt": "/Mirror/static/js/3.66148016.chunk.js.LICENSE.txt",
+    "static/js/2.353ddbc4.chunk.js.LICENSE.txt": "/Mirror/static/js/2.353ddbc4.chunk.js.LICENSE.txt",
+    "static/js/3.591af26a.chunk.js.LICENSE.txt": "/Mirror/static/js/3.591af26a.chunk.js.LICENSE.txt",
     "static/media/katex.min.css": "/Mirror/static/media/KaTeX_Typewriter-Regular.641339e2.woff2"
   },
   "entrypoints": [
-    "static/js/runtime-main.ddd12394.js",
-    "static/js/2.b56b0c63.chunk.js",
+    "static/js/runtime-main.accbf8e1.js",
+    "static/js/2.353ddbc4.chunk.js",
     "static/css/main.1076d2ec.chunk.css",
-    "static/js/main.94694ee2.chunk.js"
+    "static/js/main.9aef338c.chunk.js"
   ]
 }
