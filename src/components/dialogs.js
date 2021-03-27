@@ -93,6 +93,11 @@ export const CardEditDialog = ({ respond, card }) => {
     dispatch(core.deleteCard(card.id));
     done();
   }
+  const archive = () => {
+    dispatch(core.editCard({ card: newCard, colID }));
+    dispatch(core.deleteCard(card.id));
+    done();
+  }
   const editCard = () => {
     dispatch(core.editCard({ card: newCard, colID }));
     done();
@@ -126,6 +131,7 @@ export const CardEditDialog = ({ respond, card }) => {
         <Button onClick={editCard} color="primary" variant="contained">OK</Button>
         <div style={{ flexGrow: 1 }} />
         <Button onClick={done} color="primary">Cancel</Button>
+        <Button onClick={archive} color="primary">Archive</Button>
         <Button onClick={deleteCard}>Delete</Button>
       </DialogActions>
     </Dialog>

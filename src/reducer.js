@@ -28,6 +28,7 @@ export const addCard = createAction('kanban/ADD_CARD'); // takes { content, colI
 export const editCardContent = createAction('kanban/EDIT_CARD_CONTENT');//takes {content, cardID}
 export const editCard = createAction('kanban/EDIT_CARD'); // takes a card object; allows editing all of a card's params
 export const deleteCard = createAction('kanban/DELETE_CARD');//takes cardID
+export const archiveCard = createAction('kanban/ARCHIVE_CARD');//takes cardID
 
 export const moveCard = ([srcColID, dstColID, srcIndex, dstIndex]) =>
   srcColID === dstColID
@@ -413,6 +414,24 @@ const reducer = createReducer(loadingState, {
     });
     new EditSet()
       .editAllByID(c.cards, ns.cards, ps.columns[colID].items, ps.cards)
+      .edit(c.columns, ns.columns[colID], ps.columns[colID])
+      .commit();
+    return ns;
+  },
+  [archiveCard]: (ps, a) => {
+    // Archived cards are stored in IndexedDB and the Gist
+    const cardID = a.payload;
+    const epochms = new Date().getTime();
+    const colID = Object.keys(ps.columns).filter(colID => ps.columns[colID].items.includes(cardID))[0];
+    // Detach cards from column, edit cards
+    const ns = produce(ps, s => {
+        let card = s.cards[cardID];
+        card.moved = card.edited = card.archived = epochms;
+        card.archivedFromColID = colID;
+        s.columns[colID].items.splice(s.columns[colID].items.indexOf(cardID), 1);
+    });
+    new EditSet()
+      .edit(c.cards, ns.cards[cardID], ps.cards[cardID])
       .edit(c.columns, ns.columns[colID], ps.columns[colID])
       .commit();
     return ns;
